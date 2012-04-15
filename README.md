@@ -1,4 +1,4 @@
-#slideR
+#courseR
 
 An expierment in developing an efficient workflow with these goals:
 
