@@ -1,5 +1,4 @@
 ## TODO: depends
-#library(devtools); install_github('knitr', 'yihui')
 library(knitr)
 library(markdown)
 library(highlight)
@@ -57,14 +56,15 @@ makeSite <- function(html.template,
                 function(entry) {
                   
                   #use index.entry template to render the md representation of entries in this section
-                  sectionLines <- by(entry, entry$name,
+                  sectionLines <- by(entry, 1:length(entry$name),
                                      function(page) {
+                                       print(page$name)
                                        pageLink <- paste("<a href=", 
                                                          paste(splitExt(page$file), ".html", sep=""),
                                                          " class='", link.class,"'>",
                                                          page$name, 
                                                          "</a>", 
-                                                         sep="")                                       
+                                                         sep="")
                                        renderTemplate(
                                          template    = readLines(index.entry), 
                                          name        = pageLink,
