@@ -6,13 +6,18 @@ library(highlight)
 
 makeSite <- function(html.template, 
                      pages,
-                     page.css,
-                     page.js,
+                     css,
+                     js,
                      index,
                      index.section,
                      index.entry,
-                     index.css,
-                     index.js
+                     
+                     #Class and id attributes used in page template and main.js
+                     link.class     = 'courserLink',
+                     
+                     #post-processors finalize the html for pages
+                     postProcessor  = revealSlides
+                     
                      ) {
   
   #for each page, build the HTML resource
@@ -21,38 +26,45 @@ makeSite <- function(html.template,
     #The row containing information about this page from pages table
     page <- pages[i,]
     
+    #Calculate an html file name
+    htmlPath <- paste(splitExt(page$file), ".html", sep="")
+    
     #Start building this source
-    message("Building page for ", page$name)
+    message("------ Building page for ", page$name, " ------")
     
     #renderHTML from the rmd precursor
     renderHTML(sourcePath   = page$file,
                templatePath = html.template,
-               savePath     = paste(splitExt(page$file), ".html", sep=""),
-               css          = page.css,
-               js           = page.js,
+               savePath     = htmlPath,
+               css          = css,
+               js           = js,
                title        = page$name
                )
+    
+    #If there is a post-processor run it
+    if (!is.null(postProcessor)) {
+      
+      html <- readLines(htmlPath)
+      write(postProcessor(html), htmlPath)
+      
+    }
   
   }
   
   #Compile the index by sections
+  message("----- Building index.html -----")
   sections <- by(pages, pages$section,
                 function(entry) {
                   
                   #use index.entry template to render the md representation of entries in this section
                   sectionLines <- by(entry, entry$name,
                                      function(page) {
-                                       
-                                       #For some reason MD won't accept relative refs 
-                                       #(like "page.html") as a link, so we'll
-                                       #hard code it...
                                        pageLink <- paste("<a href=", 
                                                          paste(splitExt(page$file), ".html", sep=""),
-                                                         ">",
+                                                         " class='", link.class,"'>",
                                                          page$name, 
                                                          "</a>", 
-                                                         sep="")
-                                       
+                                                         sep="")                                       
                                        renderTemplate(
                                          template    = readLines(index.entry), 
                                          name        = pageLink,
@@ -60,7 +72,7 @@ makeSite <- function(html.template,
                                           )
                                      })
                   
-                  #use index.section ro render the md respresentation of this section
+                  #use index.section to render the md respresentation of this section
                   return(
                     renderTemplate(
                       template = readLines(index.section),
@@ -79,8 +91,8 @@ makeSite <- function(html.template,
   indexHTML <- renderTemplate(template  = readLines(html.template), 
                               title     = 'Table of contents',
                               content   = innerIndex,
-                              css       = index.css,
-                              js        = index.js
+                              css       = css,
+                              js        = js
                               )
   
   write(indexHTML, "index.html")
@@ -101,12 +113,22 @@ renderHTML <- function(sourcePath, templatePath,
   render_html()
   
   #Override knitr hooks to make things prettier
+  oldChunk <- knit_hooks$get('chunk')
+  
   knit_hooks$set(
     
     #Add code highlighting to source (the documentation makes it sound like this
     #should already be happening, but it isn't)
     source  = function(x, options) {
       sprintf("<div class=\"%s\">%s</div>", 'source', codeHighlight(x))
+    },
+    
+    #Fixes a bug that introduces a new line between images and </pre> tag which
+    #breaks markdown rendering.
+    chunk = function(x, options) {
+      txt <- oldChunk(x,options)
+      return (gsub("\n</pre>", "</pre>", txt, fixed = TRUE))
+      
     }
     
   )
@@ -155,7 +177,7 @@ renderHTML <- function(sourcePath, templatePath,
   
 }
 
-#Templating engine (uses handlebars to match replacements)
+#Templating engine (uses {{..}} to match replacements)
 renderTemplate <- function(template, ...,  rep = TRUE) {
   
   #Listify ... to get replacements
@@ -253,6 +275,63 @@ codeHighlight <- function(code) {
   
   #return the html
   return(prettyCode)
+  
+}
+
+#Postprocessors (for finalized html)
+revealSlides <- function(html) {
+  
+  #Get the index of lines that contain H1 elements
+  sectionStarts <- grep(pattern = "<[Hh]1>.*</[Hh]1>", x = html)
+  
+  #Find the line that ends the courser block (2 lines behind end of last section)
+  blockEnd <- grep("<!-- end of courser content -->", html)
+  
+  #Calculate the end indexes of all of the sections
+  if (length(sectionStarts) > 1) {
+    sectionEnds <- c(sectionStarts[2:length(sectionStarts)] - 1, blockEnd - 2)
+  } else {
+    sectionEnds <- blockEnd - 2
+  }
+  
+  #Prepend <section> to each start and re-inject into the html lines
+  html[sectionStarts] <- paste("<section>", html[sectionStarts], sep="")
+  
+  #Append </section> to each end section ending line
+  html[sectionEnds] <- paste(html[sectionEnds], "</section>", sep="")
+  
+  #Get the index of all subsection start lines
+  subsectionStarts <- grep(pattern = "<[Hh]2>.*</[Hh]2>", x = html)
+  
+  #Calculate possible subsection ends (if they end at another subsection)
+  if (length(subsectionStarts) > 1) {
+      possibleEnds = sort( c(sectionEnds,
+                           subsectionStarts[2:length(subsectionStarts)] - 1)
+                         )
+  } else {
+    possibleEnds = c(sectionEnds)
+  }
+  
+  #For each subsection
+  for (start in subsectionStarts) {
+    
+    #Prepend <section> at the start line
+    html[start] <- paste("<section>", html[start], sep="")
+    
+    #Find first possible end value that's bigger than the start
+    subsectionEnd <- possibleEnds[possibleEnds > start][1]
+    
+    #if subsectionEnd didn't happen at a valid id then this subsection is at the
+    #end of the document, so we'll have to slap another </section> there
+    if (is.na(subsectionEnd)) {
+      subsectionEnd <- blockEnd -2
+    }
+    
+    html[subsectionEnd] <- paste("</section>", html[subsectionEnd], sep="")
+    
+  }
+  
+  return(html)
   
 }
 
