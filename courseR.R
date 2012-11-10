@@ -2,6 +2,8 @@
 library(knitr)
 library(markdown)
 library(highlight)
+ 
+courserSources <- data.frame(sourceFile = character(0), md5 = character(0))
 
 makeSite <- function(html.template, 
                      pages,
@@ -58,7 +60,6 @@ makeSite <- function(html.template,
                   #use index.entry template to render the md representation of entries in this section
                   sectionLines <- by(entry, 1:length(entry$name),
                                      function(page) {
-                                       print(page$name)
                                        pageLink <- paste("<a href=", 
                                                          paste(splitExt(page$file), ".html", sep=""),
                                                          " class='", link.class,"'>",
@@ -87,7 +88,7 @@ makeSite <- function(html.template,
                             index    = sections)
   
   #Now compile the markdown to html, and save as index.html
-  innerIndex <- rawToChar(renderMarkdown(text = indexMD))
+  innerIndex <- renderMarkdown(text = indexMD)
   indexHTML <- renderTemplate(template  = readLines(html.template), 
                               title     = 'Table of contents',
                               content   = innerIndex,
@@ -140,7 +141,7 @@ renderHTML <- function(sourcePath, templatePath,
   
   #Setup knitr chunk options
   opts_chunk$set(
-    fig.width   = 5,
+    fig.width   = 8,
     fig.height  = 5,
     fig.path    = imagePath,
     comment     = "",         #Get rid of leading "##" on each line
@@ -153,7 +154,7 @@ renderHTML <- function(sourcePath, templatePath,
   
   #Use the markdown package to convert the md intermediate to HTML
   message("Running markdown... (", mdFile, ")")
-  contentHTML <- rawToChar(renderMarkdown(file = mdFile))
+  contentHTML <- renderMarkdown(file = mdFile)
   
   #Load template lines
   template <- readLines(templatePath)
