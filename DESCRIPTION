@@ -1,0 +1,9 @@
+Package: courseR
+Type: Package
+Title: Generate linked handout-style and presentation-style pages from literate knitr markdown source.
+Version: 0.1
+Date: 2013-05-04
+Author: Gregg Whitworth
+Maintainer: Gregg Whitworth
+Description: https://github.com/whitwort/courseR
+License: LGPLv3

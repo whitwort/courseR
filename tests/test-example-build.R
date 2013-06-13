@@ -1,0 +1,1 @@
+courseR.build("./inst/")
