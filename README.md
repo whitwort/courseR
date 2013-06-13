@@ -2,9 +2,9 @@
 
 An experiment in developing an efficient workflow with these goals:
 
-1.  Have a simple, easy to write and read source format (~markdown) that also supports literate programming with R
-2.  Generate very pretty, very portable presentation slides (targets frameworks like reveal.js or deck.js)
-3.  Also generate accompanying course materials (HTML), preferable from the same source
+1.  Have a simple, easy to write and read source format (RMD)
+2.  Generate course materials in HTML
+3.  Generate pretty, portable presentation slides from the same source
 
 
 ## License
