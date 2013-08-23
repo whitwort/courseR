@@ -1,0 +1,26 @@
+/* Minimal set of style updates to make printed pages look less aweful (but we*/
+/* don't want them to look too good; less documents compiled to trees = good) */
+
+@media screen {
+  .printOnly {
+    display: none;
+  }
+}
+
+@media print {
+
+  #courser-stuff {
+    border: 0px;
+    padding: 0px 0px 0px 0px;
+  }
+
+  #nav-buttons {
+    display: none;
+  }
+
+  .fadeyThing {
+    opacity: 0;
+  }
+
+
+}

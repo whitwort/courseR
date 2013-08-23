@@ -86,6 +86,7 @@ courseR.build <- function( projectPath  = getwd()
   # write each content pages
   lapply( names(content)
         , function(pageName) {
+            
             pageContent <- content[[pageName]]
           
             if (grepl('class="r output error"', pageContent, fixed = TRUE)) {
@@ -184,6 +185,7 @@ listFiles <- function(rootPath) {
 loadFiles <- function(rootPath) {
   
   files <- listFiles(rootPath)
+  
   mapply( preprocess
         , rootName(files)
         , text      = file.path(rootPath, files)
@@ -220,6 +222,7 @@ preprocess    <- function(text, type) {
   
   # If text is a file path
   if (file.exists(text)) {
+    opts_knit$set( unnamed.chunk.label = rootName(text) )
     preprocess( paste(readLines(text, warn = FALSE), collapse="\n")
               , tolower(file_ext(text))
               )

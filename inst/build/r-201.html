@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        
+        <title> r-201 </title>
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        
+          <link rel="stylesheet" href="css/main.css">
+                            <link rel="stylesheet" href="css/normalize.css">
+                            <link rel="stylesheet" href="css/page.css">
+                            <link rel="stylesheet" href="css/print.css">
+                            <link rel="stylesheet" href="css/tomorrow.css">
+                  
+        
+        <script src="js/modernizr-2.6.2.min.js"></script>
+    </head>
+    <body>
+        <!--[if lt IE 7]>
+            <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+        <![endif]-->
+
+        <div id = "courser-content" class = "pageView">
+        
+        <h1>R 201:</h1>
+
+<h3>Tables, filters and apply&#39;s, oh my!</h3>
+
+<p><img src="http://imgs.xkcd.com/comics/well_2.png" alt="well"/></p>
+
+<h1>RNA Transcribe Solutions</h1>
+
+<blockquote>
+<p>this is a really big block quote.</p>
+</blockquote>
+
+<h2>Yours&hellip;</h2>
+
+<h2>Mine:</h2>
+
+<pre><code class="r">transcribe &lt;- function(dnaFile, rnaFile) {
+
+  #Read the file
+  dna &lt;- readLines(dnaFile)
+
+  #Substitute U&#39;s for T&#39;s
+  rna &lt;- gsub(pattern     = &quot;T&quot;, 
+              replacement = &quot;U&quot;,
+              x           = dna, 
+              fixed       = TRUE
+             )
+
+  #Save the results
+  write(rna, rnaFile)
+
+}
+</code></pre>
+
+<p>Take a moment to see how I&#39;ve formatted the call to <code>sub</code>.  The formatting here is designed to make this function as easy to read as possible.  R doesn&#39;t care if your code is pretty or not; if it has correct syntax it will read it just fine (<a href="http://en.wikipedia.org/wiki/Lexical_analysis">lexical analysis</a>).  But if you write ugly code you and others will have trouble reading it in the future.  </p>
+
+<h2>An ugly version</h2>
+
+<p>This function is equivalent to the last one, but ugly.</p>
+
+<pre><code class="r">transcribe &lt;- function(f1,f2) {write(sub(&quot;T&quot;,&quot;U&quot;,readLines(f1),fixed=TRUE), f2)}
+</code></pre>
+
+<h2>To use it:</h2>
+
+<pre><code class="r">transcribe(&quot;dna.txt&quot;, &quot;rna.txt&quot;)
+</code></pre>
+
+<pre><code>Error: cannot open the connection
+</code></pre>
+
+<h1>So how would we tackle the translation problem?</h1>
+
+<h1>Time for a table</h1>
+
+<h2>It&#39;d be nice to be working with the genetic code in table format.</h2>
+
+<h2>Look at the contents of translationTable.txt</h2>
+
+<p>This is a &ldquo;tab-delimited&rdquo; file.</p>
+
+<p>You can make one in a text editor, Excel, Minitab, etc&hellip;</p>
+
+<h2>The read.* family of functions load tabular data into R</h2>
+
+<pre><code class="r">#Read a tab-delimited file
+translationTable &lt;- read.delim(&quot;translationTable.txt&quot;, stringsAsFactors = FALSE)
+</code></pre>
+
+<pre><code>Warning: cannot open file &#39;translationTable.txt&#39;: No such file or
+directory
+</code></pre>
+
+<pre><code>Error: cannot open the connection
+</code></pre>
+
+<p>What&#39;s up with the <code>stringsAsFactors = FALSE</code> part?  Factors are a more advanced topic, so we&#39;re not going to get into them today (but we <em>will</em>).  Try ommiting this argument to <code>read.delim</code> and see what happens when you run through the exercises below.  It&#39;s close to the same result.</p>
+
+<h2>If you have comma-separated file</h2>
+
+<pre><code class="r">myTable &lt;- read.csv(&quot;myTable.csv&quot;)
+</code></pre>
+
+<h2>If you need finer control over how the table is loaded</h2>
+
+<pre><code class="r">?read.table
+</code></pre>
+
+<h1>Tables</h1>
+
+<h2>It&#39;s not a number, it&#39;s not a string&hellip;</h2>
+
+<pre><code class="r">#Class tells you what kind of data a variable holds
+
+#So far we&#39;ve seen
+class(&quot;hello&quot;)
+</code></pre>
+
+<pre><code>[1] &quot;character&quot;
+</code></pre>
+
+<pre><code class="r">class(100)
+</code></pre>
+
+<pre><code>[1] &quot;numeric&quot;
+</code></pre>
+
+<pre><code class="r">
+#We&#39;ve also used TRUE as an argument for a function...
+class(TRUE)
+</code></pre>
+
+<pre><code>[1] &quot;logical&quot;
+</code></pre>
+
+<pre><code class="r">
+#The other logical value is FALSE
+class(FALSE)
+</code></pre>
+
+<pre><code>[1] &quot;logical&quot;
+</code></pre>
+
+<pre><code class="r">
+#So what&#39;s our translationTable?
+class(translationTable)
+</code></pre>
+
+<pre><code>Error: object &#39;translationTable&#39; not found
+</code></pre>
+
+<h2>The R terminology for a table is a &ldquo;data.frame&rdquo;</h2>
+
+<p>How does the structure of translationTable related to our original file?</p>
+
+<table><thead>
+<tr>
+<th>row.names</th>
+<th>aminoacid</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>GCU</td>
+<td>A</td>
+</tr>
+<tr>
+<td>GCC</td>
+<td>A</td>
+</tr>
+<tr>
+<td>GCA</td>
+<td>A</td>
+</tr>
+</tbody></table>
+
+<p>The relationship between the column headings in a data.frame the the original file can be a bit tricky to understand when you first start working with tables in R.</p>
+
+<h2>Two flavors of data.frame (depending on your data)</h2>
+
+<ul>
+<li>Unique values in the 1st column (row.names)</li>
+<li>Non-unique values in the 1st column (no row.names)</li>
+</ul>
+
+<p>When you use one of the simple read.* functions, R will try to figure out whether or not it can treat the values in the left-most column as unique.  If it can, it will make a <code>data.frame</code> with a <code>row.names</code> column on the left side of the table.  In this case, you want the heading line of your file to have one <em>fewer</em> labels than you have columns.  See how I did this in translationTable.txt?</p>
+
+<p>If your left most column does <strong>not</strong> contain unique values, R will add a new left-hand column that just contains numbers (1..n where n is the number of rows you have).  You&#39;ll see why we want to have some kind of unique label for each row in our <code>data.frame</code> objects in a moment.</p>
+
+<h1>Sidebar:  Extract &amp; Replace</h1>
+
+<p>Remember how we mentioned that the fundamental data type in R is the vector and then I promised that this would be both hard for you to wrap your heads around at first, but also extremely powerful?  Well, prepare to have your minds blown because we&#39;re about to see our first real <code>vectorized</code> operations in R!</p>
+
+<h2>Let&#39;s say we have a vector of numbers:</h2>
+
+<pre><code class="r">myNumbers &lt;- c(10,20,30,40,50)
+</code></pre>
+
+<p>Here&#39;s how we can <code>extract</code> a subset of vector:</p>
+
+<pre><code class="r">myNumbers
+</code></pre>
+
+<pre><code>[1] 10 20 30 40 50
+</code></pre>
+
+<pre><code class="r">myNumbers[1]
+</code></pre>
+
+<pre><code>[1] 10
+</code></pre>
+
+<pre><code class="r">myNumbers[3]
+</code></pre>
+
+<pre><code>[1] 30
+</code></pre>
+
+<h2>What if we want more than one at once?</h2>
+
+<pre><code class="r">myNumbers
+</code></pre>
+
+<pre><code>[1] 10 20 30 40 50
+</code></pre>
+
+<pre><code class="r">myNumbers[c(1,3)]
+</code></pre>
+
+<pre><code>[1] 10 30
+</code></pre>
+
+<p>What happened there?</p>
+
+<h2>How can we extract a range of numbers?</h2>
+
+<pre><code class="r"># The : operator creates a series of numbers
+1:5
+</code></pre>
+
+<pre><code>[1] 1 2 3 4 5
+</code></pre>
+
+<pre><code class="r">2:10
+</code></pre>
+
+<pre><code>[1]  2  3  4  5  6  7  8  9 10
+</code></pre>
+
+<pre><code class="r">
+# We can use this inside of our [...]
+myNumbers
+</code></pre>
+
+<pre><code>[1] 10 20 30 40 50
+</code></pre>
+
+<pre><code class="r">myNumbers[2:3]
+</code></pre>
+
+<pre><code>[1] 20 30
+</code></pre>
+
+<h2>We can also use logical vectors</h2>
+
+<p>TRUE = keep it
+FALSE = don&#39;t</p>
+
+<pre><code class="r">myNumbers
+</code></pre>
+
+<pre><code>[1] 10 20 30 40 50
+</code></pre>
+
+<pre><code class="r">myNumbers[c(FALSE,TRUE,TRUE,TRUE,TRUE)]
+</code></pre>
+
+<pre><code>[1] 20 30 40 50
+</code></pre>
+
+<pre><code class="r">myNumbers[c(TRUE,FALSE,FALSE,FALSE,FALSE)]
+</code></pre>
+
+<pre><code>[1] 10
+</code></pre>
+
+<h2>Now things get interesting!</h2>
+
+<pre><code class="r">myNumbers
+</code></pre>
+
+<pre><code>[1] 10 20 30 40 50
+</code></pre>
+
+<pre><code class="r">myNumbers[TRUE]
+</code></pre>
+
+<pre><code>[1] 10 20 30 40 50
+</code></pre>
+
+<pre><code class="r">myNumbers[c(TRUE,FALSE)]
+</code></pre>
+
+<pre><code>[1] 10 30 50
+</code></pre>
+
+<h2>All operations in R are vectorized&hellip;</h2>
+
+<p>Yesterday we saw that the <code>+</code> works on vectors. </p>
+
+<p>Others basic math operators:</p>
+
+<pre><code class="r">myNumbers
+</code></pre>
+
+<pre><code>[1] 10 20 30 40 50
+</code></pre>
+
+<pre><code class="r">myNumbers + 5
+</code></pre>
+
+<pre><code>[1] 15 25 35 45 55
+</code></pre>
+
+<pre><code class="r">myNumbers - 5
+</code></pre>
+
+<pre><code>[1]  5 15 25 35 45
+</code></pre>
+
+<pre><code class="r">myNumbers * c(10,0)
+</code></pre>
+
+<pre><code>[1] 100   0 300   0 500
+</code></pre>
+
+<pre><code class="r">myNumbers / 0.1
+</code></pre>
+
+<pre><code>[1] 100 200 300 400 500
+</code></pre>
+
+<h2>&hellip;including comparison!</h2>
+
+<pre><code class="r">myNumbers
+</code></pre>
+
+<pre><code>[1] 10 20 30 40 50
+</code></pre>
+
+<pre><code class="r">myNumbers &gt; 25
+</code></pre>
+
+<pre><code>[1] FALSE FALSE  TRUE  TRUE  TRUE
+</code></pre>
+
+<pre><code class="r">myNumbers &lt; 25
+</code></pre>
+
+<pre><code>[1]  TRUE  TRUE FALSE FALSE FALSE
+</code></pre>
+
+<pre><code class="r">
+#Equality comparison uses == instead of =
+myNumbers == 30
+</code></pre>
+
+<pre><code>[1] FALSE FALSE  TRUE FALSE FALSE
+</code></pre>
+
+<pre><code class="r">
+# The `!` operator negates logical vectors (&quot;not&quot;)
+myNumbers != 30
+</code></pre>
+
+<pre><code>[1]  TRUE  TRUE FALSE  TRUE  TRUE
+</code></pre>
+
+<pre><code class="r">!(myNumbers &gt; 25)
+</code></pre>
+
+<pre><code>[1]  TRUE  TRUE FALSE FALSE FALSE
+</code></pre>
+
+<p>To compare equality we use the <code>==</code> operator.  This is to prevent confusion with the <code>=</code> which is used to pass arguments to functions (or do assignment like <code>&lt;-</code>).  This will probably trip you up at first, but you&#39;ll get used to it.  See what happens if you run <code>myNumbers = 30</code>.</p>
+
+<h2>So what does it all mean?</h2>
+
+<p>We can use our extraction operators <code>[</code> <code>]</code> to filter data in our vectors.</p>
+
+<p>This is a very common idiom in R:</p>
+
+<pre><code class="r">myNumbers
+</code></pre>
+
+<pre><code>[1] 10 20 30 40 50
+</code></pre>
+
+<pre><code class="r">myNumbers[myNumbers &gt; 25]
+</code></pre>
+
+<pre><code>[1] 30 40 50
+</code></pre>
+
+<pre><code class="r">myNumbers[myNumbers &lt; 25]
+</code></pre>
+
+<pre><code>[1] 10 20
+</code></pre>
+
+<h2>You can get fancy&hellip;</h2>
+
+<p>Explore the parts of this code, then explain what it does:</p>
+
+<pre><code class="r">myNumbers[ (myNumbers %% 4) == 0 ]
+</code></pre>
+
+<pre><code>[1] 20 40
+</code></pre>
+
+<h2>You can use [] to replace data too!</h2>
+
+<pre><code class="r">myNumbers
+</code></pre>
+
+<pre><code>[1] 10 20 30 40 50
+</code></pre>
+
+<pre><code class="r">myNumbers[3] &lt;- 100
+myNumbers
+</code></pre>
+
+<pre><code>[1]  10  20 100  40  50
+</code></pre>
+
+<pre><code class="r">myNumbers[2:3] &lt;- c(1,2)
+myNumbers
+</code></pre>
+
+<pre><code>[1] 10  1  2 40 50
+</code></pre>
+
+<h1>Back to our table</h1>
+
+<h2>The [] operators work with data.frames as well</h2>
+
+<pre><code class="r"># You can subset tables on a column: table[col]
+## translationTable[1]
+
+# You can subset tables on both a row and a column
+translationTable[3,1]
+</code></pre>
+
+<pre><code>Error: object &#39;translationTable&#39; not found
+</code></pre>
+
+<pre><code class="r">
+#If you leave out the column, but keep the , you&#39;ll get all columns
+translationTable[3,]
+</code></pre>
+
+<pre><code>Error: object &#39;translationTable&#39; not found
+</code></pre>
+
+<h2>You can use text to refer to columns or rows by name</h2>
+
+<p>Only works for rows if your <code>data.frame</code> has unique <code>row.name</code>&#39;s</p>
+
+<pre><code class="r">translationTable[&quot;GUC&quot;,&quot;aminoacid&quot;]
+</code></pre>
+
+<pre><code>Error: object &#39;translationTable&#39; not found
+</code></pre>
+
+<pre><code class="r">translationTable[&quot;GUC&quot;,]
+</code></pre>
+
+<pre><code>Error: object &#39;translationTable&#39; not found
+</code></pre>
+
+<pre><code class="r">
+#Oh hey!  Remember vectors?
+translationTable[c(&quot;GUA&quot;,&quot;UAG&quot;),]
+</code></pre>
+
+<pre><code>Error: object &#39;translationTable&#39; not found
+</code></pre>
+
+<pre><code class="r">
+#... and logicals?
+translationTable[c(TRUE,FALSE),]
+</code></pre>
+
+<pre><code>Error: object &#39;translationTable&#39; not found
+</code></pre>
+
+<h2>A couple other tricks&hellip;</h2>
+
+<pre><code class="r">#If your table has row names, you can get a vector of them with:
+row.names(translationTable)
+</code></pre>
+
+<pre><code>Error: object &#39;translationTable&#39; not found
+</code></pre>
+
+<pre><code class="r">
+#The $ is a short hand notation for selecting a column of data from a table
+translationTable$aminoacid
+</code></pre>
+
+<pre><code>Error: object &#39;translationTable&#39; not found
+</code></pre>
+
+<h2>Your turn #1</h2>
+
+<p>Subset the table to return a vector of all of the codons which encode valine
+&ldquo;V&rdquo;</p>
+
+<h2>Your turn #2</h2>
+
+<p>Write a function that takes a RNA codon and returns the amino acid.</p>
+
+<pre><code class="r">translateRNA &lt;- function(codon) {
+
+  #Insert your code here
+
+}
+</code></pre>
+
+<p>Make sure it works:</p>
+
+<pre><code class="r">translateRNA(&quot;UAU&quot;)
+</code></pre>
+
+<pre><code>Error: object &#39;translationTable&#39; not found
+</code></pre>
+
+<p>How might this function be useful in a script designed to translate dna.txt?</p>
+
+<p>For a full reference on extraction and replacement operators in R, you can search for &ldquo;[&rdquo; in the Rstudio search box, or run <code>help(&quot;[&quot;)</code> at the prompt.</p>
+
+<h1>Subsetting strings</h1>
+
+<h2>We&#39;re getting close!</h2>
+
+<p>We can translate codons&hellip;</p>
+
+<pre><code class="r">translateRNA(&quot;UGG&quot;)
+</code></pre>
+
+<pre><code>Error: object &#39;translationTable&#39; not found
+</code></pre>
+
+<p>&hellip;but we need to be able to read a string of letters in sets of 3.</p>
+
+<pre><code class="r">sampleRNA &lt;- &quot;GTAGCTGGCAAGTTAATAGAGATGGAAAAC&quot;
+</code></pre>
+
+<h2>Side bar: length of a string</h2>
+
+<p>Figuring out the number of characters in a piece of text is a little funny&hellip;</p>
+
+<pre><code class="r">sampleRNA
+</code></pre>
+
+<pre><code>[1] &quot;GTAGCTGGCAAGTTAATAGAGATGGAAAAC&quot;
+</code></pre>
+
+<pre><code class="r">length(sampleRNA)
+</code></pre>
+
+<pre><code>[1] 1
+</code></pre>
+
+<pre><code class="r">length(c(&quot;A&quot;,&quot;B&quot;))
+</code></pre>
+
+<pre><code>[1] 2
+</code></pre>
+
+<pre><code class="r">
+#Number of characters in a string
+nchar(sampleRNA)
+</code></pre>
+
+<pre><code>[1] 30
+</code></pre>
+
+<pre><code class="r">nchar(c(&quot;A&quot;,&quot;B&quot;))
+</code></pre>
+
+<pre><code>[1] 1 1
+</code></pre>
+
+<p>What happened there?</p>
+
+<h2>Side bar: subsetting a string</h2>
+
+<p>Similarly, subsetting a string vector is a little funny&hellip;</p>
+
+<pre><code class="r">sampleRNA
+</code></pre>
+
+<pre><code>[1] &quot;GTAGCTGGCAAGTTAATAGAGATGGAAAAC&quot;
+</code></pre>
+
+<pre><code class="r">sampleRNA[1]
+</code></pre>
+
+<pre><code>[1] &quot;GTAGCTGGCAAGTTAATAGAGATGGAAAAC&quot;
+</code></pre>
+
+<pre><code class="r">c(&quot;A&quot;,&quot;B&quot;)[1]
+</code></pre>
+
+<pre><code>[1] &quot;A&quot;
+</code></pre>
+
+<pre><code class="r">sampleRNA[1:2]
+</code></pre>
+
+<pre><code>[1] &quot;GTAGCTGGCAAGTTAATAGAGATGGAAAAC&quot; NA                              
+</code></pre>
+
+<pre><code class="r">c(&quot;A&quot;,&quot;B&quot;)[1:2]
+</code></pre>
+
+<pre><code>[1] &quot;A&quot; &quot;B&quot;
+</code></pre>
+
+<pre><code class="r">
+# Use substr to pull characters out of a string
+substr(sampleRNA, start = 1, stop = 3)
+</code></pre>
+
+<pre><code>[1] &quot;GTA&quot;
+</code></pre>
+
+<pre><code class="r">substr(c(&quot;ABCD&quot;,&quot;EFGH&quot;), start = 1, stop = 3)
+</code></pre>
+
+<pre><code>[1] &quot;ABC&quot; &quot;EFG&quot;
+</code></pre>
+
+<h2>Subsetting some codons</h2>
+
+<p>Our first codon is&hellip;</p>
+
+<pre><code class="r">substr(sampleRNA, start = 1, stop = 3)
+</code></pre>
+
+<pre><code>[1] &quot;GTA&quot;
+</code></pre>
+
+<p>Our second codon is&hellip;</p>
+
+<pre><code class="r">substr(sampleRNA, start = 4, stop = 6)
+</code></pre>
+
+<pre><code>[1] &quot;GCT&quot;
+</code></pre>
+
+<p>Our third codon is&hellip;</p>
+
+<pre><code class="r">substr(sampleRNA, start = 7, stop = 9)
+</code></pre>
+
+<pre><code>[1] &quot;GGC&quot;
+</code></pre>
+
+<h2>Seeing the pattern</h2>
+
+<p>Our n&#39;th codon is&hellip;</p>
+
+<pre><code class="r">n &lt;- 4
+substr(sampleRNA, start = (n * 3) - 2, stop = n * 3)
+</code></pre>
+
+<pre><code>[1] &quot;AAG&quot;
+</code></pre>
+
+<p>Our last codon is&hellip;</p>
+
+<pre><code class="r">substr(sampleRNA, start = nchar(sampleRNA) - 2, stop = nchar(sampleRNA))
+</code></pre>
+
+<pre><code>[1] &quot;AAC&quot;
+</code></pre>
+
+<h2>Your turn #3</h2>
+
+<p>Write a function that takes a codon number <code>n</code> and returns the sequence</p>
+
+<pre><code class="r">getCodon &lt;- function(n) {
+
+  #Insert your code here
+
+}
+</code></pre>
+
+<p>Make sure it works:</p>
+
+<pre><code class="r">getCodon(5)
+</code></pre>
+
+<pre><code>[1] &quot;TTA&quot;
+</code></pre>
+
+<h2>Almost there..</h2>
+
+<p>That&#39;s great, but now we need to generate a series of codon numbers (1..n)</p>
+
+<p>We&#39;ve seen the parts that let us do this!</p>
+
+<pre><code class="r">codonNumbers &lt;- 1:( nchar(sampleRNA) / 3)
+codonNumbers
+</code></pre>
+
+<pre><code> [1]  1  2  3  4  5  6  7  8  9 10
+</code></pre>
+
+<h1>Apply Magic</h1>
+
+<p>The last piece in the puzzle is applying our <code>getCodon</code> to our <code>codonNumbers</code></p>
+
+<p>The *apply family of functions in R is:</p>
+
+<ul>
+<li>very powerful</li>
+<li>a little overwhelming at first</li>
+</ul>
+
+<h2>sapply</h2>
+
+<p>For this task we&#39;ll use <strong>s</strong>apply.  We&#39;ll look at the other apply&#39;s later.</p>
+
+<p>Let&#39;s see it in action:</p>
+
+<pre><code class="r">sapply(codonNumbers, FUN = getCodon)
+</code></pre>
+
+<pre><code> [1] &quot;GTA&quot; &quot;GCT&quot; &quot;GGC&quot; &quot;AAG&quot; &quot;TTA&quot; &quot;ATA&quot; &quot;GAG&quot; &quot;ATG&quot; &quot;GAA&quot; &quot;AAC&quot;
+</code></pre>
+
+<p>What happened there?</p>
+
+<h1>Task #1</h1>
+
+<h2>Put it all together!</h2>
+
+<p>I&#39;ve given you all of the pieces we need to write a translator.
+Now you have to play with them and put it all together.</p>
+
+<h2>The outline of your final function should look like</h2>
+
+<pre><code class="r">translate &lt;- function(dnaFile) {
+
+  #Do stuff here!
+
+}
+</code></pre>
+
+<h1>Challenge #1</h1>
+
+<p>Translate all 6 possible open reading frames</p>
+
+<h1>Challenge #2</h1>
+
+<p>Find the open reading frame that is most likely the real one!</p>
+
+        
+        </div>
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="js/jquery-1.9.1.min.js"><\/script>')</script>
+        
+          <script src="js/highlight-7.3.min.js"></script>
+                            <script src="js/main.js"></script>
+                            <script src="js/plugins.js"></script>
+                  
+
+    </body>
+</html>

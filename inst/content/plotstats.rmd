@@ -1,0 +1,134 @@
+# Introduction to simple plots and basic statistics in R
+
+# A sample dataset
+
+## Let's use `data.frame` to build a simple table of data to work with.
+
+Usually you'd be loading data from an external file, but we'll use this example to demonstrate the `rep` function:
+
+``` {r}
+rep(c("a","b"), times = 3)
+rep(c("a","b"), each = 2)
+rep(c("a","b"), times = 3, each = 3)
+````
+
+## Clotting time dataset 
+
+We'll have 12 observations, the first 6 with "drug1" the second 6 with "drug2"
+
+``` {r}
+clotData <- data.frame(
+                drugType = rep( c("drug1", "drug2"), each = 6 ),
+                clotTime = c( 8.8, 8.4, 7.9, 8.7, 9.1, 9.6, 9.9, 9.0, 11.1, 
+                              9.6, 8.7, 10.4)
+              )
+
+clotData
+````
+
+# Summary statistics
+
+## General summary
+
+The `summary` function provides a simple way to get a standard set statistics:
+
+``` {r}
+summary(clotData)
+````
+
+## Summary by factor
+
+What if we wanted individual summaries of the data for each drug type?
+
+``` {r}
+by(clotData, INDICES = clotData$drugType, FUN = summary)
+````
+
+What happened there?
+
+## Aggregate by a factor
+
+How can we make a new table with just average clot times for each drug?
+
+``` {r}
+aggregate(clotData$clotTime, 
+          by  = list(Drug=clotData$drugType), 
+          FUN = mean)
+````
+
+What happened there?
+
+# Simple plots
+
+## The plot function is magic!
+
+``` {r}
+plot(clotData)
+````
+
+This is a [box plot](http://en.wikipedia.org/wiki/Box_plot).
+
+## Simple x,y plot
+
+``` {r}
+plot(c(1,2,3,4), c(2,3,4,5))
+````
+
+## Simple f(x) plot
+
+``` {r}
+plot( function(x) { x * 4} )
+````
+
+## Simple f(x) plot
+
+``` {r}
+plot( function(x) { x ^ 2} )
+````
+
+## Let's plot a normal distribution in blue
+
+``` {r}
+x <- seq(-4, 4, length = 200)
+y <- dnorm(x, mean = 0, sd = 1)
+plot( x, y, col = "blue")
+````
+
+## Two plots on one graph
+``` {r}
+x <- seq(-4, 4, length = 200)
+y1 <- dnorm(x, mean = 0, sd = 1)
+y2 <- dnorm(x, mean = 1, sd = 1)
+plot( x, y1, type = "l", col = "blue" )
+lines( x, y2, col = "red" )
+````
+
+# A simple t-test
+
+## Let's look at those box plots again:
+
+``` {r}
+plot(clotData)
+````
+
+Are the sample means different?
+
+## The t-test {stats}
+
+``` {r}
+help(t.test)
+help.search("t.test")
+````
+
+## The formula expression
+
+``` {r}
+library(stats)
+t.test(clotData$clotTime ~ clotData$drugType)
+````
+
+## The data.frame short cut
+
+``` {r}
+t.test(clotTime ~ drugType, data = clotdata)
+````

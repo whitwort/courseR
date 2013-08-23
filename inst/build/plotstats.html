@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        
+        <title> plotstats </title>
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        
+          <link rel="stylesheet" href="css/main.css">
+                            <link rel="stylesheet" href="css/normalize.css">
+                            <link rel="stylesheet" href="css/page.css">
+                            <link rel="stylesheet" href="css/print.css">
+                            <link rel="stylesheet" href="css/tomorrow.css">
+                  
+        
+        <script src="js/modernizr-2.6.2.min.js"></script>
+    </head>
+    <body>
+        <!--[if lt IE 7]>
+            <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+        <![endif]-->
+
+        <div id = "courser-content" class = "pageView">
+        
+        <h1>Introduction to simple plots and basic statistics in R</h1>
+
+<h1>A sample dataset</h1>
+
+<h2>Let&#39;s use <code>data.frame</code> to build a simple table of data to work with.</h2>
+
+<p>Usually you&#39;d be loading data from an external file, but we&#39;ll use this example to demonstrate the <code>rep</code> function:</p>
+
+<pre><code class="r">rep(c(&quot;a&quot;,&quot;b&quot;), times = 3)
+</code></pre>
+
+<pre><code>[1] &quot;a&quot; &quot;b&quot; &quot;a&quot; &quot;b&quot; &quot;a&quot; &quot;b&quot;
+</code></pre>
+
+<pre><code class="r">rep(c(&quot;a&quot;,&quot;b&quot;), each = 2)
+</code></pre>
+
+<pre><code>[1] &quot;a&quot; &quot;a&quot; &quot;b&quot; &quot;b&quot;
+</code></pre>
+
+<pre><code class="r">rep(c(&quot;a&quot;,&quot;b&quot;), times = 3, each = 3)
+</code></pre>
+
+<pre><code> [1] &quot;a&quot; &quot;a&quot; &quot;a&quot; &quot;b&quot; &quot;b&quot; &quot;b&quot; &quot;a&quot; &quot;a&quot; &quot;a&quot; &quot;b&quot; &quot;b&quot; &quot;b&quot; &quot;a&quot; &quot;a&quot; &quot;a&quot; &quot;b&quot; &quot;b&quot;
+[18] &quot;b&quot;
+</code></pre>
+
+<h2>Clotting time dataset</h2>
+
+<p>We&#39;ll have 12 observations, the first 6 with &ldquo;drug1&rdquo; the second 6 with &ldquo;drug2&rdquo;</p>
+
+<pre><code class="r">clotData &lt;- data.frame(
+                drugType = rep( c(&quot;drug1&quot;, &quot;drug2&quot;), each = 6 ),
+                clotTime = c( 8.8, 8.4, 7.9, 8.7, 9.1, 9.6, 9.9, 9.0, 11.1, 
+                              9.6, 8.7, 10.4)
+              )
+
+clotData
+</code></pre>
+
+<pre><code>   drugType clotTime
+1     drug1      8.8
+2     drug1      8.4
+3     drug1      7.9
+4     drug1      8.7
+5     drug1      9.1
+6     drug1      9.6
+7     drug2      9.9
+8     drug2      9.0
+9     drug2     11.1
+10    drug2      9.6
+11    drug2      8.7
+12    drug2     10.4
+</code></pre>
+
+<h1>Summary statistics</h1>
+
+<h2>General summary</h2>
+
+<p>The <code>summary</code> function provides a simple way to get a standard set statistics:</p>
+
+<pre><code class="r">summary(clotData)
+</code></pre>
+
+<pre><code>  drugType    clotTime    
+ drug1:6   Min.   : 7.90  
+ drug2:6   1st Qu.: 8.70  
+           Median : 9.05  
+           Mean   : 9.27  
+           3rd Qu.: 9.68  
+           Max.   :11.10  
+</code></pre>
+
+<h2>Summary by factor</h2>
+
+<p>What if we wanted individual summaries of the data for each drug type?</p>
+
+<pre><code class="r">by(clotData, INDICES = clotData$drugType, FUN = summary)
+</code></pre>
+
+<pre><code>clotData$drugType: drug1
+  drugType    clotTime   
+ drug1:6   Min.   :7.90  
+ drug2:0   1st Qu.:8.47  
+           Median :8.75  
+           Mean   :8.75  
+           3rd Qu.:9.03  
+           Max.   :9.60  
+-------------------------------------------------------- 
+clotData$drugType: drug2
+  drugType    clotTime    
+ drug1:0   Min.   : 8.70  
+ drug2:6   1st Qu.: 9.15  
+           Median : 9.75  
+           Mean   : 9.78  
+           3rd Qu.:10.28  
+           Max.   :11.10  
+</code></pre>
+
+<p>What happened there?</p>
+
+<h2>Aggregate by a factor</h2>
+
+<p>How can we make a new table with just average clot times for each drug?</p>
+
+<pre><code class="r">aggregate(clotData$clotTime, 
+          by  = list(Drug=clotData$drugType), 
+          FUN = mean)
+</code></pre>
+
+<pre><code>   Drug     x
+1 drug1 8.750
+2 drug2 9.783
+</code></pre>
+
+<p>What happened there?</p>
+
+<h1>Simple plots</h1>
+
+<h2>The plot function is magic!</h2>
+
+<pre><code class="r">plot(clotData)
+</code></pre>
+
+<p><img src="img/unnamed-chunk-6.png" alt="plot of chunk unnamed-chunk-6"/> </p>
+
+<p>This is a <a href="http://en.wikipedia.org/wiki/Box_plot">box plot</a>.</p>
+
+<h2>Simple x,y plot</h2>
+
+<pre><code class="r">plot(c(1,2,3,4), c(2,3,4,5))
+</code></pre>
+
+<p><img src="img/unnamed-chunk-7.png" alt="plot of chunk unnamed-chunk-7"/> </p>
+
+<h2>Simple f(x) plot</h2>
+
+<pre><code class="r">plot( function(x) { x * 4} )
+</code></pre>
+
+<p><img src="img/unnamed-chunk-8.png" alt="plot of chunk unnamed-chunk-8"/> </p>
+
+<h2>Simple f(x) plot</h2>
+
+<pre><code class="r">plot( function(x) { x ^ 2} )
+</code></pre>
+
+<p><img src="img/unnamed-chunk-9.png" alt="plot of chunk unnamed-chunk-9"/> </p>
+
+<h2>Let&#39;s plot a normal distribution in blue</h2>
+
+<pre><code class="r">x &lt;- seq(-4, 4, length = 200)
+y &lt;- dnorm(x, mean = 0, sd = 1)
+plot( x, y, col = &quot;blue&quot;)
+</code></pre>
+
+<p><img src="img/unnamed-chunk-10.png" alt="plot of chunk unnamed-chunk-10"/> </p>
+
+<h2>Two plots on one graph</h2>
+
+<pre><code class="r">x &lt;- seq(-4, 4, length = 200)
+y1 &lt;- dnorm(x, mean = 0, sd = 1)
+y2 &lt;- dnorm(x, mean = 1, sd = 1)
+plot( x, y1, type = &quot;l&quot;, col = &quot;blue&quot; )
+lines( x, y2, col = &quot;red&quot; )
+</code></pre>
+
+<p><img src="img/unnamed-chunk-11.png" alt="plot of chunk unnamed-chunk-11"/> </p>
+
+<h1>A simple t-test</h1>
+
+<h2>Let&#39;s look at those box plots again:</h2>
+
+<pre><code class="r">plot(clotData)
+</code></pre>
+
+<p><img src="img/unnamed-chunk-12.png" alt="plot of chunk unnamed-chunk-12"/> </p>
+
+<p>Are the sample means different?</p>
+
+<h2>The t-test {stats}</h2>
+
+<pre><code class="r">help(t.test)
+help.search(&quot;t.test&quot;)
+</code></pre>
+
+<h2>The formula expression</h2>
+
+<pre><code class="r">library(stats)
+t.test(clotData$clotTime ~ clotData$drugType)
+</code></pre>
+
+<pre><code>
+    Welch Two Sample t-test
+
+data:  clotData$clotTime by clotData$drugType
+t = -2.382, df = 8.625, p-value = 0.04221
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -2.02101 -0.04565
+sample estimates:
+mean in group drug1 mean in group drug2 
+              8.750               9.783 
+</code></pre>
+
+<h2>The data.frame short cut</h2>
+
+<pre><code class="r">t.test(clotTime ~ drugType, data = clotdata)
+</code></pre>
+
+<pre><code>Error: object &#39;clotdata&#39; not found
+</code></pre>
+
+        
+        </div>
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="js/jquery-1.9.1.min.js"><\/script>')</script>
+        
+          <script src="js/highlight-7.3.min.js"></script>
+                            <script src="js/main.js"></script>
+                            <script src="js/plugins.js"></script>
+                  
+
+    </body>
+</html>
