@@ -2,7 +2,7 @@
 $(function() {
 
   // Update code block classes to be all R
-  $('code').removeClass().addClass('r')
+  // $('code').removeClass().addClass('r')
   hljs.initHighlightingOnLoad()
 
 });

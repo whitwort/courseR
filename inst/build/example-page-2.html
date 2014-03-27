@@ -7,7 +7,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         
-        <title> plotstats </title>
+        <title> example-page-2 </title>
         
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
@@ -29,59 +29,13 @@
 
         <div id = "courser-content" class = "pageView">
         
-        <h1>Introduction to simple plots and basic statistics in R</h1>
+        <h1>Introduction to simple plots and statistics in R</h1>
 
 <h1>A sample dataset</h1>
 
-<h2>Let&#39;s use <code>data.frame</code> to build a simple table of data to work with.</h2>
+<p>Let&#39;s open a sample data set to work with:</p>
 
-<p>Usually you&#39;d be loading data from an external file, but we&#39;ll use this example to demonstrate the <code>rep</code> function:</p>
-
-<pre><code class="r">rep(c(&quot;a&quot;,&quot;b&quot;), times = 3)
-</code></pre>
-
-<pre><code>[1] &quot;a&quot; &quot;b&quot; &quot;a&quot; &quot;b&quot; &quot;a&quot; &quot;b&quot;
-</code></pre>
-
-<pre><code class="r">rep(c(&quot;a&quot;,&quot;b&quot;), each = 2)
-</code></pre>
-
-<pre><code>[1] &quot;a&quot; &quot;a&quot; &quot;b&quot; &quot;b&quot;
-</code></pre>
-
-<pre><code class="r">rep(c(&quot;a&quot;,&quot;b&quot;), times = 3, each = 3)
-</code></pre>
-
-<pre><code> [1] &quot;a&quot; &quot;a&quot; &quot;a&quot; &quot;b&quot; &quot;b&quot; &quot;b&quot; &quot;a&quot; &quot;a&quot; &quot;a&quot; &quot;b&quot; &quot;b&quot; &quot;b&quot; &quot;a&quot; &quot;a&quot; &quot;a&quot; &quot;b&quot; &quot;b&quot;
-[18] &quot;b&quot;
-</code></pre>
-
-<h2>Clotting time dataset</h2>
-
-<p>We&#39;ll have 12 observations, the first 6 with &ldquo;drug1&rdquo; the second 6 with &ldquo;drug2&rdquo;</p>
-
-<pre><code class="r">clotData &lt;- data.frame(
-                drugType = rep( c(&quot;drug1&quot;, &quot;drug2&quot;), each = 6 ),
-                clotTime = c( 8.8, 8.4, 7.9, 8.7, 9.1, 9.6, 9.9, 9.0, 11.1, 
-                              9.6, 8.7, 10.4)
-              )
-
-clotData
-</code></pre>
-
-<pre><code>   drugType clotTime
-1     drug1      8.8
-2     drug1      8.4
-3     drug1      7.9
-4     drug1      8.7
-5     drug1      9.1
-6     drug1      9.6
-7     drug2      9.9
-8     drug2      9.0
-9     drug2     11.1
-10    drug2      9.6
-11    drug2      8.7
-12    drug2     10.4
+<pre><code class="r">clotData &lt;- read.table(&quot;data/clot.txt&quot;)
 </code></pre>
 
 <h1>Summary statistics</h1>
@@ -153,7 +107,7 @@ clotData$drugType: drug2
 <pre><code class="r">plot(clotData)
 </code></pre>
 
-<p><img src="img/unnamed-chunk-6.png" alt="plot of chunk unnamed-chunk-6"/> </p>
+<p><img src="img/example-page-2-5.png" alt="plot of chunk example-page-2-5"/> </p>
 
 <p>This is a <a href="http://en.wikipedia.org/wiki/Box_plot">box plot</a>.</p>
 
@@ -162,21 +116,21 @@ clotData$drugType: drug2
 <pre><code class="r">plot(c(1,2,3,4), c(2,3,4,5))
 </code></pre>
 
-<p><img src="img/unnamed-chunk-7.png" alt="plot of chunk unnamed-chunk-7"/> </p>
+<p><img src="img/example-page-2-6.png" alt="plot of chunk example-page-2-6"/> </p>
 
 <h2>Simple f(x) plot</h2>
 
 <pre><code class="r">plot( function(x) { x * 4} )
 </code></pre>
 
-<p><img src="img/unnamed-chunk-8.png" alt="plot of chunk unnamed-chunk-8"/> </p>
+<p><img src="img/example-page-2-7.png" alt="plot of chunk example-page-2-7"/> </p>
 
 <h2>Simple f(x) plot</h2>
 
 <pre><code class="r">plot( function(x) { x ^ 2} )
 </code></pre>
 
-<p><img src="img/unnamed-chunk-9.png" alt="plot of chunk unnamed-chunk-9"/> </p>
+<p><img src="img/example-page-2-8.png" alt="plot of chunk example-page-2-8"/> </p>
 
 <h2>Let&#39;s plot a normal distribution in blue</h2>
 
@@ -185,7 +139,7 @@ y &lt;- dnorm(x, mean = 0, sd = 1)
 plot( x, y, col = &quot;blue&quot;)
 </code></pre>
 
-<p><img src="img/unnamed-chunk-10.png" alt="plot of chunk unnamed-chunk-10"/> </p>
+<p><img src="img/example-page-2-9.png" alt="plot of chunk example-page-2-9"/> </p>
 
 <h2>Two plots on one graph</h2>
 
@@ -196,7 +150,7 @@ plot( x, y1, type = &quot;l&quot;, col = &quot;blue&quot; )
 lines( x, y2, col = &quot;red&quot; )
 </code></pre>
 
-<p><img src="img/unnamed-chunk-11.png" alt="plot of chunk unnamed-chunk-11"/> </p>
+<p><img src="img/example-page-2-10.png" alt="plot of chunk example-page-2-10"/> </p>
 
 <h1>A simple t-test</h1>
 
@@ -205,7 +159,7 @@ lines( x, y2, col = &quot;red&quot; )
 <pre><code class="r">plot(clotData)
 </code></pre>
 
-<p><img src="img/unnamed-chunk-12.png" alt="plot of chunk unnamed-chunk-12"/> </p>
+<p><img src="img/example-page-2-11.png" alt="plot of chunk example-page-2-11"/> </p>
 
 <p>Are the sample means different?</p>
 
@@ -234,21 +188,38 @@ mean in group drug1 mean in group drug2
               8.750               9.783 
 </code></pre>
 
-<h2>The data.frame short cut</h2>
+<h2>The data.frame shortcut</h2>
 
-<pre><code class="r">t.test(clotTime ~ drugType, data = clotdata)
+<pre><code class="r"># This line should cause an error
+t.test(clotTime ~ drugType, data = clotdata)
 </code></pre>
 
 <pre><code>Error: object &#39;clotdata&#39; not found
 </code></pre>
 
+<pre><code class="r">
+# Corrected
+t.test(clotTime ~ drugType, data = clotData)
+</code></pre>
+
+<pre><code>
+    Welch Two Sample t-test
+
+data:  clotTime by drugType
+t = -2.382, df = 8.625, p-value = 0.04221
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ -2.02101 -0.04565
+sample estimates:
+mean in group drug1 mean in group drug2 
+              8.750               9.783 
+</code></pre>
+
         
         </div>
-
-        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-        <script>window.jQuery || document.write('<script src="js/jquery-1.9.1.min.js"><\/script>')</script>
         
           <script src="js/highlight-7.3.min.js"></script>
+                            <script src="js/jquery-1.9.1.min.js"></script>
                             <script src="js/main.js"></script>
                             <script src="js/plugins.js"></script>
                   
