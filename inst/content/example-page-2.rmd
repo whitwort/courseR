@@ -1,30 +1,12 @@
-# Introduction to simple plots and basic statistics in R
+# Introduction to simple plots and statistics in R
 
 # A sample dataset
 
-## Let's use `data.frame` to build a simple table of data to work with.
-
-Usually you'd be loading data from an external file, but we'll use this example to demonstrate the `rep` function:
+Let's open a sample data set to work with:
 
 ``` {r}
-rep(c("a","b"), times = 3)
-rep(c("a","b"), each = 2)
-rep(c("a","b"), times = 3, each = 3)
-````
-
-## Clotting time dataset 
-
-We'll have 12 observations, the first 6 with "drug1" the second 6 with "drug2"
-
-``` {r}
-clotData <- data.frame(
-                drugType = rep( c("drug1", "drug2"), each = 6 ),
-                clotTime = c( 8.8, 8.4, 7.9, 8.7, 9.1, 9.6, 9.9, 9.0, 11.1, 
-                              9.6, 8.7, 10.4)
-              )
-
-clotData
-````
+clotData <- read.table("data/clot.txt")
+```
 
 # Summary statistics
 
@@ -127,8 +109,12 @@ library(stats)
 t.test(clotData$clotTime ~ clotData$drugType)
 ````
 
-## The data.frame short cut
+## The data.frame shortcut
 
 ``` {r}
+# This line should cause an error
 t.test(clotTime ~ drugType, data = clotdata)
+
+# Corrected
+t.test(clotTime ~ drugType, data = clotData)
 ````

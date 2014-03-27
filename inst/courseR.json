@@ -1,21 +1,14 @@
-{
-
-    "name"    : "Sample project"
+{   "name"    : "Sample project"
   , "content" : "content/"
-  , "toc"  : [ { "content"     : "r-introduction"
+  , "toc"  : [ { "content"     : "example-page-1"
                , "title"       : "An introduction to R"
                , "description" : "An exploration of why R is awesome."
                , "section"     : "Background"        
                }
-             , { "content"     : "r-201"
-               , "title"       : "An intermediate introduction to R"
-               , "description" : "Information about tables filters and apply's."
-               , "section"     : "Background"        
-               }
-             , { "content"     : "plotstats"
-               , "title"       : "Plotting tutorial"
-               , "description" : "An tutorial on basic plotting facilities in R."
-               , "section"     : "Excercises"        
+             , { "content"     : "example-page-2"
+               , "title"       : "Basic statistics in R"
+               , "description" : "An introduction to simple summary statitics and tests."
+               , "section"     : "Tutorial"        
                }
              ]
              
@@ -27,5 +20,5 @@
   , "data": "data/"
   
   , "optimize" : false
-
+  
 }

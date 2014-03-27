@@ -10,7 +10,6 @@ library(tools)
 ## API
 courseR.init  <- function(overwrite = FALSE) {
   
-  
 }
 
 courseR.build <- function( projectPath  = getwd()
@@ -35,6 +34,7 @@ courseR.build <- function( projectPath  = getwd()
   # knitr customization
   opts_knit$set( progress = FALSE 
                , base.dir = buildPath
+               , root.dir = projectPath
                )
   
   opts_chunk$set( fig.width   = 8
@@ -42,8 +42,6 @@ courseR.build <- function( projectPath  = getwd()
                 , fig.path    = config$img
                 , comment     = ""
                 , tidy        = FALSE
-                , cache       = TRUE
-                , cache.path  = file.path(projectPath, "build-cache/")
                 , autodep     = TRUE
                 )
   
@@ -67,11 +65,14 @@ courseR.build <- function( projectPath  = getwd()
                                     , recursive    = TRUE
                                     )
                           
-                          sourceFiles <- file.path(sourcePath, list.files(sourcePath))
+                          sourceFiles <- file.path( sourcePath
+                                                  , list.files(sourcePath)
+                                                  )
+                          
                           if ( length(sourceFiles) > 0 ) {
                             file.copy( from = sourceFiles
                                      , to   = buildPath
-                            )
+                                     )
                           }
                           
                           lapply( listFiles(sourcePath)
@@ -83,7 +84,7 @@ courseR.build <- function( projectPath  = getwd()
                       , simplify = FALSE
                       )
   
-  # write each content pages
+  # write each content page
   lapply( names(content)
         , function(pageName) {
             
@@ -99,6 +100,7 @@ courseR.build <- function( projectPath  = getwd()
             pageData    <- list( content = pageContent
                                , title   = pageName
                                )
+            
             write( whisker.render(templates$page, c(globalData, pageData), templates)
                  , file.path(buildPath, paste(pageName, "html", sep = "."))
                  )
@@ -111,12 +113,12 @@ courseR.build <- function( projectPath  = getwd()
   
   missingContent  <- setdiff(tocNames, contentNames)
   if (length(missingContent) > 0) {
-    warning("Files listed in TOC but missing from content: ", paste(missingContent, sep = ", "))
+    warning("Files listed in TOC but missing from 'content': ", paste(missingContent, sep = ", "))
   }
   
   missingTOC      <- setdiff(contentNames, tocNames)
   if (length(missingTOC) > 0) {
-    warning("Files found in content but not listed in TOC: ", paste(missingTOC, sep = ","))
+    warning("Files found in 'content' but not listed in TOC: ", paste(missingTOC, sep = ","))
   }
   
   # write the index
@@ -173,6 +175,7 @@ courseR.build <- function( projectPath  = getwd()
 listFiles <- function(rootPath) {
   ignores     <- "courser-ignore"
   ignoreFile  <- file.path(rootPath, ignores)
+  
   if (file.exists(ignoreFile)) {
     ignores = c(ignores, readLines(ignoreFile))
   }
