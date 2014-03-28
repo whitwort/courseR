@@ -4,6 +4,6 @@ Title: Generate linked handout-style and presentation-style pages from literate 
 Version: 0.2
 Date: 2014-03-26
 Author: Gregg Whitworth
-Maintainer: Gregg Whitworth
+Maintainer: Gregg Whitworth <whitwort@gmail.com>
 Description: https://github.com/whitwort/courseR
 License: LGPLv3
