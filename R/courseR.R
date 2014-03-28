@@ -4,11 +4,16 @@ library(XML)
 library(whisker)
 library(markdown)
 library(knitr)
-
 library(tools)
 
 ## API
-courseR.init  <- function(overwrite = FALSE) {
+courseR.init  <- function( path             = getwd()
+                         , overwrite        = FALSE
+                         ) {
+  
+}
+
+courseR.update <- function(path = getwd()) {
   
 }
 
