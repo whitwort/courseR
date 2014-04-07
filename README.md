@@ -9,4 +9,4 @@ An experiment in developing an efficient workflow with these goals:
 
 ## License
 
-Copyright © 2013 Gregg Whitworth and licensed under [LGPLv3](http://www.gnu.org/copyleft/lesser.html).
+Copyright © 2013-2014 Gregg Whitworth and licensed under [LGPLv3](http://www.gnu.org/copyleft/lesser.html).
