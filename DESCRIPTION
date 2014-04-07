@@ -1,6 +1,7 @@
 Package: courseR
 Type: Package
-Title: Generate linked handout-style and presentation-style pages from literate knitr markdown source.
+Title: Generate linked handout-style and presentation-style pages from literate
+    knitr markdown source.
 Version: 0.2
 Date: 2014-03-26
 Author: Gregg Whitworth
