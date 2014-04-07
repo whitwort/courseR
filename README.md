@@ -1,6 +1,6 @@
 # courseR
 
-An experiment in developing an efficient workflow with these goals:
+An experiment in developing an efficient workflow for producing coures materials for classes that make heavy use of R with these features:
 
 1.  Have a simple, easy to write and read source format (RMD)
 2.  Generate course materials in HTML
