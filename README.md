@@ -4,7 +4,7 @@ An experiment in developing an efficient workflow for producing coures materials
 
 1.  Have a simple, easy to write and read source format (RMD)
 2.  Generate course materials in HTML
-3.  Generate pretty, portable presentation slides from the same source
+3.  TODO: Generate pretty, portable presentation slides from the same source
 
 
 ## License
