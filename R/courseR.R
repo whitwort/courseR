@@ -1,4 +1,3 @@
-# TODO documentation
 library(RJSONIO)
 library(XML)
 library(whisker)

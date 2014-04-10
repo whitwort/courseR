@@ -8,8 +8,6 @@ library(ggplot2)
 ggplot(diamonds, aes(depth, fill = cut)) + geom_density(alpha = 0.2) + xlim(55, 70)
 ````
 
-![plot example](img/intro-example.png)
-
 # What is [R][]?
 
 R is a freely-available, [open-source](http://en.wikipedia.org/wiki/Open_source), derivative of [S-Plus](http://en.wikipedia.org/wiki/S-PLUS) that has attracted the attention of wide range of users in both the academic and private sectors.  There are several key features which make [R](http://www.r-project.org) an *awesome* tool for data analysis.  
@@ -26,11 +24,6 @@ The learning curve will be a little steep at first, but ultimately should prove 
 Like many other [high-level](http://en.wikipedia.org/wiki/High-level_programming_language) programming languages, when you install [R][] it comes with a large library of tools.  Unlike other languages, this toolbox is geared towards statistical analysis and data visualization.  The volume of [statistical tools](http://cran.r-project.org/web/packages/available_packages_by_name.html) is truly staggering and the biggest barrier to entry into [R][] for new comers is probably this embarrassment of riches!  In this regard, [R][] blows everything else -- Excel, Minitab, SPSS, etc -- out of the water.  Which leads us to...
 
 # Why is [R][] *awesome*?
-
-Because [R][] is both:
-
-* Open source (free like *ideas*)![ideas](img/noun_project_762.svg)
-* Free to use (free like *pizza*)![pizza](img/noun_project_1158.svg)
 
 [R][] is entirely open source.  This means that the software is both free to obtain (free as in *pizza*) and that the implementation details of all statistical methods found in it [R](http://www.r-project.org) are freely available and open to scrutiny (free as in *ideas*).  
 
