@@ -16,13 +16,13 @@ courseR is a tool chain designed to build websites from [R Markdown](https://git
 
 courseR and RMarkdown v2.0 are both on github, so the easiest way to install them is to use the devtools package.  If you don't have it already:
 
-```
+```S
 install.packages("devtools")
 ```
 
 To install courseR and the new version of RMarkdown from github:
 
-```
+```S
 devtools::install_github("rstudio/rmarkdown")
 devtools::install_github("whitwort/courseR")
 ```
@@ -31,14 +31,14 @@ devtools::install_github("whitwort/courseR")
 
 To initialize a new template project directory either start a blank project in RStudio or manually set your working directory into an empty path, then call:
 
-```{r}
+```S
 library(courseR)
 courseR.init()
 ```
 
 See the new README.md file in the root of the project folder for a full description of the structure of the subfolders that were created and the courseR.yaml file for example configuration options.  When you're ready to build the project website, just call:
 
-```{r}
+```S
 courseR.build()
 ```
 
