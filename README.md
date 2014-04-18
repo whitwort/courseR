@@ -1,6 +1,6 @@
 # courseR
 
-courseR is a tool chain designed to build websites from [R Markdown](https://github.com/rstudio/rmarkdown) sources.  This third (and hopefully final) rewrite now leverages the power of [R Markdown](https://github.com/rstudio/rmarkdown) v2.0, which in turn uses [Knitr](http://yihui.name/knitr/) and [Pandoc](http://johnmacfarlane.net/pandoc/) to do the heavy lifting during page rendering.  While originally designed to produce websites for courses that are taught primarily in R, the package is likely to be generally useful when building any sort of website from a set of RMarkdown sources.  The chief features are:
+courseR is a tool chain designed to build websites from [R Markdown](https://github.com/rstudio/rmarkdown) sources.  This third (and hopefully final) rewrite now leverages the power of R Markdown v2, which in turn uses [Knitr](http://yihui.name/knitr/) and [Pandoc](http://johnmacfarlane.net/pandoc/) to do the heavy lifting during page rendering.  While originally designed to produce websites for courses that are taught primarily in R, the package is likely to be generally useful when building any sort of website from a set of RMarkdown sources.  The chief features are:
 
 1.  Source files can be RMarkdown (.rmd), plain markdown (.md), or R scripts.  The courseR headers are now fully compatible with RMarkdown v2.0 headers, making it easy to do *ad hoc* page renders with RMarkdown (which will come packaged in future versions of RStudio).
 
