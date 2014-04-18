@@ -2,82 +2,99 @@
 \alias{courseR.build}
 \title{(Re)build a courseR project}
 \usage{
-courseR.build(projectPath = getwd(), buildPath = file.path(projectPath,
-  "build"), configJSON = file.path(projectPath, "courseR.json"),
-  config = fromJSON(configJSON),
-  templates = loadFiles(file.path(projectPath, config$templates)),
-  content = loadFiles(file.path(projectPath, config$content)),
-  name = config$name, toc = config$toc, css = config$css,
-  js = config$js, img = config$img, data = config$data,
-  optimize = config$optimize)
+courseR.build(projectPath = getwd(), config = yaml.load_file(configPath),
+  configPath = file.path(projectPath, "courseR.yaml"),
+  content = file.path(projectPath, config$paths$content),
+  app = file.path(projectPath, config$paths$app),
+  templates = file.path(projectPath, config$paths$templates),
+  buildCache = file.path(projectPath, config$paths$buildCache),
+  build = file.path(projectPath, config$paths$build),
+  formats = config$output_formats, contents = config$contents,
+  templateData = config$templateData, annotations = config$annotations,
+  sourceExternals = config$sourceExternals,
+  outputExternals = config$outputExternals, forceRebuild = FALSE,
+  dumpContext = FALSE)
 }
 \arguments{
   \item{projectPath}{a character string with the root path
   to a project folder.  This folder should contain the
-  courseR.json configuration file along with required
-  resource subfolders (unless alternative locations are
-  specified).  Defaults to the current working directory.}
+  required resource subfolders (unless alternative
+  locations are specified). Defaults to the current working
+  directory.}
 
-  \item{buildPath}{a character string with the path of the
-  destination folder for this build.  Defaults to a
-  '/build' subfolder.}
+  \item{config}{a list structure containing a full set of
+  project configuration settings.  Defaults to the yaml
+  parse of the file found on configPath.}
 
-  \item{configJSON}{a character string the name of the
-  configuration file.  Defaults to 'courseR.json'.}
+  \item{configPath}{a character string path to a yaml
+  configuration file.  Defaults to courseR.yaml.}
 
-  \item{config}{a list containing configuration settings.
-  Use to directly pass in a configuration profile instead
-  of reading options in from a .json file.}
+  \item{content}{a character string containing the path to
+  the directory containing content files.}
 
-  \item{templates}{a character vector containing template
-  file paths.  Use to override the default enumeration of
-  the 'templates' directory.}
+  \item{app}{a character string containing the path to a
+  directory containing web application resources.}
 
-  \item{buildPath}{a character vector containing content
-  file paths.  Use to override the default enumeration of
-  the 'contents' directory.}
+  \item{templates}{a character string containing the path
+  to the directory containing templates to be made
+  available to post processing calls.}
 
-  \item{name}{a character string containing the project
-  name (defaults to configuration file setting).}
+  \item{buildCache}{a character string containing the path
+  to the build cache directory.}
 
-  \item{toc}{a list containing the table of contents
-  structure (defaults to configuration file setting).}
+  \item{build}{a character string containing the path to
+  the final build directory.}
 
-  \item{css}{a character string with the directory path
-  where css files are found (defaults to configuration file
-  setting).}
+  \item{formats}{a list containing the default output
+  formats data structure (see the default courseR.yaml for
+  examples).}
 
-  \item{js}{a character string with the directory path
-  where javascript files are found (defaults to
-  configuration file setting).}
+  \item{contents}{a list containing a full site contents
+  structure.  If NULL then one is built using content
+  headers; the order of both the sections and content
+  within sections is determined by an alphabetical sorting
+  of content file names.}
 
-  \item{img}{a character string with the directory path
-  where image files are found (defaults to configuration
-  file setting).}
+  \item{templateData}{a list containing additional data
+  bindings that should be made available to the
+  post-processing environments.}
 
-  \item{data}{a character string with the directory path
-  where data files are found (defaults to configuration
-  file setting).}
+  \item{annotations}{a character vector containing the
+  names of yaml header fields that should be flagged as
+  content annotations; these bindings are made available to
+  the post-processing environments.}
 
-  \item{optimize}{a logical indicating whether or not web
-  resources should be run through an optimizer.}
+  \item{sourceExternals}{a character vector containing the
+  names of yaml header fields that reference external files
+  that should be considered as integral parts of the source
+  content (for example, data files that are loaded when
+  code in an RMD file is executed).  Sources are rebuilt
+  when these files chage and they are bundled when the
+  final site is built.}
+
+  \item{outputExternals}{a character vector containing the
+  names of fields on output formats that reference external
+  files that should be considered as integral to the format
+  rendering stage (for example, pandoc templates).  Outputs
+  will be rebuilt when these files change.}
+
+  \item{forceRebuild}{a logical indicating whether or not
+  the entire project should be rerendered and rebuilt,
+  irrespective of the state of the intermediate cache.
+  Mostly useful for debugging purposes.}
+
+  \item{dumpContext}{a logical indicating whether or not
+  data bindings available to post-processors should be
+  dumped to YAML files for each output being produced.
+  Useful during development for discovering what variables
+  are available for use in post-processing functions.}
 }
 \description{
-Generates a new website package for a courseR project.
-After editing the 'courseR.json' configuration file and
-adding content to the 'content' directory, simply call this
-function with defaults to build a website package in a
-'build' subfolder.
-}
-\details{
-Many of the optional arguments to this function can also be
-specified in the 'courseR.json' project file.  However,
-explicitly setting an option in a call to this function
-will override the settings in the configuration file.
-
-If files are present in project subfolders that you'd like
-to the build script ignore, simply create a
-'courser-ignore' text file in the subfolder and list the
-files you want to skip (one file name per line).
+All of the arguments to this function can be provided in
+the project courseR.yaml configuration file.  By default
+the current working directory is assumed to be the project
+root.  See the courseR.yaml file provided in the template
+project for a full description of all of the project build
+options.
 }
 

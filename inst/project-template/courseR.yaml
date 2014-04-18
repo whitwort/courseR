@@ -1,0 +1,150 @@
+# Output formats control what kinds of documents get generated from source .rmd,
+# .r and .md files found in the 'content' directory.  Each output format entry 
+# should be a type key (arbitrary string).
+# 
+# Indivudual documents can add or remove type output_formats in their yaml 
+# headers by a including a top-level output_formats entry which follows the same
+# data structure as used in this file.  Any new format type keys found in 
+# document heards will be appended to the defaults defined here.  Any default 
+# type keys with a value of 'false' will be skipped; for example, with the 
+# default configuration below, a 'slides: false' entry will cause slide 
+# generation to be skiped for that document.
+# 
+output_formats:
+  
+  # The value of keys defines the output format 'type'; these strings are
+  # aribtrary but their names and associated output files are made available as
+  # data bindings for use in post processing functions.
+  page:
+  
+    # each output format must define an file_extension, which is used to name
+    # output files.
+    file_extension: .html
+
+    # output formats can optionally define list of post processors to call
+    # during the project build step.  This data structure should be an array of
+    # string names which can be parsed and eval'ed at runtime to return a
+    # function.  See the built-in post processing functions for examples.
+    post_processors:
+      - fixPartialsMarkup
+      - renderWhisker
+      - linkData
+      - responsiveImages
+
+    # each output format must define a render function.  These data structures
+    # mirror the 'output' bindings in stock R Markdown yaml headers.  The one
+    # and only key should be a string that can be parsed and eval'ed at runtime
+    # to return an R Markdown output_format function.  Key:value pairs listed
+    # below are passed into the output_format function as arguments.
+    render: 
+      html_document:
+
+        # The default document configuration here assumes you want full control 
+        # over the base template, javascript and css (in contrast to the 
+        # rmarkdown defaults).  By default courseR also uses a Bootstrap
+        # 3.x-based pandoc template, rather than the 2.x template, allowing you
+        # to install any of the current themes from bootswatch.com in the 'app'
+        # resource directories.
+        # 
+        # In this setup, css and js tags are introduced via whisker template
+        # expansion (the second build step) rather than through pandoc
+        # templating.  This allows us to stay in self_contained mode for image
+        # embeding to avoid naming conflicts between knitr chunk renders while
+        # still having common resource URLs for these resources shared across
+        # the site.
+        # 
+        # Paths that point to external resources (like template and include 
+        # files) should be relative to the /content directory (not the root 
+        # project directory).
+        # 
+        template:   ../templates/page-template.html
+        theme:      null
+        highlight:  null
+        mathjax:    null
+
+        # The default project template assumes a table of contents will be
+        # generate for each page.  The toc_depth argument defines how deep into
+        # the header hierarchy the contents generator will descend.
+        # 
+        toc:        true
+        toc_depth:  1
+
+  slides: 
+    file_extension: -slides.html
+    post_processors:
+      - trimText
+      - linkData
+    render: ioslides_presentation
+
+  PDF:
+    file_extension: .pdf
+    render:
+      pdf_document:
+        toc:              true
+        toc_depth:        2
+        number_sections:  true
+
+# The default project directory hierarchy.  Note, if you changes paths here, you
+# may also have to update paths in template files and the output_formats 
+# configuration entries.  Paths listed here are assumed to be relative to the 
+# root project directory.
+# 
+paths:
+  
+  # Any .R, .MD, or .RMD files found in the root of the content directory are
+  # considered to be part of the project
+  content:      content
+
+  # All of the resources in the app directory are copied verbatim to the root of
+  # the final build directory; place js, css, and other common web resources
+  # here.
+  app:          app
+
+  # Template files that are found in the templates directory are loaded and
+  # passed to post processing functions when the project is being built.  In the
+  # list of templates passed to post processing functions, template key names
+  # are the roots of the file names without extensions (for example
+  # mytemplate.html would be available as the 'mytemplate' key in a post
+  # processing function).  Templates can either be arbitrary text files or .R
+  # scripts.  If scripts are found, they are parsed and eval'ed at build time
+  # and their return value used as the template string.
+  templates:    templates
+
+  # The buildCache and build directories are the target of the intermediate
+  # output rendering and final build steps, respectively.
+  buildCache:   build-cache
+  build:        build
+
+# Any additional data bindings defined here will be made available to the 
+# templating engine and post-processing calls.
+#
+templateData:
+  siteName: courseR  
+  baseURL:  http://mysite.com
+  trimTextCutoff: 140
+
+# Assorted additional configuration options.
+#
+
+# YAML header keys that reference textual annotations for content sources which
+# should be available in the root templating context
+annotations:
+  - title
+  - description
+  - section
+  - data
+
+# Header keys that reference external files loaded/used by source files, which
+# should be considered part of the source.  When these files change all output
+# targets will be re-rendered.
+sourceExternals:
+  - data
+  - img
+  
+# Keys on output format render structures that reference external files
+# loaded/used by the render call.  When these files change, the associated
+# output formats will be re-rendered.
+outputExternals:
+  - template
+  - includes
+

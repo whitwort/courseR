@@ -1,0 +1,16 @@
+
+/* remove hljs backgrounds since we grab bootstrap code element formatting */
+.hljs {
+  background: none;
+}
+
+/* padding for bootstrap navbar */
+body {
+  padding-top: 50px;
+  padding-bottom: 40px;
+}
+@media (max-width: 979px) {
+  body {
+    padding-top: 0;
+  }
+}

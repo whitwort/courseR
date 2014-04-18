@@ -1,14 +1,11 @@
-library(RJSONIO)
-library(XML)
-library(whisker)
-library(markdown)
-library(knitr)
-library(tools)
-
 #' Initialize a new courseR project directory  
 #' 
-#' After initializing a new project see the 'courseR.json' file and '/content'
-#' subdirectory for examples.
+#' After initializing a new project see the '/content' subdirectory for example 
+#' content pages.  See the 'courseR.yaml' configuration file and /templates' 
+#' subdirectory for ways to customize the visual look and structure of the 
+#' project site.
+#' 
+#' Run (\code{\link{courseR.build}}) to render and build the site.
 #' 
 #' @export
 #' 
@@ -17,310 +14,151 @@ library(tools)
 #'   directory.
 #' @param overwrite a logical value specifying whether or not existing files
 #'   should be overwritten.
+#' 
 courseR.init  <- function( path         = getwd()
                          , overwrite    = FALSE
                          ) {
   
-  sourcePath  <- file.path( find.package("courseR")
-                          , "project-template"
-                          )
+  sourcePath  <- file.path(find.package("courseR"), "project-template")
+  recursiveCopy(sourcePath, path, overwrite = overwrite)
   
-  lapply( file.path( path
-                   , list.dirs( sourcePath
-                              , full.names = FALSE
-                              )
-                   )
-        , function(p) { dir.create( p
-                                  , showWarnings = FALSE
-                                  , recursive = TRUE
-                                  )
-                      }
-        )
-  
-  file.copy( list.files( sourcePath
-                       , full.names = TRUE
-                       )
-           , path
-           , overwrite = overwrite
-           , recursive = TRUE
-           , copy.mode = FALSE
-           )
-  
-  cat("New courseR project initialized.  To get started, see 'courseR.json' and '/content' in the new project directory.")
+  cat("New courseR project initialized.  To get started, see the '/content' and 
+      '/template' folders in the new project directory.")
   
 }
 
 #' (Re)build a courseR project
 #' 
-#' Generates a new website package for a courseR project.  After editing the 
-#' 'courseR.json' configuration file and adding content to the 'content' 
-#' directory, simply call this function with defaults to build a website package
-#' in a 'build' subfolder.
-#' 
-#' Many of the optional arguments to this function can also be specified in the 
-#' 'courseR.json' project file.  However, explicitly setting an option in a call
-#' to this function will override the settings in the configuration file.
-#' 
-#' If files are present in project subfolders that you'd like to the build 
-#' script ignore, simply create a 'courser-ignore' text file in the subfolder 
-#' and list the files you want to skip (one file name per line).
+#' All of the arguments to this function can be provided in the project 
+#' courseR.yaml configuration file.  By default the current working directory is
+#' assumed to be the project root.  See the courseR.yaml file provided in the 
+#' template project for a full description of all of the project build options.
 #' 
 #' @export
 #' 
 #' @param projectPath a character string with the root path to a project folder.
-#'   This folder should contain the courseR.json configuration file along with 
-#'   required resource subfolders (unless alternative locations are specified). 
-#'   Defaults to the current working directory.
-#' @param buildPath a character string with the path of the destination folder
-#'   for this build.  Defaults to a '/build' subfolder.
-#' @param configJSON a character string the name of the configuration file. 
-#'   Defaults to 'courseR.json'.
-#' @param config a list containing configuration settings.  Use to directly pass
-#'   in a configuration profile instead of reading options in from a .json file.
-#' @param templates a character vector containing template file paths.  Use to
-#'   override the default enumeration of the 'templates' directory.
-#' @param buildPath a character vector containing content file paths.  Use to
-#'   override the default enumeration of the 'contents' directory.
-#' @param name a character string containing the project name (defaults to
-#'   configuration file setting).
-#' @param toc a list containing the table of contents structure (defaults to
-#'   configuration file setting).
-#' @param css a character string with the directory path where css files are
-#'   found (defaults to configuration file setting).
-#' @param js a character string with the directory path where javascript files
-#'   are found (defaults to configuration file setting).
-#' @param img a character string with the directory path where image files are
-#'   found (defaults to configuration file setting).
-#' @param data a character string with the directory path where data files are
-#'   found (defaults to configuration file setting).
-#' @param optimize a logical indicating whether or not web resources should be
-#'   run through an optimizer.
-courseR.build <- function( projectPath  = getwd()
-                         , buildPath    = file.path(projectPath, "build")
-                         , configJSON   = file.path(projectPath, "courseR.json")
-                         , config       = fromJSON(configJSON)
-                         , templates    = loadFiles(file.path(projectPath, config$templates))
-                         , content      = loadFiles(file.path(projectPath, config$content))
-                         , name         = config$name
-                         , toc          = config$toc
-                         , css          = config$css
-                         , js           = config$js
-                         , img          = config$img
-                         , data         = config$data
-                         , optimize     = config$optimize
+#'   This folder should contain the required resource subfolders (unless 
+#'   alternative locations are specified). Defaults to the current working 
+#'   directory.
+#' @param config a list structure containing a full set of project configuration
+#'   settings.  Defaults to the yaml parse of the file found on configPath.
+#' @param configPath a character string path to a yaml configuration file. 
+#'   Defaults to courseR.yaml.
+#' @param content a character string containing the path to the directory
+#'   containing content files.
+#' @param app a character string containing the path to a directory containing
+#'   web application resources.
+#' @param templates a character string containing the path to the directory
+#'   containing templates to be made available to post processing calls.
+#' @param buildCache a character string containing the path to the build cache
+#'   directory.
+#' @param build a character string containing the path to the final build
+#'   directory.
+#' @param formats a list containing the default output formats data structure
+#'   (see the default courseR.yaml for examples).
+#' @param contents a list containing a full site contents structure.  If NULL 
+#'   then one is built using content headers; the order of both the sections and
+#'   content within sections is determined by an alphabetical sorting of content
+#'   file names.
+#' @param templateData a list containing additional data bindings that should be
+#'   made available to the post-processing environments.
+#' @param annotations a character vector containing the names of yaml header
+#'   fields that should be flagged as content annotations; these bindings are
+#'   made available to the post-processing environments.
+#' @param sourceExternals a character vector containing the names of yaml header
+#'   fields that reference external files that should be considered as integral
+#'   parts of the source content (for example, data files that are loaded when
+#'   code in an RMD file is executed).  Sources are rebuilt when these files
+#'   chage and they are bundled when the final site is built.
+#' @param outputExternals a character vector containing the names of fields on
+#'   output formats that reference external files that should be considered as
+#'   integral to the format rendering stage (for example, pandoc templates). 
+#'   Outputs will be rebuilt when these files change.
+#' @param forceRebuild a logical indicating whether or not the entire project
+#'   should be rerendered and rebuilt, irrespective of the state of the
+#'   intermediate cache.  Mostly useful for debugging purposes.
+#' @param dumpContext a logical indicating whether or not data bindings
+#'   available to post-processors should be dumped to YAML files for each output
+#'   being produced.  Useful during development for discovering what variables
+#'   are available for use in post-processing functions.
+#' 
+#' @import digest
+#' @import tools
+#' @import rmarkdown
+#' @import yaml
+#' @import whisker
+#' @import plyr
+#' @import compare
+#' @import shiny
+#' @import XML
+#' @import selectr
+#' 
+courseR.build <- function( projectPath      = getwd()
+                         , config           = yaml.load_file(configPath)
+                         , configPath       = file.path(projectPath, "courseR.yaml")
+                         , content          = file.path(projectPath, config$paths$content)
+                         , app              = file.path(projectPath, config$paths$app)
+                         , templates        = file.path(projectPath, config$paths$templates)
+                         , buildCache       = file.path(projectPath, config$paths$buildCache)
+                         , build            = file.path(projectPath, config$paths$build)
+                         , formats          = config$output_formats
+                         , contents         = config$contents
+                         , templateData     = config$templateData
+                         , annotations      = config$annotations
+                         , sourceExternals  = config$sourceExternals
+                         , outputExternals  = config$outputExternals
+                         
+                         , forceRebuild     = FALSE
+                         , dumpContext      = FALSE
                          ) {
   
-  if (optimize) {
-    warning("Optimization hasn't been implemented yet.")   # TODO
-  }
-  
-  # knitr customization
-  opts_knit$set( progress = FALSE 
-               , base.dir = buildPath
-               , root.dir = projectPath
-               )
-  
-  opts_chunk$set( fig.width   = 8
-                , fig.height  = 5
-                , fig.path    = config$img
-                , comment     = ""
-                , tidy        = FALSE
-                , autodep     = TRUE
-                )
-  
-  # if the build path exists, clear it out
-  if (file.exists(buildPath)) {
-    unlink(buildPath, recursive = TRUE)
-  }
-  
-  # setup build path & copy resources directories; the path to files in each of 
-  # the resource paths are available as a file list on templates (with ignored 
-  # files filtered out).
-  globalData <- sapply( c("img", "js", "css", "data")
-                      , function(p) {
-                        
-                          resourceDir <- eval(parse(text = p))
-                          sourcePath  <- file.path(projectPath, resourceDir)
-                          buildPath   <- file.path(buildPath, resourceDir)
-                          
-                          dir.create( buildPath
-                                    , showWarnings = FALSE
-                                    , recursive    = TRUE
-                                    )
-                          
-                          sourceFiles <- file.path( sourcePath
-                                                  , list.files(sourcePath)
-                                                  )
-                          
-                          if ( length(sourceFiles) > 0 ) {
-                            file.copy( from = sourceFiles
-                                     , to   = buildPath
-                                     )
-                          }
-                          
-                          lapply( listFiles(sourcePath)
-                                , function(filePath) {
-                                    list( path = file.path(p, filePath) ) 
-                                })
-                      }
-                      
-                      , simplify = FALSE
-                      )
-  
-  # write each content page
-  lapply( names(content)
-        , function(pageName) {
-            
-            pageContent <- content[[pageName]]
-          
-            if (grepl('class="r output error"', pageContent, fixed = TRUE)) {
-              warning("Page `", pageName, "` contains output with errors.")
-            }
-            if (grepl('class="r output warning"', pageContent, fixed = TRUE)) {
-              warning("Page `", pageName, "` contains output with warnings.")
-            }
-            
-            pageData    <- list( content = pageContent
-                               , title   = pageName
-                               )
-            
-            write( whisker.render(templates$page, c(globalData, pageData), templates)
-                 , file.path(buildPath, paste(pageName, "html", sep = "."))
-                 )
-        })
-  
-  
-  # check for errors in TOC list
-  tocNames        <- sapply(toc, function(entry) { rootName(entry[['content']]) })
-  contentNames    <- names(content)
-  
-  missingContent  <- setdiff(tocNames, contentNames)
-  if (length(missingContent) > 0) {
-    warning("Files listed in TOC but missing from 'content': ", paste(missingContent, sep = ", "))
-  }
-  
-  missingTOC      <- setdiff(contentNames, tocNames)
-  if (length(missingTOC) > 0) {
-    warning("Files found in 'content' but not listed in TOC: ", paste(missingTOC, sep = ","))
-  }
-  
-  # write the index
-  sections <- tapply( toc
-                    , sapply( toc
-                            , function(entry) { 
-                                if (is.null(entry[["section"]])) {
-                                  entry[["section"]] <- "Contents"
-                                }
-                               
-                                entry[["section"]]
-                              }
+  # We take r scripts, rmd and md files as possible sources
+  contentFiles <- list.files( content
+                            , pattern     = "(^.*\\.r$)|(^.*\\.rmd$)|(^.*\\.md$)"
+                            , ignore.case = TRUE
                             )
-                    , function(entries) {
-                        lapply( entries
-                              , function(entry) {
-                                  url <- paste( rootName(entry['content'])
-                                              , "html"
-                                              , sep = "."
-                                              )
-                                  entry['url'] <- url
-                                  entry
-                              })
-                      }
-                    )
   
-  sectionData <- lapply( names(sections)
-                       , function(name) {
-                           list( section = name, entries = sections[[name]] ) 
-                       })
+  # The intermediate build step contains the results of the R Markdown rendering
+  # (via knitr and Pandoc).  We cache the results of the intermediate build to
+  # avoid having to re-execute (potentially) costly R between build updates when
+  # only the presentation or overall structure of the project has changed.
+  if (forceRebuild) { unlink(buildCache, recursive = TRUE) }
+  if ( !file.exists(buildCache) ) { dir.create(buildCache) }
   
-  indexContent <- whisker.render( templates$index
-                                , c( globalData
-                                   , list(sections = sectionData)
-                                   )
-                                , templates
-                                )
-    
-  write( whisker.render( templates$page
-                       , c( globalData
-                          , list( title = name, content = indexContent )
-                          )
-                       , templates
-                       )
-       , file.path(buildPath, "index.html")
-       )
-  
-  # restore knitr defaults
-  opts_knit$restore()
-  opts_chunk$restore()
-  
-}
+  manifest <- renderCache( targetPath      = buildCache
+                         , sourceFiles     = contentFiles
+                         , contentPath     = content
+                         , defaultFormats  = formats
+                         , annotations     = annotations
+                         , sourceExternals = sourceExternals
+                         , outputExternals = outputExternals
+                         )
 
-listFiles <- function(rootPath) {
-  ignores     <- "courser-ignore"
-  ignoreFile  <- file.path(rootPath, ignores)
-  
-  if (file.exists(ignoreFile)) {
-    ignores = c(ignores, readLines(ignoreFile))
+  # Build a contents structure from the manifest if one is not provided
+  if (is.null(contents)) {
+    contents <- buildContents(manifest)
   }
+  templateData$sections <- contents
   
-  files <- list.files(rootPath, recursive = TRUE)
-  setdiff(files, ignores)
+  # The final build contains the results of post processing calls.
+  if (file.exists(build)) { unlink(build, recursive = TRUE) }
+  dir.create(build)
   
-}
-
-loadFiles <- function(rootPath) {
+  final <- buildFinal( targetPath  = build
+                     , buildCache  = buildCache
+                     , manifest    = manifest
+                     , context     = templateData
+                     , templates   = loadTemplates(templates, templateData)
+                     , dumpContext = dumpContext
+                     )
   
-  files <- listFiles(rootPath)
-  
-  mapply( preprocess
-        , rootName(files)
-        , text      = file.path(rootPath, files)
-        , SIMPLIFY  = FALSE
-        )
-  
-}
-
-preprocessors <- list(
-      'html'  = function(text) { text }
-    , 'md'    = function(text) { 
-                  preprocess( markdownToHTML( text          = text
-                                            , fragment.only = TRUE
-                                            , options       = c( "use_xhtml"
-                                                               , "smartypants"
-                                                               )
-                                            )
-                            , 'html'
-                            )
-                  }
-    , 'rmd'   = function(text) { 
-                  preprocess( knit(text = text)
-                            , 'md'
-                            )
-                  }
-    , 'r'     = function(text) { 
-                  preprocess( toString(eval(parse(text = text)))
-                            , 'rmd'
-                            )
-                  }
-    )
-
-preprocess    <- function(text, type) {
-  
-  # If text is a file path
-  if (file.exists(text)) {
-    opts_knit$set( unnamed.chunk.label = rootName(text) )
-    preprocess( paste(readLines(text, warn = FALSE), collapse="\n")
-              , tolower(file_ext(text))
+  # copy over all web resources found in app and source externals
+  recursiveCopy(app, build)
+  if (length(sourceExternals) > 0) {
+   s <- mapply( recursiveCopy
+              , file.path(content, sourceExternals)
+              , file.path(build, sourceExternals)
               )
-  
-  # Otherwise, pick a preprocessing path
-  } else {
-    preprocessors[[type]](text)
-    
-  }
+  } 
   
 }
-
-# Utilities
-rootName <- function(filePath) { file_path_sans_ext(basename(filePath)) }
-

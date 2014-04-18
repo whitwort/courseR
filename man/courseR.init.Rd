@@ -13,7 +13,14 @@ courseR.init(path = getwd(), overwrite = FALSE)
   not existing files should be overwritten.}
 }
 \description{
-After initializing a new project see the 'courseR.json'
-file and '/content' subdirectory for examples.
+After initializing a new project see the '/content'
+subdirectory for example content pages.  See the
+'courseR.yaml' configuration file and /templates'
+subdirectory for ways to customize the visual look and
+structure of the project site.
+}
+\details{
+Run (\code{\link{courseR.build}}) to render and build the
+site.
 }
 

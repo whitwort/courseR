@@ -1,0 +1,26 @@
+\name{renderWhisker}
+\alias{renderWhisker}
+\title{Post processor that uses the whisker package to render mustache-style
+templates.}
+\usage{
+renderWhisker(text, context, templates)
+}
+\arguments{
+  \item{text}{a character string containing the text of the
+  output document}
+
+  \item{context}{a list containing post processing
+  environment variables}
+
+  \item{templates}{a list containing strings holding the
+  contents of template documents}
+}
+\value{
+a string character containing the new text of the output
+document
+}
+\description{
+All post processor take exactly three arguments (passed in
+by the courseR framework).
+}
+

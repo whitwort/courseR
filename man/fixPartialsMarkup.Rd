@@ -1,0 +1,35 @@
+\name{fixPartialsMarkup}
+\alias{fixPartialsMarkup}
+\title{Post processor that restores whisker/mustache partials tags}
+\usage{
+fixPartialsMarkup(text, context, templates)
+}
+\arguments{
+  \item{text}{a character string containing the text of the
+  output document}
+
+  \item{context}{a list containing post processing
+  environment variables}
+
+  \item{templates}{a list containing strings holding the
+  contents of template documents}
+}
+\value{
+a string character containing the new text of the output
+document
+}
+\description{
+According to the pandoc documentation, it should be
+possible to preserve the mustache partials include syntax
+by escaping but this doesn't seem to be working.  This post
+processor restores these tags by aassume that the HTML
+encoded result only occurs in the document when the
+whisker/mustache tag was meant.  This is useful to include
+before the renderWhisker post_processor in output format
+configurations.
+}
+\details{
+All post processor take exactly three arguments (passed in
+by the courseR framework).
+}
+

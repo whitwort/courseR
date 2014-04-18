@@ -1,120 +1,38 @@
-# Introduction to simple plots and statistics in R
+---
+title: "Data files"
+description: An example of how to reference external data files in courseR projects.  Also includes examples of text trimming in slide generation.
+section: Tutorial
+data: data/codons.txt
+---
 
-# A sample dataset
+# Data references
 
-Let's open a sample data set to work with:
+## Including data files
 
-``` {r}
-clotData <- read.table("data/clot.txt")
+If your R Markdown scripts load data from external files, courseR can track changes to these files for you and provide automatic download links in output HTML pages.
+
+* To reference external data files, include a header like:
+
+```
+data: data/codons
 ```
 
-# Summary statistics
+* In R blocks, you'll get links:
 
-## General summary
+```{r}
+myData <- read.table("data/codons.txt")
+```
 
-The `summary` function provides a simple way to get a standard set statistics:
+# Text trimming
 
-``` {r}
-summary(clotData)
-````
+## Long text goes away
 
-## Summary by factor
+In slides, you won't see the following block of text:
 
-What if we wanted individual summaries of the data for each drug type?
+Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
-``` {r}
-by(clotData, INDICES = clotData$drugType, FUN = summary)
-````
+## Block quotes are preserved
 
-What happened there?
+But you can preserve large text blocks by enclosing them in block quotes (with ">" in markdown):
 
-## Aggregate by a factor
-
-How can we make a new table with just average clot times for each drug?
-
-``` {r}
-aggregate(clotData$clotTime, 
-          by  = list(Drug=clotData$drugType), 
-          FUN = mean)
-````
-
-What happened there?
-
-# Simple plots
-
-## The plot function is magic!
-
-``` {r}
-plot(clotData)
-````
-
-This is a [box plot](http://en.wikipedia.org/wiki/Box_plot).
-
-## Simple x,y plot
-
-``` {r}
-plot(c(1,2,3,4), c(2,3,4,5))
-````
-
-## Simple f(x) plot
-
-``` {r}
-plot( function(x) { x * 4} )
-````
-
-## Simple f(x) plot
-
-``` {r}
-plot( function(x) { x ^ 2} )
-````
-
-## Let's plot a normal distribution in blue
-
-``` {r}
-x <- seq(-4, 4, length = 200)
-y <- dnorm(x, mean = 0, sd = 1)
-plot( x, y, col = "blue")
-````
-
-## Two plots on one graph
-``` {r}
-x <- seq(-4, 4, length = 200)
-y1 <- dnorm(x, mean = 0, sd = 1)
-y2 <- dnorm(x, mean = 1, sd = 1)
-plot( x, y1, type = "l", col = "blue" )
-lines( x, y2, col = "red" )
-````
-
-# A simple t-test
-
-## Let's look at those box plots again:
-
-``` {r}
-plot(clotData)
-````
-
-Are the sample means different?
-
-## The t-test {stats}
-
-``` {r}
-help(t.test)
-help.search("t.test")
-````
-
-## The formula expression
-
-``` {r}
-library(stats)
-t.test(clotData$clotTime ~ clotData$drugType)
-````
-
-## The data.frame shortcut
-
-``` {r}
-# This line should cause an error
-t.test(clotTime ~ drugType, data = clotdata)
-
-# Corrected
-t.test(clotTime ~ drugType, data = clotData)
-````
+> Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.

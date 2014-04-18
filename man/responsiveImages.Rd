@@ -1,0 +1,29 @@
+\name{responsiveImages}
+\alias{responsiveImages}
+\title{Post processor that adds centered and responsive classes to images}
+\usage{
+responsiveImages(text, context, templates)
+}
+\arguments{
+  \item{text}{a character string containing the text of the
+  output document}
+
+  \item{context}{a list containing post processing
+  environment variables}
+
+  \item{templates}{a list containing strings holding the
+  contents of template documents}
+}
+\value{
+a string character containing the new text of the output
+document
+}
+\description{
+This post processor adds the classes 'img-responsive' and
+'center-block' to all img tags on a page.
+}
+\details{
+All post processor take exactly three arguments (passed in
+by the courseR framework).
+}
+
