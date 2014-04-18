@@ -16,12 +16,13 @@ courseR is a tool chain designed to build websites from [R Markdown](https://git
 
 courseR and RMarkdown v2.0 are both on github, so the easiest way to install them is to use the devtools package.  If you don't have it already:
 
-```{r}
+```
 install.packages("devtools")
 ```
 
 To install courseR and the new version of RMarkdown from github:
-```{r}
+
+```
 devtools::install_github("rstudio/rmarkdown")
 devtools::install_github("whitwort/courseR")
 ```
