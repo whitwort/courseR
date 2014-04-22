@@ -75,6 +75,10 @@ renderCache  <- function( targetPath
                                , function(format) { as.yaml(format) } 
                                )
   
+  for (colName in annotations) {
+    manifest[[colName]] <- sapply(manifest[[colName]], as.yaml)
+  }
+  
   # Serialize the current manifest (used in the next build step)
   write.table(manifest, build.manifest)
   
@@ -182,7 +186,7 @@ renderOutput <- function( sourceFile
     
     # if the file doesn't exist or the cache for this format is invalid render
     # the file
-    if (!file.exists(outputPath) || rebuild) {
+    if ( (!file.exists(outputPath) || rebuild) && file.exists(sourceFile)) {
       cat("\nRendering", outputFile, "...")
       if (class(format$render) == "character") {
         renderFormat <- do.call(get(format$render), list())
