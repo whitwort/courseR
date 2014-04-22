@@ -75,15 +75,22 @@ renderCache  <- function( targetPath
                                , function(format) { as.yaml(format) } 
                                )
   
+  # Serialize manifest
+  writeManifest(manifest, annotations, build.manifest)
+  
+  # return the manifest
+  manifest
+  
+}
+
+writeManifest <- function(manifest, annotations, build.manifest) {
+  
   for (colName in annotations) {
     manifest[[colName]] <- sapply(manifest[[colName]], as.yaml)
   }
   
   # Serialize the current manifest (used in the next build step)
   write.table(manifest, build.manifest)
-  
-  # return the manifest
-  manifest
   
 }
 

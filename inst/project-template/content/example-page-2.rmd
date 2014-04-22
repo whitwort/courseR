@@ -2,7 +2,9 @@
 title: "Data files"
 description: An example of how to reference external data files in courseR projects.  Also includes examples of text trimming in slide generation.
 section: Tutorial
-data: data/codons.txt
+data: 
+  - data/codons.txt
+  - data/data.txt
 ---
 
 # Data references
