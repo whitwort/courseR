@@ -17,7 +17,7 @@ fileHash    <- function(path, wd = getwd()) {
     
     # If the file is large (>1mb), hash the file info instead of the contents
     info <- file.info(path)
-    if (info$size > 1024 * 1024) {
+    if (is.na(info$size) || info$size > 1024 * 1024) {
       hash <- digest(info)
       
       # If the file is small, hash the contents (to avoid recompiling if no actual

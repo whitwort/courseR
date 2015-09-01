@@ -8,7 +8,7 @@ courseR is a tool chain designed to build websites from [R Markdown](https://git
 
 3.  Separation in the build workflow between an intermediate page rendering step and the final website building step to allow templates to make use of site-wide information (for example, to build global tables of contents).
 
-4.  Smart(ish) caches between builds.  The default Knitr caching mechanism caches the results of chunk blocks, re-runing blocks if the code in them changes.  Unfortunately, there's no way to automatically invalidate these caches when external files they depend upon change.  Instead of using R object chunk-caches, courseR caches the each output that is rendered by RMarkdown.  If source files or data they depend upon change, all associated output files are re-rendered; if templates or configuration settings for a particular output target change, only these files are re-rendered.
+4.  Smart(ish) caches between builds.  The default Knitr caching mechanism caches the results of chunk blocks, re-runing blocks if the code in them changes.  Unfortunately, there's no way to automatically invalidate these caches when external files they depend upon change.  Instead of using R object chunk-caches, courseR caches the output that is rendered by RMarkdown.  If source files or data they depend upon change, all associated output files are re-rendered; if templates or configuration settings for a particular output target change, only these files are re-rendered.
 
 ## Getting started
 
@@ -16,13 +16,13 @@ courseR is a tool chain designed to build websites from [R Markdown](https://git
 
 courseR and RMarkdown v2.0 are both on github, so the easiest way to install them is to use the devtools package.  If you don't have it already:
 
-```S
+```r
 install.packages("devtools")
 ```
 
 To install courseR and the new version of RMarkdown from github:
 
-```S
+```r
 devtools::install_github("rstudio/rmarkdown")
 devtools::install_github("whitwort/courseR")
 ```
@@ -31,14 +31,14 @@ devtools::install_github("whitwort/courseR")
 
 To initialize a new template project directory either start a blank project in RStudio or manually set your working directory into an empty path, then call:
 
-```S
+```r
 library(courseR)
 courseR.init()
 ```
 
 See the new README.md file in the root of the project folder for a full description of the structure of the subfolders that were created and the courseR.yaml file for example configuration options.  When you're ready to build the project website, just call:
 
-```S
+```r
 courseR.build()
 ```
 
