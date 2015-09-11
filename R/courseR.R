@@ -15,9 +15,9 @@
 #' @param overwrite a logical value specifying whether or not existing files
 #'   should be overwritten.
 #' 
-courseR.init  <- function( path         = getwd()
-                         , overwrite    = FALSE
-                         ) {
+init  <- function( path = getwd()
+                 , overwrite    = FALSE
+                 ) {
   
   sourcePath  <- file.path(find.package("courseR"), "project-template")
   recursiveCopy(sourcePath, path, overwrite = overwrite)
@@ -93,24 +93,24 @@ courseR.init  <- function( path         = getwd()
 #' @import XML
 #' @import selectr
 #' 
-courseR.build <- function( projectPath      = getwd()
-                         , config           = yaml.load_file(configPath)
-                         , configPath       = file.path(projectPath, "courseR.yaml")
-                         , content          = file.path(projectPath, config$paths$content)
-                         , app              = file.path(projectPath, config$paths$app)
-                         , templates        = file.path(projectPath, config$paths$templates)
-                         , buildCache       = file.path(projectPath, config$paths$buildCache)
-                         , build            = file.path(projectPath, config$paths$build)
-                         , formats          = config$output_formats
-                         , contents         = config$contents
-                         , templateData     = config$templateData
-                         , annotations      = config$annotations
-                         , sourceExternals  = config$sourceExternals
-                         , outputExternals  = config$outputExternals
-                         
-                         , forceRebuild     = FALSE
-                         , dumpContext      = FALSE
-                         ) {
+build <- function( projectPath      = getwd()
+                 , config           = yaml.load_file(configPath)
+                 , configPath       = file.path(projectPath, "courseR.yaml")
+                 , content          = file.path(projectPath, config$paths$content)
+                 , app              = file.path(projectPath, config$paths$app)
+                 , templates        = file.path(projectPath, config$paths$templates)
+                 , buildCache       = file.path(projectPath, config$paths$buildCache)
+                 , build            = file.path(projectPath, config$paths$build)
+                 , formats          = config$output_formats
+                 , contents         = config$contents
+                 , templateData     = config$templateData
+                 , annotations      = config$annotations
+                 , sourceExternals  = config$sourceExternals
+                 , outputExternals  = config$outputExternals
+                 
+                 , forceRebuild     = FALSE
+                 , dumpContext      = FALSE
+                 ) {
   
   # We take r scripts, rmd and md files as possible sources
   contentFiles <- list.files( content
