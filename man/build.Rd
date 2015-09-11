@@ -14,7 +14,7 @@ build(projectPath = getwd(), config = yaml.load_file(configPath),
   formats = config$output_formats, contents = config$contents,
   templateData = config$templateData, annotations = config$annotations,
   sourceExternals = config$sourceExternals,
-  outputExternals = config$outputExternals, forceRebuild = FALSE,
+  outputExternals = config$outputExternals, clearCache = FALSE,
   dumpContext = FALSE)
 }
 \arguments{
@@ -70,8 +70,8 @@ output formats that reference external files that should be considered as
 integral to the format rendering stage (for example, pandoc templates).
 Outputs will be rebuilt when these files change.}
 
-\item{forceRebuild}{a logical indicating whether or not the entire project
-should be rerendered and rebuilt, irrespective of the state of the
+\item{clearCache}{a logical indicating whether or not the entire project
+should be re-rendered and rebuilt, irrespective of the state of the
 intermediate cache.  Mostly useful for debugging purposes.}
 
 \item{dumpContext}{a logical indicating whether or not data bindings

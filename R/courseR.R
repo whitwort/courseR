@@ -15,7 +15,7 @@
 #' @param overwrite a logical value specifying whether or not existing files
 #'   should be overwritten.
 #' 
-init  <- function( path = getwd()
+init  <- function( path         = getwd()
                  , overwrite    = FALSE
                  ) {
   
@@ -161,4 +161,29 @@ build <- function( projectPath      = getwd()
               )
   } 
   
+}
+
+
+#' Get project content manifest
+#'
+#' @param projectPath a character string with the root path to a project folder.
+#'   This folder should contain the required resource subfolders (unless 
+#'   alternative locations are specified). Defaults to the current working 
+#'   directory.
+#' @param config a list structure containing a full set of project configuration
+#'   settings.  Defaults to the yaml parse of the file found on configPath.
+#' @param configPath a character string path to a yaml configuration file. 
+#'   Defaults to courseR.yaml.
+#' @param buildCache a character string containing the path to the build cache 
+#'   directory.
+#'   
+#' @return A data.frame
+#' @export
+#'
+manifest <- function( projectPath = getwd()
+                    , config      = yaml.load_file(configPath)
+                    , configPath  = file.path(projectPath, "courseR.yaml")
+                    , buildCache  = file.path(projectPath, config$paths$buildCache)
+                    ) {
+  read.table(file.path(buildCache, 'build.manifest'), stringsAsFactors = FALSE)
 }
