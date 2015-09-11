@@ -74,8 +74,8 @@ init  <- function( path = getwd()
 #'   output formats that reference external files that should be considered as
 #'   integral to the format rendering stage (for example, pandoc templates). 
 #'   Outputs will be rebuilt when these files change.
-#' @param forceRebuild a logical indicating whether or not the entire project
-#'   should be rerendered and rebuilt, irrespective of the state of the
+#' @param clearCache a logical indicating whether or not the entire project
+#'   should be re-rendered and rebuilt, irrespective of the state of the
 #'   intermediate cache.  Mostly useful for debugging purposes.
 #' @param dumpContext a logical indicating whether or not data bindings
 #'   available to post-processors should be dumped to YAML files for each output
@@ -108,7 +108,7 @@ build <- function( projectPath      = getwd()
                  , sourceExternals  = config$sourceExternals
                  , outputExternals  = config$outputExternals
                  
-                 , forceRebuild     = FALSE
+                 , clearCache       = FALSE
                  , dumpContext      = FALSE
                  ) {
   
@@ -122,7 +122,7 @@ build <- function( projectPath      = getwd()
   # (via knitr and Pandoc).  We cache the results of the intermediate build to
   # avoid having to re-execute (potentially) costly R between build updates when
   # only the presentation or overall structure of the project has changed.
-  if (forceRebuild) { unlink(buildCache, recursive = TRUE) }
+  if (clearCache) { unlink(buildCache, recursive = TRUE) }
   if ( !file.exists(buildCache) ) { dir.create(buildCache) }
   
   manifest <- renderCache( targetPath      = buildCache
