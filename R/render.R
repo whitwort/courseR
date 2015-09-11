@@ -133,7 +133,7 @@ hashSources <- function(sourceFiles, headers, sourceExternals, contentPath) {
             } else { 
               sourceFiles = file 
             }
-            fileHash(sourceFiles, wd = contentPath)
+            fileHash(file.path(contentPath, sourceFiles))
           }
         , sourceFiles
         , headers
@@ -166,11 +166,8 @@ mergeFormats <- function( fileHeader
       renderArgs   <- format$render[[1]]
       externalRefs <- intersect(names(renderArgs), outputExternals)
       if (length(externalRefs) > 0) {
-        formats[[name]]$externalsHash <- fileHash( c(renderArgs[[externalRefs]]
-                                                    , recursive = TRUE
-                                                    )
-                                                 , wd = contentPath
-                                                 )
+        files <- c(renderArgs[[externalRefs]], recursive = TRUE)
+        formats[[name]]$externalsHash <- fileHash(file.path(contentPath, files))
       }
     }
   }
@@ -204,7 +201,8 @@ renderOutput <- function( sourceFile
       # rmarkdown::render
       render( input         = sourceFile
             , output_format = renderFormat
-            , output_file   = outputPath
+            , output_file   = outputFile
+            , output_dir    = targetPath
             , quiet         = TRUE
             )
     }

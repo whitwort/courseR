@@ -4,15 +4,12 @@ loadTextFile    <- function(filePath, warn = FALSE) {
 
 rootName    <- function(filePath) { file_path_sans_ext(basename(filePath)) }
 
-fileHash    <- function(path, wd = getwd()) {
-  
-  oldwd <- getwd()
-  setwd(wd)
-  
+fileHash    <- function(path) {
+
   # If there are multiple paths, hash each then digest the resulting vector of
   # hashes
   if (length(path) > 1) {
-    hash <- digest( sapply(path, function(p) { fileHash(p, wd) }) )
+    hash <- digest( sapply(path, function(p) { fileHash(p) }) )
   } else {
     
     # If the file is large (>1mb), hash the file info instead of the contents
@@ -20,17 +17,44 @@ fileHash    <- function(path, wd = getwd()) {
     if (is.na(info$size) || info$size > 1024 * 1024) {
       hash <- digest(info)
       
-      # If the file is small, hash the contents (to avoid recompiling if no actual
-      # content changes have been made even if the file has been touched)
+    # If the file is small, hash the contents (to avoid recompiling if no actual
+    # content changes have been made even if the file has been touched)
     } else {
       hash <- md5sum(path)
     }  
+    
   }
   
-  setwd(oldwd)
   hash
-  
 }
+
+# fileHash    <- function(path, wd = getwd()) {
+#   
+#   oldwd <- getwd()
+#   setwd(wd)
+#   
+#   # If there are multiple paths, hash each then digest the resulting vector of
+#   # hashes
+#   if (length(path) > 1) {
+#     hash <- digest( sapply(path, function(p) { fileHash(p, wd) }) )
+#   } else {
+#     
+#     # If the file is large (>1mb), hash the file info instead of the contents
+#     info <- file.info(path)
+#     if (is.na(info$size) || info$size > 1024 * 1024) {
+#       hash <- digest(info)
+#       
+#       # If the file is small, hash the contents (to avoid recompiling if no actual
+#       # content changes have been made even if the file has been touched)
+#     } else {
+#       hash <- md5sum(path)
+#     }  
+#   }
+#   
+#   setwd(oldwd)
+#   hash
+#   
+# }
 
 recursiveCopy <- function(fromPath, toPath, overwrite = TRUE) {
   lapply( file.path( toPath, list.dirs(fromPath, full.names = FALSE) )
