@@ -12,7 +12,7 @@ renderCache  <- function( targetPath
   manifest       <- data.frame(file = sourceFiles, stringsAsFactors = FALSE)
   if ( file.exists(build.manifest) ) {
     oldManifest  <- read.table(build.manifest, stringsAsFactors = FALSE)
-    manifest     <- merge(manifest, oldManifest, by = "file", all = TRUE)
+    manifest     <- merge(manifest, oldManifest, by = "file", all.x = TRUE, all.y = FALSE)
   }
   
   # Parse yaml headers from sources into a list
