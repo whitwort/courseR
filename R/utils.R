@@ -2,7 +2,7 @@ loadTextFile    <- function(filePath, warn = FALSE) {
   paste(readLines(filePath, warn = warn), sep = "\n")
 }
 
-rootName    <- function(filePath) { file_path_sans_ext(basename(filePath)) }
+rootName    <- function(filePath) { tools::file_path_sans_ext(basename(filePath)) }
 
 fileHash    <- function(path) {
 
@@ -20,7 +20,7 @@ fileHash    <- function(path) {
     # If the file is small, hash the contents (to avoid recompiling if no actual
     # content changes have been made even if the file has been touched)
     } else {
-      hash <- md5sum(path)
+      hash <- tools::md5sum(path)
     }  
     
   }

@@ -83,7 +83,7 @@ init  <- function( path         = getwd()
 #'   are available for use in post-processing functions.
 #' 
 #' @import digest
-#' @import tools
+
 #' @import rmarkdown
 #' @import yaml
 #' @import whisker
