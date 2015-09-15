@@ -159,10 +159,13 @@ build <- function( projectPath      = getwd()
               , file.path(content, sourceExternals)
               , file.path(build, sourceExternals)
               )
-  } 
+  }
+  
+  if (!is.null(config$package)) {
+    updatePackage(config, manifest, projectPath)
+  }
   
 }
-
 
 #' Get project content manifest
 #'
@@ -187,3 +190,4 @@ manifest <- function( projectPath = getwd()
                     ) {
   read.table(file.path(buildCache, 'build.manifest'), stringsAsFactors = FALSE)
 }
+
