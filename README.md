@@ -49,4 +49,4 @@ courseR::build()
 
 ## License
 
-Copyright © 2013-2014 Gregg Whitworth and licensed under [GPLv3](http://www.gnu.org/licenses/gpl-3.0.html).
+Copyright © 2013-2015 Gregg Whitworth and licensed under [GPLv3](http://www.gnu.org/licenses/gpl-3.0.html).

@@ -162,7 +162,15 @@ build <- function( projectPath      = getwd()
   }
   
   if (!is.null(config$package)) {
-    updatePackage(config, manifest, projectPath)
+    updateScript <- file.path( projectPath
+                             , config$package$packagePath
+                             , "R"
+                             , config$package$updateScript
+                             )
+    if (file.exists(updateScript)) {
+      source(updateScript, local = TRUE)
+      updatePackage(config, manifest, projectPath)  
+    }
   }
   
 }
