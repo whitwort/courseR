@@ -32,14 +32,13 @@ devtools::install_github("whitwort/courseR")
 To initialize a new template project directory either start a blank project in RStudio or manually set your working directory into an empty path, then call:
 
 ```r
-library(courseR)
-courseR.init()
+courseR::init()
 ```
 
 See the new README.md file in the root of the project folder for a full description of the structure of the subfolders that were created and the courseR.yaml file for example configuration options.  When you're ready to build the project website, just call:
 
 ```r
-courseR.build()
+courseR::build()
 ```
 
 ## Version
