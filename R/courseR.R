@@ -118,6 +118,28 @@ build <- function( projectPath      = getwd()
                             , ignore.case = TRUE
                             )
   
+  # Package hooks
+  if (!is.null(config$package)) {
+    buildScript <- file.path( projectPath
+                            , config$package$packagePath
+                            , "R"
+                            , config$package$buildScript
+                            )
+    
+    if (file.exists(buildScript)) { 
+      preHook  <- if (is.character(config$package$preHook))  { TRUE } else { FALSE }
+      postHook <- if (is.character(config$package$postHook)) { TRUE } else { FALSE }
+      if (preHook || postHook) {
+        source(buildScript, local = TRUE)   
+      }
+    }
+
+  }
+  
+  if (exists("preHook") && preHook) {
+    config <- eval(parse(text = config$package$preHook))(config, contentFiles, projectPath)
+  }
+  
   # The intermediate build step contains the results of the R Markdown rendering
   # (via knitr and Pandoc).  We cache the results of the intermediate build to
   # avoid having to re-execute (potentially) costly R between build updates when
@@ -132,6 +154,7 @@ build <- function( projectPath      = getwd()
                          , annotations     = annotations
                          , sourceExternals = sourceExternals
                          , outputExternals = outputExternals
+                         , config          = config
                          )
 
   # Build a contents structure from the manifest if one is not provided
@@ -144,33 +167,25 @@ build <- function( projectPath      = getwd()
   if (file.exists(build)) { unlink(build, recursive = TRUE) }
   dir.create(build)
   
-  final <- buildFinal( targetPath  = build
-                     , buildCache  = buildCache
-                     , manifest    = manifest
-                     , context     = templateData
-                     , templates   = loadTemplates(templates, templateData)
-                     , dumpContext = dumpContext
-                     )
+  buildFinal( targetPath  = build
+            , buildCache  = buildCache
+            , manifest    = manifest
+            , context     = templateData
+            , templates   = loadTemplates(templates, templateData)
+            , dumpContext = dumpContext
+            )
   
   # copy over all web resources found in app and source externals
   recursiveCopy(app, build)
   if (length(sourceExternals) > 0) {
-   s <- mapply( recursiveCopy
-              , file.path(content, sourceExternals)
-              , file.path(build, sourceExternals)
-              )
+   mapply( recursiveCopy
+         , file.path(content, sourceExternals)
+         , file.path(build, sourceExternals)
+         )
   }
   
-  if (!is.null(config$package)) {
-    updateScript <- file.path( projectPath
-                             , config$package$packagePath
-                             , "R"
-                             , config$package$updateScript
-                             )
-    if (file.exists(updateScript)) {
-      source(updateScript, local = TRUE)
-      updatePackage(config, manifest, projectPath)  
-    }
+  if (exists("postHook") && postHook) {
+    eval(parse(text = config$package$postHook))(config, manifest, projectPath)    
   }
   
 }

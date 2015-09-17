@@ -5,6 +5,7 @@ renderCache  <- function( targetPath
                         , annotations
                         , sourceExternals
                         , outputExternals
+                        , config
                         ) {
   
   # Create a manifest and merge in pre-existing data if it exists
@@ -56,7 +57,7 @@ renderCache  <- function( targetPath
                                                 , sourceHash
                                                 , outputFormats
                                                 )
-                   , MoreArgs     = list(targetPath = targetPath)
+                   , MoreArgs     = list(targetPath = targetPath, config = config)
                    , SIMPLIFY     = FALSE
                    , USE.NAMES    = TRUE
                    )
@@ -180,6 +181,7 @@ renderOutput <- function( sourceFile
                         , formats
                         , rebuilds
                         , targetPath
+                        , config
                         ) {
   
   fileRoot     <- rootName(sourceFile)
@@ -196,6 +198,13 @@ renderOutput <- function( sourceFile
         renderFormat <- do.call(get(format$render), list())
       } else {
         renderFormat <- do.call(get(names(format$render)), format$render[[1]]) 
+      }
+      
+      if (!is.null(config$knitr) && !is.null(renderFormat$knitr)) {
+        cat("updating knitr hooks")
+        for (name in names(config$knitr)) {
+          renderFormat$knitr[[name]] <- listMerge(renderFormat$knitr[[name]], config$knitr[[name]])
+        }
       }
       
       # rmarkdown::render
