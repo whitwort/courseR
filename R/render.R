@@ -201,7 +201,6 @@ renderOutput <- function( sourceFile
       }
       
       if (!is.null(config$knitr) && !is.null(renderFormat$knitr)) {
-        cat("updating knitr hooks")
         for (name in names(config$knitr)) {
           renderFormat$knitr[[name]] <- listMerge(renderFormat$knitr[[name]], config$knitr[[name]])
         }
