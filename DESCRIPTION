@@ -1,24 +1,17 @@
 Package: courseR
 Type: Package
-Title: R Markdown build tool for generation course websites
-Description: Build complete websites with multiple output formats from a common
-    set of R markdown sources.  Useful for creating class websites with linked
-    handout-style webpages and HTML presentations.
-Version: 0.3
-Date: 2014-04-16
+Title: R Markdown tool for generation course websites and managing assignments
+Description: This package implements my workflow for (1) creating websites for
+    teaching courses in R and (2) using an R package to semi-automation student
+    homework assignment tasks in a managed environment (e.x. RStudio server)
+Version: 0.4
+Date: 2017-01-06
 Author: Gregg Whitworth
 Maintainer: Gregg Whitworth <whitwort@gmail.com>
 URL: http://github.com/whitwort/courseR
+BugReports: http://github.com/whitwort/courseR/issues
+VignetteBuilder: knitr
 Imports:
-    digest,
-    tools,
-    rmarkdown,
-    yaml,
-    whisker,
-    plyr,
-    compare,
-    shiny,
-    XML,
-    selectr
 SystemRequirements: pandoc (>= 1.12.3)
 License: GPL-3
+RoxygenNote: 5.0.1
