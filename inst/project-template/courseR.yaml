@@ -15,14 +15,11 @@ paths:
 # courseR makes extensive use of whisker (mustache) templates
 templates:
 
-  # website vendor libraries (Bootstrap, jquery, etc.) and custom js/css/fonts
-  lib-path:     templates/lib
-  
   # template for the custom R package
-  package-path: templates/package
+  package: templates/package
   
   # templates for content and assignment documents
-  pages-path:   templates/pages
+  pages:   templates/pages
   
   # all key-value pairs defined here will be available as variables when 
   # templates are rendered
@@ -30,6 +27,7 @@ templates:
     
     # automatically created entries; explicitly setting a value will override
     # name:     # the default course name is the directory where build() is called
+    #... all data here as well
     
 # Build options
 build:
@@ -37,6 +35,7 @@ build:
   # Set `package: false` to skip building a course package
   package: 
     path: build/{{name}}
+    name: {{name}}
   
   # Set `site: false` to skip building the website
   site:
@@ -44,6 +43,7 @@ build:
     pages:        true        # make pages?
     slides:       true        # make slides?
     trim-slides:  true        # removes blocks of text from slides
+    url:          http://localhost/{{name}} # no trailing slash
 
 # Course-specific configuration options; these change the default view for the 
 # assignments shiny app.  * makes all users include that type's view.
