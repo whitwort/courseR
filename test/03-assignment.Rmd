@@ -1,0 +1,20 @@
+---
+title:  Assignment 1
+type:   assignment
+---
+
+## R Markdown
+
+Print out a summary of the `cars` data set:
+
+```{r}
+summary(cars)
+```
+
+## Including Plots
+
+Plot the variable `pressure`:
+
+```{r}
+plot(pressure)
+``` 

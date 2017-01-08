@@ -1,18 +1,22 @@
 renderTemplate <- function(template, data, file = NULL, partials = list()) {
-  s <- whisker::whisker.render( template = readFile(source)
+  s <- whisker::whisker.render( template = readFile(template)
                               , data     = data
                               , partials = partials
                               )
   
-  if (!is.null(file)) { cat(s, file = file) }
+  if (!is.null(file)) { cat(s, "\n", file = file) }
   
   invisible(s)
 }
 
 loadPartials <- function(path, recursive = TRUE) {
-  lapply( list.files(file.path(path, "partials"), recursive = recursive)
-        , function(file) { readFile(file.path(path, file)) }
-        )
+  paths <- list.files(path, recursive = recursive)
+  x <- lapply( paths
+             , function(file) { readFile(file.path(path, file)) }
+             )
+  
+  names(x) <- splitext(paths)
+  x
 }
 
 readFile <- function(path) {
@@ -28,15 +32,15 @@ loadConfig <- function(path) {
 getHeader <- function(path) {
   lines <- readLines(path)
   exts  <- grep("^(---|\\.\\.\\.)\\s*$", lines)
-  yaml::yaml.load(paste0(lines[(exts[1] + 1):(exts[2] - 1)]))
+  yaml::yaml.load(paste0(lines[(exts[1] + 1):(exts[2] - 1)], collapse = "\n"))
 }
 
 splitext <- function(path) {
   s <- strsplit(basename(path), ".", fixed = TRUE)
-  s[[1]][1]
+  sapply(s, function(x) x[1])
 }
 
-newSource <- function(tmpl, dest, path = getwd(), ...) {
+newSource <- function(tmpl, dest, path, ...) {
   
   config   <- loadConfig(path)
   renderTemplate( template = file.path(path, "templates", "site", tmpl)
@@ -44,6 +48,7 @@ newSource <- function(tmpl, dest, path = getwd(), ...) {
                 , file     = file.path(path, dest)
                 , partials = loadPartials(file.path(path, "templates", "site", "partials"))
                 )
+  
   update(path)
   
 }

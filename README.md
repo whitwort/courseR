@@ -26,7 +26,7 @@ See `courseR.yaml` for configuration options and files in `templates/` to custom
 
 ## Version
 
-* 0.4  Yup, it happened again.  The new `rmarkdown::render_site` supercedes most of what this package used to do; rewritten as a custom site-generator function.  Also added v2.0 of the course package implementation.
+* 0.4  Yup, it happened again.  The new `rmarkdown::render_site` supercedes most of what this package used to do.  Also added v2.0 of the course package implementation.
 * 0.3  Rewritten to leaverage new features in RMarkdown v2.0
 * 0.2  Rewritten to use whisker for templating and make heavier use of new Knitr features
 * 0.1  Initital experiment in developing a workflow to produce both handout-style webpages and HTML slides from a common set of markdown sources.

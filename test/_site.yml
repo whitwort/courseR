@@ -1,4 +1,4 @@
-name: {{name}}
+name: test
 output:
   html_document:
     theme:      cosmo
@@ -7,4 +7,4 @@ output:
     toc_float:  true
     include:
       after_body: footer.md
-
+ 

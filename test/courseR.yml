@@ -27,7 +27,7 @@ templates:
   # templates are rendered
   data:
     
-    name: {{name}} # project name; defaults to path where init() was called
+    name: test # project name; defaults to path where init() was called
     #... all data here as well
     
 # Build options
@@ -35,18 +35,18 @@ build:
 
   # Set `package: false` to skip building a course package
   package: 
-    dist: dist/{{name}}
-    name: {{name}}
+    dist: dist/test
+    name: test
   
   # Set `site: false` to skip building the website
   site:
     build:        build       # temporary build path for intermediate rmds
     dist:         dist/www
     max-chars:    144         # removes blocks of text from slides; set to false to disable
-    url:          http://localhost/{{name}} # no trailing slash
+    url:          http://localhost/test # no trailing slash
 
 # Course-specific configuration options; these change the default view for the 
 # assignments shiny app.  * makes all users include that type's view.
 instructor-users: "*"
 
-student-users: "*"
+student-users: "*" 

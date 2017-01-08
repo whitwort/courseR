@@ -1,7 +1,0 @@
----
-title:  {{title}}
-site:   courseR::courseRsite
-output: html_document
----
-
-{{rmd}}

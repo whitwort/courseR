@@ -16,8 +16,13 @@ init <- function( path      = getwd()
   
   message("Initializing courseR project: ", name)
   
+  if (!dir.exists(path)) { dir.create(path) }
+  
   sourcePath <- system.file(package = "courseR")
-  file.copy( from      = file.path(sourcePath, "project-template")
+  file.copy( from      = list.files( file.path(sourcePath, "project-template")
+                                   , full.names   = TRUE
+                                   , include.dirs = TRUE
+                                   )
            , to        = path
            , overwrite = overwrite
            , recursive = TRUE
@@ -33,12 +38,12 @@ init <- function( path      = getwd()
         )
   
   if (examples) {
-    newContent(file = "01-sample.rmd", title = "Sample 1", data = "sample.txt")
+    newContent(file = "01-sample.Rmd", title = "Sample 1", data = "sample.txt", path = path)
     cat("sample data", file = file.path(path, "data", "sample1.txt"))
     
-    newContent(file = "02-sample.rmd", title = "Sample 2")
+    newContent(file = "02-sample.Rmd", title = "Sample 2", path = path)
     
-    newAssignment(file = "03-assignment.rmd", title = "Assignment 1")
+    newAssignment(file = "03-assignment.Rmd", title = "Assignment 1", path = path)
   }
 
 }
@@ -53,10 +58,11 @@ init <- function( path      = getwd()
 #' @export
 update <- function(path = getwd()) {
   
-  rmds <- lapply( list.files(path, pattern = "*.rmd")
+  rmds <- lapply( list.files(path, pattern = "*.Rmd")
                 , function(file) { 
                     h <- getHeader(file.path(path, file))
                     list( type  = h$type
+                        , rmd   = file
                         , file  = paste0(splitext(file), ".html")
                         , title = h$title
                         )                
@@ -75,19 +81,113 @@ update <- function(path = getwd()) {
                 , partials = loadPartials(file.path(path, "templates", "site", "partials"))
                 )
   
+  invisible(list(rmds = rmds, types = types))
+  
 }
 
 #' Build a project
 #' 
 #' @param cleanBuild should intermediate build files be deleted when the build 
-#'   is done
+#'   is done.  Note this will trounce any knitr caching
 #' @param cleanPreviews should .html files created in the main project directory
 #'   by making ad hoc previews in RStudio be deleted
 #' @param path path for the project to build
 #'   
 #' @export
-build <- function(cleanBuild = TRUE, cleanPreviews = TRUE, path = getwd()) {
-  update(path)
+build <- function(cleanBuild = FALSE, cleanPreviews = TRUE, path = getwd()) {
+  
+  update <- update(path)
+  rmds   <- update$rmds
+  types  <- update$types
+  
+  config <- loadConfig(path)
+  
+  if (!is.logical(config$build$site)) {
+    buildPath <- file.path(path, config$build$site$build)
+    
+    if (cleanBuild && dir.exists(buildPath)) {
+      unlink(buildPath)
+    }
+    
+    if (!dir.exists(buildPath)) {
+      dir.create(buildPath)
+    }
+    
+    file.copy( from = file.path(path, c("_site.yml", "_navbar.html", "footer.md", "index.Rmd", "data")) # index.Rmd can't be spelled .rmd currently
+             , to   = buildPath
+             , recursive = TRUE
+             )
+    
+    partials = loadPartials(file.path(path, "templates", "site", "partials"))
+    
+    content <- rmds[types == 'content']
+    lapply( content
+          , function(x) {
+              rmd    <- getRMD(file.path(path, x$rmd))
+              
+              pagedata   <- c( config$templates$data
+                             , x
+                             , list( content = collapseRMD(rmd)
+                                   , slides  = paste0(splitext(x$file), "-slides.html")
+                                   )
+                             )
+              renderTemplate( template = file.path(path, "templates", "site", "content-page.Rmd")
+                            , data     = pagedata
+                            , file     = file.path(buildPath, x$rmd)
+                            , partials = partials
+                            )
+              
+              slidedata <- c( config$templates$data
+                            , x
+                            , list(content = slideRMD(rmd, config))
+                            )
+              
+              renderTemplate( template = file.path(path, "templates", "site", "content-slides.Rmd")
+                            , data     = slidedata
+                            , file     = file.path(buildPath, paste0(splitext(x$file), "-slides.Rmd"))
+                            , partials = partials
+                            )
+             
+              
+              if (cleanPreviews) {
+                unlink(x$file)
+              }
+            }
+          )
+    
+    assignments <- rmds[types == 'assignment']
+    lapply( assignments
+          , function(x) {
+              rmd  <- getRMD(file.path(path, x$rmd))
+              data <- c( config$templates$data
+                       , x
+                       , list( solution   = solutionRMD(rmd)
+                             , assignment = splitext(x$rmd)
+                             )
+                       )
+              
+              instPath <- file.path(path, "templates", "site", "assignment-instructions.md")
+              
+              renderTemplate( template = file.path(path, "templates", "site", "assignment-page.Rmd")
+                            , data     = data
+                            , file     = file.path(buildPath, x$rmd)
+                            , partials = partials
+                            )
+            
+              if (cleanPreviews) {
+                unlink(x$file)
+              }
+              
+            }
+          )
+    
+    rmarkdown::render_site(input = buildPath, env = new.env())
+  }
+  
+  if (!is.logical(config$build$package)) {
+    
+  }
+  
 }
 
 #' Create a new assignment file
@@ -99,19 +199,16 @@ build <- function(cleanBuild = TRUE, cleanPreviews = TRUE, path = getwd()) {
 #' @param ... additional arguments are available as keys when the template is
 #'   rendered to create the new file
 #'   
-#' @return
 #' @export
-#' 
-#' @examples
 newAssignment <- function(file, title, data = "", path = getwd(), ...) {
 
-  newSource( tmpl  = "assignment.rmd"
+  newSource( tmpl  = "assignment.Rmd"
            , dest  = file
            , title = title
            , data  = data
+           , path  = path
            , ...
            )
-  update(path)
   
 }
 
@@ -124,19 +221,16 @@ newAssignment <- function(file, title, data = "", path = getwd(), ...) {
 #' @param ... additional arguments are available as keys when the template is
 #'   rendered to create the new file
 #'   
-#' @return
 #' @export
-#' 
-#' @examples
 newContent <- function(file, title, data = "", path = getwd(), ...) {
   
-  newSource( tmpl  = "content.rmd"
+  newSource( tmpl  = "content.Rmd"
            , dest  = file
            , title = title
            , data  = data
+           , path  = path
            , ...
            )
-  update(path)
   
 }
 

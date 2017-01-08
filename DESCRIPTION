@@ -10,10 +10,11 @@ Author: Gregg Whitworth
 Maintainer: Gregg Whitworth <whitwort@gmail.com>
 URL: http://github.com/whitwort/courseR
 BugReports: http://github.com/whitwort/courseR/issues
-VignetteBuilder: knitr
 Imports:
   revealjs,
-  whisker
+  whisker,
+  yaml,
+  rmarkdown
 SystemRequirements: pandoc (>= 1.12.3)
 License: GPL-3
 RoxygenNote: 5.0.1
