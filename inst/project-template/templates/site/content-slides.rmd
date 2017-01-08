@@ -1,0 +1,10 @@
+---
+title:  {{title}}
+site:   courseR::courseRsite
+output: 
+  revealjs::revealjs_presentation: 
+    incremental: true
+    center:      true
+---
+
+{{rmd}}

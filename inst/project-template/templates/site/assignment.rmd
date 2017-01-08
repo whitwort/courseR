@@ -1,0 +1,24 @@
+---
+title:  {{title}}
+type:   assignment
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+Print out a summary of the `cars` data set:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+Plot the variable `pressure`:
+
+```{r pressure}
+plot(pressure)
+```
