@@ -102,9 +102,13 @@ build <- function(cleanBuild = FALSE, cleanPreviews = TRUE, path = getwd()) {
   
   config <- loadConfig(path)
   
+  distPath <- file.path(path, config$paths$dist)
+  unlink(distPath, recursive = TRUE)
+  dir.create(distPath)
+  
   if (!is.logical(config$build$site)) {
     buildPath <- file.path(path, config$build$site$build)
-    
+
     if (cleanBuild && dir.exists(buildPath)) {
       unlink(buildPath)
     }
@@ -182,10 +186,20 @@ build <- function(cleanBuild = FALSE, cleanPreviews = TRUE, path = getwd()) {
           )
     
     rmarkdown::render_site(input = buildPath, env = new.env())
+    file.copy( from      = file.path(buildPath, "_site/")
+             , to        = distPath
+             , recursive = TRUE
+             )
+    file.rename( from = file.path(distPath, "_site")
+               , to   = file.path(distPath, config$build$site$dist)
+               )
   }
   
   if (!is.logical(config$build$package)) {
+    packageDist <- file.path(distPath, config$build$package$dist)
     
+    unlink(packageDist)
+    dir.create(packageDist)
   }
   
 }
