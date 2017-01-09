@@ -22,7 +22,7 @@ Build the website and package with:
 courseR::build()
 ```
 
-See `courseR.yaml` for configuration options and files in `templates/` to customize the generated website or R package.
+See `courseR.yml` for configuration options and files in `templates/` to customize the generated website or R package.
 
 ## Version
 
