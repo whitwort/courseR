@@ -5,21 +5,26 @@
 #'   you've done on this asignment already
 #' @param path path to your course project folder
 #' @param pkg path to course package
+#' 
+#' @return new file path
 #'   
 #' @export
 startAssignment <- function(name, overwrite = FALSE, path = getwd(), pkg) {
-  
+
   taskPath <- file.path(pkg, "data", "assignments")
-  source   <- file.path(taskPath, paste0(name, ".Rmd"))
+  if (!grepl(".Rmd", name)) {
+    name <- paste0(name, ".Rmd")
+  }
+  source   <- file.path(taskPath, name)
   if (!file.exists(source)) { 
     stop("There is not assignment with that name") 
   }
   
-  dest <- file.path(path, paste0(name, ".Rmd"))
+  dest <- file.path(path, name)
   if (file.exists(dest) && !overwrite) {
     stop("An excercise of that name already exists; use overwrite = TRUE if you'd like to erase your current copy.")
   }
-  
+
   message("Copying assignment file to: ", dest)
   file.copy(from = source, to = dest, overwrite = overwrite)
   
@@ -28,6 +33,8 @@ startAssignment <- function(name, overwrite = FALSE, path = getwd(), pkg) {
            , to   = file.path(path)
            , recursive = TRUE
            )
+  
+  dest
 }
 
 #' Check an assignment
@@ -88,4 +95,46 @@ submitAssignment <- function(name, path = getwd(), pkg) {
 #' @export
 checkAssignments <- function(path = getwd(), pkg) {
   
+}
+
+#' Custom RMarkdown document type that parses student assignments
+#' 
+#' Flag an Rmd file as an assignment by setting its output type to this
+#' function; not meant to be called directly.
+#' 
+#' @param assignment name of the assignment
+#' @param submit bool is this a submission render?
+#' @param pkg path to course package for this assignment
+#' @param ...
+#'   
+#' @return an R Markdown output format definition
+#' @export
+assignment <- function(assignment, submit = FALSE, pkg, ...) {
+  print("assignment called")
+  path <- studentPath()
+  if (submit) {
+    warning("not yet implemented")
+  } else {
+    config  <- loadConfig(file.path(pkg, "data"))
+    pkgPath <- file.path(path, config$build$package$name)
+    if (!dir.exists(pkgPath)) { dir.create(pkgPath) }
+    rdsPath <- file.path(pkgPath, "check") #update to handle submission runs
+    if (!dir.exists(rdsPath)) { dir.create(rdsPath) }
+  }
+
+  doc <- rmarkdown::html_document()
+  doc$keep_md <- TRUE
+  doc$clean_supporting <- FALSE
+  
+  doc$knitr$knit_hooks <- list(task = function(before, options, envirs, ...) { 
+      print(names(options))
+      print(names(list(...)))
+      if (before) { 
+        paste0("start-", options$task) 
+      } else { 
+        paste0("end-", options$task) 
+      }
+    })
+  
+  doc
 }

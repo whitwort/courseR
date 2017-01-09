@@ -4,10 +4,12 @@
 \alias{taskCollector}
 \title{Collect task chunks/source code blocks}
 \usage{
-taskCollector(callback, rds)
+taskCollector(callback = function(x, options) {     x }, assignment, rds)
 }
 \arguments{
 \item{callback}{tail call callback}
+
+\item{assignment}{name of the current assignment}
 
 \item{rds}{target data file}
 }
@@ -16,6 +18,6 @@ function to set as knitr hook
 }
 \description{
 knitr hook function to collect source and result chunks when assignments are
-knit
+knit.  Not meant to be used directly.
 }
 

@@ -11,7 +11,7 @@
 #' @export
 init <- function( path      = getwd()
                 , name      = basename(path)
-                , overwrite = TRUE
+                , overwrite = TRUE #bugged
                 , examples  = TRUE
                 , install   = TRUE
                 ) {
@@ -124,6 +124,9 @@ build <- function(cleanBuild = FALSE, cleanPreviews = TRUE, path = getwd()) {
   types  <- update$types
   
   config <- loadConfig(path)
+  if (!is.null(config$build$hooks$before)) {
+    lapply(config$build$hooks$before, function(f) do.call(f, args = list(update = update)))
+  }
   
   distPath <- file.path(path, config$paths$dist)
   unlink(distPath, recursive = TRUE)
@@ -298,6 +301,11 @@ build <- function(cleanBuild = FALSE, cleanPreviews = TRUE, path = getwd()) {
                )
   }
   
+  if (!is.null(config$build$hooks$after)) {
+    lapply(config$build$hooks$after, function(f) do.call(f, args = list(update = update)))
+  }
+  
+  TRUE
 }
 
 #' Create a new course content file

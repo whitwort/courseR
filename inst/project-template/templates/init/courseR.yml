@@ -32,6 +32,12 @@ build:
     dist:         www
     max-chars:    144         # removes blocks of text from slides; set to false to disable
     url:          http://localhost/{{name}} # no trailing slash
+    
+  # Hooks name closures called in order before or after builds; their called 
+  # with the return from `update`: function(update) 
+  #hooks:
+    #before: 
+    #after:  
 
 # Course-specific configuration options; these change the default view for the 
 # assignments shiny app.  * makes all users include that type's view.

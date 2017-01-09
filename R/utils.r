@@ -8,11 +8,8 @@ renderTemplate <- function(template, data, file = NULL, partials = list()) {
                               )
   
   # un-escape stuff whisker escaped
-  s <- gsub("&amp;", "&", s)
-  s <- gsub("&lt;", "<", s)
-  s <- gsub("&gt;", ">", s)
-  s <- gsub("&quot;", "\"", s)
-  
+  s <- whisker.unescape(s)
+
   if (!is.null(file)) { cat(s, "\n", file = file) }
   
   invisible(s)
@@ -103,4 +100,39 @@ smartSuppress <- function(expr, warningGrep) {
     }
   }
   withCallingHandlers(expr, warning = h)
+}
+
+whisker.unescape <- function(s) {
+  
+  # un-escape stuff whisker escaped
+  s <- gsub("&amp;", "&", s)
+  s <- gsub("&lt;", "<", s)
+  s <- gsub("&gt;", ">", s)
+  s <- gsub("&quot;", "\"", s)
+  
+  s
+}
+
+# l list of lists
+markdownify <- function(l, de.p = TRUE) {
+  x <- lapply( 1:length(l)
+             , function(i) {
+               if (class(l[[i]]) == "character") {
+                 s <- markdown::markdownToHTML(text = l[[i]], fragment.only = TRUE)
+                 
+                 if (de.p) {
+                   s <- gsub("<p>", "", s, fixed = TRUE)
+                   s <- gsub("</p>\n", "", s, fixed = TRUE)
+                 }
+                 
+                 s
+               } else if (class(l[[i]]) == "list") {
+                 markdownify(l[[i]])
+               } else {
+                 l[[i]]
+               }
+             }
+            )
+  names(x) <- names(l)
+  x
 }

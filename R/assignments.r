@@ -9,11 +9,13 @@
 #'   
 #' @return function to set as knitr hook
 #' @export
-taskCollector <- function(callback, assignment, rds) {
+taskCollector <- function(callback = function(x, options) { x }, assignment, rds) {
   
   function(x, options) {
-    
+    print("in task")
+    print(x)
     if (!is.null(options$task)) {
+      
       if (file.exists(rds)) {
         db <- readRDS(rds)
       } else {
@@ -29,4 +31,11 @@ taskCollector <- function(callback, assignment, rds) {
     callback(x, options)
   }
   
+}
+
+
+studentPath <- function() {
+  path <- file.path("~", ".courseR")
+  if (!dir.exists(path)) { dir.create(path) }
+  path
 }

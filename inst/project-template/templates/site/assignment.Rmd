@@ -27,7 +27,7 @@ Additional chunk options are carried over:
 plot(pressure)
 ```
 
-Chuncks not named `solution` are left unchanged:
+Chunks not named `solution` are left unchanged:
 
 ```{r}
 print("hello normal chunk!")

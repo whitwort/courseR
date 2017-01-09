@@ -1,7 +1,8 @@
 ---
 title:      "{{title}}"
-output:     html_document
-assignment: "{{assignment}}"
+output:
+  {{build.package.name}}::assignment:
+    assignment: "{{assignment}}"
 ---
 
 {{tasks}}

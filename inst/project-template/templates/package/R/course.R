@@ -1,13 +1,10 @@
 #' Start an assignment
 #' 
-#' @param name name of the assignment to start
-#' @param overwrite if true this function will overwrite any existing work
-#'   you've done on this asignment already
-#' @param path path to your course project folder
-#'   
+#' @inheritParams courseR::startAssignment
+#' 
 #' @export
 startAssignment <- function(name, overwrite = FALSE, path = getwd()) {
-  courseR::startAssignment(name = name, overwrite = overwrite, path = path, pgk = system.file(package = "{{name}}"))
+  courseR::startAssignment(name = name, overwrite = overwrite, path = path, pkg = system.file(package = "{{name}}"))
 }
 
 #' Check an assignment
@@ -49,4 +46,19 @@ submitAssignment <- function(name, path = getwd()) {
 #' @export
 checkAssignments <- function(path = getwd()) {
   courseR::checkAssignments(path = path, pkg = system.file(package = "{{name}}"))
+}
+
+#' Custom RMarkdown document type that parses student assignments
+#' 
+#' Flag an Rmd file as an assignment by setting its output type to this
+#' function; not meant to be called directly.
+#' 
+#' @param assignment name of the assignment
+#' @param submit bool is this a submission render?
+#' @param ...
+#'   
+#' @return an R Markdown output format definition
+#' @export
+assignment <- function(assignment, submit = FALSE, ...) {
+  courseR::assignment(assignment = assignment, submit = submit, pkg = system.file(package = "{{name}}"), ...)
 }
