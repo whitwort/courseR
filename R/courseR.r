@@ -254,7 +254,8 @@ build <- function(cleanBuild = FALSE, cleanPreviews = TRUE, path = getwd()) {
               # knitr's working path is in build/
               pkgData <- file.path("..", "..", distPath, config$build$package$dist, "data")
               data$taskcollector <- renderTemplate( template = file.path(path, "templates", "site", "task-collector.Rmd")
-                                                  , data = list( chunkrds   = file.path(pkgData, "solution-chunk.rds")
+                                                  , data = list( hook       = "chunk"
+                                                               , rds        = file.path(pkgData, "solution-chunk.rds")
                                                                , assignment = data$assignment
                                                                )
                                                   )
