@@ -95,3 +95,12 @@ mergeLists <- function(a, b, overwrite = FALSE, recursive = TRUE) {
   }
   a
 }
+
+smartSuppress <- function(expr, warningGrep) {
+  h <- function(w) {
+    if (grepl(warningGrep, w)) {
+      invokeRestart("muffleWarning")
+    }
+  }
+  withCallingHandlers(expr, warning = h)
+}

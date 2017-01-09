@@ -68,6 +68,7 @@ init <- function( path      = getwd()
                 , file = file.path(path, "package", "R", "course.R")
                 )
   
+  path
 }
 
 #' Update a project
@@ -252,7 +253,7 @@ build <- function(cleanBuild = FALSE, cleanPreviews = TRUE, path = getwd()) {
                                            )
               
               # knitr's working path is in build/
-              pkgData <- file.path("..", "..", distPath, config$build$package$dist, "data")
+              pkgData <- file.path(normalizePath(distPath), config$build$package$dist, "data")
               data$taskcollector <- renderTemplate( template = file.path(path, "templates", "site", "task-collector.Rmd")
                                                   , data = list( hook       = "chunk"
                                                                , rds        = file.path(pkgData, "solution-chunk.rds")
@@ -283,7 +284,11 @@ build <- function(cleanBuild = FALSE, cleanPreviews = TRUE, path = getwd()) {
             }
           )
     
-    rmarkdown::render_site(input = buildPath, env = new.env())
+    # for some reason -slides are always already copied; supress warning
+    smartSuppress({
+      rmarkdown::render_site(input = buildPath, env = new.env())
+    }, "-slides.html")
+    
     file.copy( from      = file.path(buildPath, "_site/")
              , to        = distPath
              , recursive = TRUE
