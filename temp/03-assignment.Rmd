@@ -1,0 +1,35 @@
+---
+title:  "Assignment 1"
+type:   assignment
+---
+
+## R Markdown
+
+Print out a summary of the `cars` data set:
+
+```{r solution}
+# name chuncks with solution code 'solution'
+
+summary(cars)
+```
+
+## Including Plots
+
+Plot the variable `pressure`:
+
+```{r solution}
+plot(pressure)
+```
+
+Additional chunk options are carried over:
+
+```{r solution, comment="Something interesting"}
+plot(pressure)
+```
+
+Chuncks not named `solution` are left unchanged:
+
+```{r}
+print("hello normal chunk!")
+```
+ 

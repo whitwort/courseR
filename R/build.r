@@ -13,24 +13,32 @@ slideRMD <- function(lines, config) {
 }
 
 solutionRMD <- function(lines) {
-  s <- collapseRMD(lines)
-  
-  gsub( pattern     = "```\\{(.*?)\\}(.*?)```"
-      , replacement = "```{\\1, echo = FALSE}\n\\2```"
+  assnRMD(lines, "solution", ", echo=FALSE")
+}
+
+taskRMD <- function(lines) {
+  s <- assnRMD(lines, "answer", "")
+  gsub( pattern = "\\n```(\\{r answer.*\\}).*?\\n```"
+      , replacement = "\n```\\1\n# Enter your code here!\n\n```"
       , x = s
       )
   
 }
 
-taskRMD <- function(lines) {
-  s <- collapseRMD(lines)
+assnRMD <- function(lines, prefix, postfix) {
+  starts <- grep(pattern = "^```\\{r solution(.*?)\\}", x = lines)
+  for (i in 1:length(starts)) {
+    lines[starts[i]] <- sub( pattern     = "solution"
+                           , replacement = paste0(prefix, "-", i, ", task=", i, postfix)
+                           , x     = lines[starts[i]]
+                           , fixed = TRUE
+                           )
+  }
   
-  gsub( pattern     = "```\\{(.*?)\\}(.*?)```"
-      , replacement = "```{\\1}\n# Enter your code here!\n\n```"
-      , x = s
-      )
+  collapseRMD(lines)
 }
 
 collapseRMD <- function(lines) {
   paste0(paste0(lines, collapse = "\n"), "\n")
 }
+

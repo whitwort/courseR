@@ -1,0 +1,13 @@
+Package: {{name}}
+Title: Course package for {{name}}
+Version: 0.1
+Date: 2017-01-06
+Author: Gregg Whitworth
+Maintainer: Gregg Whitworth <whitwort@gmail.com>
+URL: http://github.com/whitwort/courseR
+BugReports: http://github.com/whitwort/courseR/issues
+Description: What the package does (one paragraph).
+Imports: courseR
+Depends: R (>= 3.3.2)
+License: GPL-3
+RoxygenNote: 5.0.1

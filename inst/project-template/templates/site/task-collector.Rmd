@@ -1,0 +1,4 @@
+```{r knitr_options, echo=FALSE, cache=FALSE}
+chunk <- knitr::knit_hooks$get('chunk')
+knitr::knit_hooks$set(chunk = courseR::taskCollector(callback = chunk, assignment = "{{assignment}}", rds = "{{chunkrds}}"))
+```

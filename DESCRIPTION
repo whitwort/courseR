@@ -14,7 +14,9 @@ Imports:
   revealjs,
   whisker,
   yaml,
-  rmarkdown
+  rmarkdown,
+  devtools, 
+  roxygen2
 SystemRequirements: pandoc (>= 1.12.3)
 License: GPL-3
 RoxygenNote: 5.0.1
