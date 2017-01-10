@@ -16,6 +16,9 @@ you've done on this asignment already}
 
 \item{pkg}{path to course package}
 }
+\value{
+new file path
+}
 \description{
 Start an assignment
 }

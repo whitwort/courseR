@@ -21,4 +21,4 @@ test_that("startAssignment works", {
   
 })
 
-# unlink("temp")
+unlink("temp")

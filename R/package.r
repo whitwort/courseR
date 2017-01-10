@@ -49,7 +49,7 @@ startAssignment <- function(name, overwrite = FALSE, path = getwd(), pkg) {
 #' @return true if we don't find anything dodgy
 #' @export
 checkAssignment <- function(name, path = getwd(), pkg) {
-  
+  message("Nothing to see here; check back later.")
 }
 
 #' Submit an assignment
@@ -65,21 +65,20 @@ checkAssignment <- function(name, path = getwd(), pkg) {
 #' @export
 submitAssignment <- function(name, path = getwd(), pkg) {
   
-  if (!dir.exists(path, "assignments")) {
-    dir.create(path, "assignments")
-  }
-  
-  source <- file.path(path, paste0(name, ".Rmd"))
-  if (!file.exists(source)) {
-    stop("You don't seem to have a solution file for this assignment: ", source)
-  }
-  
-  message("Here let me Knit that for you; the assignment will only be submitted if this succeeds...")
-  tryCatch( { rmarkdown::render(source, envir = new.env()) }
-          , error = function(e) stop("Well, that didn't go well.  Assignment not submitted.")
-          )
-  
-  
+  # if (!dir.exists(path, "assignments")) {
+  #   dir.create(path, "assignments")
+  # }
+  # 
+  # source <- file.path(path, paste0(name, ".Rmd"))
+  # if (!file.exists(source)) {
+  #   stop("You don't seem to have a solution file for this assignment: ", source)
+  # }
+  # 
+  # message("Here let me Knit that for you; the assignment will only be submitted if this succeeds...")
+  # tryCatch( { rmarkdown::render(source, envir = new.env()) }
+  #         , error = function(e) stop("Well, that didn't go well.  Assignment not submitted.")
+  #         )
+  message("Nothing to see here; check back later.")
   
 }
 
@@ -94,47 +93,6 @@ submitAssignment <- function(name, path = getwd(), pkg) {
 #'   
 #' @export
 checkAssignments <- function(path = getwd(), pkg) {
-  
+  message("Nothing to see here; check back later.")
 }
 
-#' Custom RMarkdown document type that parses student assignments
-#' 
-#' Flag an Rmd file as an assignment by setting its output type to this
-#' function; not meant to be called directly.
-#' 
-#' @param assignment name of the assignment
-#' @param submit bool is this a submission render?
-#' @param pkg path to course package for this assignment
-#' @param ...
-#'   
-#' @return an R Markdown output format definition
-#' @export
-assignment <- function(assignment, submit = FALSE, pkg, ...) {
-  print("assignment called")
-  path <- studentPath()
-  if (submit) {
-    warning("not yet implemented")
-  } else {
-    config  <- loadConfig(file.path(pkg, "data"))
-    pkgPath <- file.path(path, config$build$package$name)
-    if (!dir.exists(pkgPath)) { dir.create(pkgPath) }
-    rdsPath <- file.path(pkgPath, "check") #update to handle submission runs
-    if (!dir.exists(rdsPath)) { dir.create(rdsPath) }
-  }
-
-  doc <- rmarkdown::html_document()
-  doc$keep_md <- TRUE
-  doc$clean_supporting <- FALSE
-  
-  doc$knitr$knit_hooks <- list(task = function(before, options, envirs, ...) { 
-      print(names(options))
-      print(names(list(...)))
-      if (before) { 
-        paste0("start-", options$task) 
-      } else { 
-        paste0("end-", options$task) 
-      }
-    })
-  
-  doc
-}

@@ -170,7 +170,12 @@ build <- function(cleanBuild = FALSE, cleanPreviews = TRUE, path = getwd()) {
       dir.create(buildPath)
     }
     
-    file.copy( from = file.path(path, c("_site.yml", "_navbar.html", "footer.md", "index.Rmd", "data")) # index.Rmd can't be spelled .rmd currently
+    markdown::markdownToHTML( file = file.path(path, "footer.md")
+                            , output = file.path(buildPath, "footer.html")
+                            , fragment.only = TRUE
+                            )
+    
+    file.copy( from = file.path(path, c("_site.yml", "_navbar.html", "index.Rmd", "data")) # index.Rmd can't be spelled .rmd currently
              , to   = buildPath
              , recursive = TRUE
              )
@@ -232,8 +237,8 @@ build <- function(cleanBuild = FALSE, cleanPreviews = TRUE, path = getwd()) {
           )
     
     # assignments
-    assnPath  <- file.path(path, "templates", "site", "assignment-page.Rmd")
-    assnHead  <- getHeader(assnPath)
+    assnPath  <- file.path(path, "templates", "site", "assignment-solution.Rmd")
+    #assnHead  <- getHeader(assnPath)
     assnTmpl  <- subHeader(assnPath, "{{header}}")
     
     assignments <- rmds[types == 'assignment']
@@ -241,30 +246,22 @@ build <- function(cleanBuild = FALSE, cleanPreviews = TRUE, path = getwd()) {
           , function(x) {
               rmd  <- getRMD(file.path(path, x$rmd))
               head <- getHeader(file.path(path, x$rmd))
-                
+              
               data <- c( config$templates$data
                        , x
                        , list( solution   = solutionRMD(rmd)
                              , tasks      = taskRMD(rmd)
                              , assignment = splitext(x$rmd)
+                             , rdsPath    = normalizePath(file.path(distPath, config$build$package$dist, "data"))
                              )
                        )
               
-              data$header <- renderTemplate( template = mergeHeader(assnHead, head)
+              data$header <- renderTemplate( template = getHeaderString(assnPath) # with this implementation there is no merge of headers on assignments
                                            , data
                                            , partials = partials
                                            )
               
-              # knitr's working path is in build/
-              pkgData <- file.path(normalizePath(distPath), config$build$package$dist, "data")
-              data$taskcollector <- renderTemplate( template = file.path(path, "templates", "site", "task-collector.Rmd")
-                                                  , data = list( hook       = "chunk"
-                                                               , rds        = file.path(pkgData, "solution-chunk.rds")
-                                                               , assignment = data$assignment
-                                                               )
-                                                  )
-              
-              instPath <- file.path(path, "templates", "site", "assignment-instructions.md")
+#              instPath <- file.path(path, "templates", "site", "assignment-instructions.md")
               
               # solution htmls
               renderTemplate( template = assnTmpl
@@ -272,7 +269,7 @@ build <- function(cleanBuild = FALSE, cleanPreviews = TRUE, path = getwd()) {
                             , file     = file.path(buildPath, x$rmd)
                             , partials = partials
                             )
-            
+              
               # task htmls
               renderTemplate( template = file.path(path, "templates", "site", "assignment-tasks.Rmd")
                             , data     = data
@@ -290,7 +287,7 @@ build <- function(cleanBuild = FALSE, cleanPreviews = TRUE, path = getwd()) {
     # for some reason -slides are always already copied; supress warning
     smartSuppress({
       rmarkdown::render_site(input = buildPath, env = new.env())
-    }, "-slides.html")
+    }, "cannot rename file")
     
     file.copy( from      = file.path(buildPath, "_site/")
              , to        = distPath

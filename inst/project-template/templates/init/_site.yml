@@ -6,5 +6,5 @@ output:
     toc_depth:  2
     toc_float:  true
     include:
-      after_body: footer.md
+      after_body: footer.html
 

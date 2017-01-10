@@ -1,8 +1,7 @@
 ---
 title:      "{{title}}"
-output:
-  {{build.package.name}}::assignment:
-    assignment: "{{assignment}}"
+output:     {{build.package.name}}::assignment
+assignment: "{{assignment}}"
 ---
 
 {{tasks}}

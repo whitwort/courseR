@@ -41,6 +41,12 @@ getHeader <- function(path) {
   yaml::yaml.load(paste0(lines[(exts[1] + 1):(exts[2] - 1)], collapse = "\n"))
 }
 
+getHeaderString <- function(path) {
+  lines <- readLines(path)
+  exts  <- grep("^(---|\\.\\.\\.)\\s*$", lines)
+  paste0(lines[(exts[1] + 1):(exts[2] - 1)], collapse = "\n")
+}
+
 subHeader <- function(path, replacement) {
   lines <- readLines(path)
   exts  <- grep("^(---|\\.\\.\\.)\\s*$", lines)

@@ -12,10 +12,8 @@ startAssignment <- function(name, overwrite = FALSE, path = getwd()) {
 #' Allows you to check your current progress on an assignment against a
 #' reference solution.
 #' 
-#' @param name name of the assignment to check
-#' @param path path to your course project folder
-#'   
-#' @return true if we don't find anything dodgy
+#' @inheritParams courseR::checkAssignment
+#' 
 #' @export
 checkAssignment <- function(name, path = getwd()) {
   courseR::checkAssignment(name = name, path = path, pkg = system.file(package = "{{name}}"))
@@ -27,8 +25,7 @@ checkAssignment <- function(name, path = getwd()) {
 #' and/or ready for grading.  You can resubmit assignments; doing so will reset
 #' the current grading information.
 #' 
-#' @param name name of the assignment to submit
-#' @param path path to your course project folder
+#' @inheritParams courseR::submitAssignment
 #'   
 #' @export
 submitAssignment <- function(name, path = getwd()) {
@@ -41,7 +38,7 @@ submitAssignment <- function(name, path = getwd()) {
 #' instructor account.  For students, it shows your current progress on all
 #' assignments; for instructors a grading interface.
 #' 
-#' @param path
+#' @inheritParams courseR::checkAssignments
 #'   
 #' @export
 checkAssignments <- function(path = getwd()) {
@@ -53,12 +50,9 @@ checkAssignments <- function(path = getwd()) {
 #' Flag an Rmd file as an assignment by setting its output type to this
 #' function; not meant to be called directly.
 #' 
-#' @param assignment name of the assignment
-#' @param submit bool is this a submission render?
-#' @param ...
-#'   
-#' @return an R Markdown output format definition
+#' @inheritParams courseR::assignment
+#' 
 #' @export
-assignment <- function(assignment, submit = FALSE, ...) {
-  courseR::assignment(assignment = assignment, submit = submit, pkg = system.file(package = "{{name}}"), ...)
+assignment <- function(...) {
+  courseR::assignment(pkg = system.file(package = "{{name}}"), ...)
 }

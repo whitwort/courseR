@@ -1,4 +1,0 @@
-```{r knitr_options, echo=FALSE, cache=FALSE}
-{{hook}} <- knitr::knit_hooks$get('{{hook}}')
-knitr::knit_hooks$set({{hook}} = courseR::taskCollector(callback = {{hook}}, assignment = "{{assignment}}", rds = "{{rds}}"))
-```
