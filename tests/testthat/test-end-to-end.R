@@ -1,24 +1,25 @@
 context("end-to-end tests")
 
-dir.create("temp")
+testPath <- normalizePath("temp")
+
+unlink(testPath, recursive = TRUE)
+dir.create(testPath)
 test_that("fresh init and build run without errors", {
   
-  expect_equal(courseR::init(path = "temp"), "temp")
-  expect_true(courseR::build(path = "temp"))
+  expect_equal(courseR::init(path = testPath), testPath)
+  expect_true(courseR::build(path = testPath))
   
 })
 
 test_that("package loads", {
-  devtools::install("temp/dist/temp/")
+  devtools::install(file.path(testPath, "dist", "temp"))
 })
 
 test_that("startAssignment works", {
-  dir.create("temp/student")
-#  expect_type(temp::startAssignment('03-assignment.Rmd', path = student), type = "character")
-  expect_type(temp::startAssignment('03-assignment', path = "temp/student"), type = "character")
-  expect_true(file.exists("temp/student/03-assignment.Rmd"))
-  unlink("temp/student")
+  studentPath <- file.path(testPath, "student")
   
+  unlink(studentPath, recursive = TRUE)
+  dir.create(studentPath)
+  expect_type(temp::startAssignment('03-assignment', path = studentPath), type = "character")
+  expect_true(file.exists(file.path(studentPath, "03-assignment.Rmd")))
 })
-
-unlink("temp")

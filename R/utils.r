@@ -1,4 +1,4 @@
-renderTemplate <- function(template, data, file = NULL, partials = list()) {
+renderTemplate <- function(template, data, file = NULL, partials = list(), post = function(s) { s }) {
   if (file.exists(template)) {
     template <- readFile(template)
   }
@@ -9,10 +9,18 @@ renderTemplate <- function(template, data, file = NULL, partials = list()) {
   
   # un-escape stuff whisker escaped
   s <- whisker.unescape(s)
-
+  s <- post(s)
+  
   if (!is.null(file)) { cat(s, "\n", file = file) }
   
   invisible(s)
+}
+
+# this could be smarter
+stripEmptyH <- function(s) {
+  s <- gsub("\\n#\\n", "", s)
+  s <- gsub("\\n##\\n", "", s)
+  s
 }
 
 loadPartials <- function(path, recursive = TRUE) {
@@ -99,6 +107,27 @@ mergeLists <- function(a, b, overwrite = FALSE, recursive = TRUE) {
   a
 }
 
+listify <- function(v) { sapply(v, function(x) x, simplify = FALSE) }
+
+getRMDFile <- function(name, path, onlyone = TRUE, exists = TRUE) {
+  if (file.exists(file.path(path, name))) {
+    file.path(path, name)
+  } else {
+    f <- list.files(path, pattern = paste0("^", name, "\\.[Rr]md$"), full.names = TRUE)
+    if (onlyone && (length(f) > 1)) {
+      stop("More than one markdown file matches that assignment name: ", f)
+    }
+    if (exists && length(f) == 0) {
+      stop("No markdown file exists that matches that assignment name here: ", path)
+    }
+    if (!exists && length(f) == 0) {
+      f <- file.path(path, paste0(name, ".Rmd"))
+    }
+    f
+  }
+  
+}
+
 smartSuppress <- function(expr, warningGrep) {
   h <- function(w) {
     if (grepl(warningGrep, w)) {
@@ -119,8 +148,8 @@ whisker.unescape <- function(s) {
   s
 }
 
-# l list of lists
-markdownify <- function(l, de.p = TRUE) {
+# l list of lists; add <p> for new lines
+markdownify <- function(l, de.p = FALSE, add.p = TRUE) {
   x <- lapply( 1:length(l)
              , function(i) {
                if (class(l[[i]]) == "character") {
@@ -129,6 +158,10 @@ markdownify <- function(l, de.p = TRUE) {
                  if (de.p) {
                    s <- gsub("<p>", "", s, fixed = TRUE)
                    s <- gsub("</p>\n", "", s, fixed = TRUE)
+                 }
+                 if (add.p) {
+                   s <- gsub("\\n$", "", s)
+                   s <- gsub("\n", "</p><p>", s, fixed = TRUE)
                  }
                  
                  s
@@ -141,4 +174,9 @@ markdownify <- function(l, de.p = TRUE) {
             )
   names(x) <- names(l)
   x
+}
+
+# there really must be an easier way to do this
+shinyToNode <- function(s) {
+  xml_child(xml_child(read_html(as.character(s))))
 }

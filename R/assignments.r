@@ -24,7 +24,7 @@ solution <- function(...) {
 #' @return an R Markdown output format definition
 #' @export
 assignment <- function(pkg, ...) {
-
+  
   config  <- loadConfig(file.path(pkg, "data"))
   taskCollector(type = config$build$package$name, ...)
   
@@ -47,17 +47,23 @@ taskCollector <- function(type, ...) {
   doc$pre_processor <- function(metadata, input_file, runtime, knit_meta, files_dir, output_dir) { 
     
     s <- readFile(input_file)
-    s <- gsub("\\{\\{start-task-(\\d)\\}\\}", '<div class="assignment-task" id="task-\\1">' , s)
-    s <- gsub("\\{\\{end-task-(\\d)\\}\\}", "</div>", s)
+    s <- gsub( "\\{\\{start-task-(\\d)\\}\\}"
+             , '<div>{{task-\\1-before}}</div><div class="assignment-task" id="task-\\1">' 
+             , s
+             )
+    s <- gsub( "\\{\\{end-task-(\\d)\\}\\}"
+             , '</div><div>{{task-\\1-after}}</div>'
+             , s
+             )
     
     cat(s, file = input_file)
-    
+
     pre(metadata, input_file, runtime, knit_meta, files_dir, output_dir) 
   }
   
   post <- doc$post_processor
   doc$post_processor <- function(metadata, input_file, output_file, clean, verbose) { 
-    
+
     s  <- readFile(output_file)
     h  <- xml2::read_html(s)
     
@@ -70,25 +76,111 @@ taskCollector <- function(type, ...) {
                 )
     
     if (type == "solutions") {
-      rdsPath <- file.path(metadata$rdsPath, paste0(metadata$assignment, "-solutions.rds") )  
+      # we don't seem to be able to force self_contained during a site build; so
+      # we have URI encode manually
+      imgs <- sapply( list.files( file.path(paste0(metadata$assignment, "_files"), "figure-html")
+                                , full.names = TRUE
+                                )
+                    , function(file) { knitr::image_uri(file) }
+                    )
+      
+      embeded <- lapply( d
+                       , function(html) {
+                           for (name in names(imgs)) {
+                             html <- gsub(name, imgs[name], html, fixed = TRUE)
+                           }
+                           html
+                         } 
+                       )
+      
+      saveRDS( list(html = embeded)
+             , file.path(metadata$rdsPath, paste0(metadata$assignment, "-solutions.rds"))
+             )
     } else {
-      # type is package/course name
-      rdsPath <- file.path(studentPath(), paste(type, metadata$assignment, "answers.rds", sep = "-") )
+      # create a template for the check-UI
+      b      <- rvest::html_node(h, "body")
+      d$html <- as.character(b)
+      
+      # save the source file path
+      d$sourceRMD  <- getRMDFile( path = normalizePath(dirname(output_file))
+                                , name = splitext(basename(output_file))
+                                )
+      d$sourceHTML <- normalizePath(output_file)
+      
+      saveRDS( d
+             , file = file.path( studentPath(type)
+                               , paste(metadata$assignment, "answers.rds", sep = "-")
+                               )
+             )
     }
-    
-    saveRDS(d, file = rdsPath)
     
     post(metadata, input_file, output_file, clean, verbose) 
   }
   
-  #doc$keep_md <- TRUE
+  # # not working; get's trounced by site build?
+  # if (type == 'solutions') {
+  #   doc$self_contained <- TRUE
+  # }
   
   doc
-  
 }
 
-studentPath <- function() {
+# Rmd = title
+.listAssignments <- function(pkg) {
+  data <- readRDS(file.path(pkg, "data", "course.rds"))
+  sapply(data$assignments, function(l) { splitext(l$rmd) } )
+}
+
+# $filename = hash | NA if missing
+listCheck <- function(pkg, path = studentPath(pkg)) {
+  l <- lapply( .listAssignments(pkg)
+             , function(name) { 
+                 filePath <- rdsPath(name, path)
+                 if (!file.exists(filePath)) {
+                   NA
+                 } else {
+                   as.character(openssl::md5(file(filePath)))
+                 }
+               }
+             )
+  names(l) <- .listAssignments(pkg)
+  l
+}
+
+rdsPath <- function(name, path, tag = "-answers") {
+  file.path(path, paste0(splitext(name), tag, ".rds"))
+}
+
+listSubmitted <- function(pkg, path = studentPath(pkg)) {
+  listCheck(pkg, path = file.path(path, "submitted"))
+}
+
+listSources <- function(pkg, path = studentPath(pkg)) {
+  checks <- listCheck(pkg, path)
+  l <- lapply( names(checks)
+             , function(name) {
+                 if (!is.na(checks[[name]])) {
+                   filePath <- readRDS(rdsPath(name, path))$sourceRMD
+                   if (!file.exists(filePath)) {
+                     NA
+                   } else {
+                     as.character(openssl::md5(file(filePath))  )
+                   }
+                 }
+               }
+             )
+    
+  names(l) <- names(checks)
+  l
+}
+
+studentPath <- function(pkg) {
   path <- file.path("~", ".courseR")
+  pkg  <- basename(pkg)
+  
   if (!dir.exists(path)) { dir.create(path) }
-  path
+  pkgPath <- file.path(path, pkg)
+  if (!dir.exists(pkgPath)) { dir.create(pkgPath) }
+  if (!dir.exists(file.path(pkgPath, "submitted"))) { dir.create(file.path(pkgPath, "submitted")) }
+  pkgPath
 }

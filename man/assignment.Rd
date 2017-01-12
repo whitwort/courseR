@@ -10,8 +10,6 @@ assignment(pkg, ...)
 \item{pkg}{path to course package for this assignment}
 
 \item{...}{}
-
-\item{submit}{bool is this a submission render?}
 }
 \value{
 an R Markdown output format definition

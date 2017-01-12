@@ -81,7 +81,7 @@ init <- function( path      = getwd()
 #' @export
 update <- function(path = getwd()) {
   
-  rmds <- lapply( list.files(path, pattern = "*.Rmd")
+  rmds <- lapply( list.files(path, pattern = "*.[Rr]md")
                 , function(file) { 
                     h <- getHeader(file.path(path, file))
                     list( type  = h$type
@@ -104,7 +104,12 @@ update <- function(path = getwd()) {
                 , partials = loadPartials(file.path(path, "templates", "site", "partials"))
                 )
   
-  invisible(list(rmds = rmds, types = types))
+  invisible(list( rmds        = rmds
+                , types       = types
+                , content     = data$content
+                , assignments = data$assignments
+                )
+           )
   
 }
 
@@ -142,6 +147,9 @@ build <- function(cleanBuild = FALSE, cleanPreviews = TRUE, path = getwd()) {
     file.copy( from = file.path(path, "courseR.yml")
              , to   = file.path(distPath, config$build$package$dist, "data")
              )
+    file.copy( from = file.path(path, "_site.yml")
+             , to   = file.path(distPath, config$build$package$dist, "data")
+             )
     
     taskPath <- file.path(distPath, config$build$package$dist, "data", "assignments")
     if (!dir.exists(taskPath)) { dir.create(taskPath) }
@@ -150,8 +158,11 @@ build <- function(cleanBuild = FALSE, cleanPreviews = TRUE, path = getwd()) {
              , to   = file.path(taskPath)
              , recursive = TRUE
              )
-        
     
+    saveRDS( update
+           , file = file.path(distPath, config$build$package$dist, "data", "course.rds")
+           )
+  
   } else {
     # hacktacular
     dir.create(file.path(distPath, config$build$package$dist, "data"))
@@ -163,7 +174,7 @@ build <- function(cleanBuild = FALSE, cleanPreviews = TRUE, path = getwd()) {
     buildPath <- file.path(path, config$build$site$build)
 
     if (cleanBuild && dir.exists(buildPath)) {
-      unlink(buildPath)
+      unlink(buildPath, recursive = TRUE)
     }
     
     if (!dir.exists(buildPath)) {
@@ -172,6 +183,12 @@ build <- function(cleanBuild = FALSE, cleanPreviews = TRUE, path = getwd()) {
     
     markdown::markdownToHTML( file = file.path(path, "footer.md")
                             , output = file.path(buildPath, "footer.html")
+                            , fragment.only = TRUE
+                            )
+    
+    # hack to make content pages ad hoc knit, otherwize they'd be missing a footer file
+    markdown::markdownToHTML( file = file.path(path, "footer.md")
+                            , output = file.path(path, "footer.html")
                             , fragment.only = TRUE
                             )
     
@@ -212,6 +229,7 @@ build <- function(cleanBuild = FALSE, cleanPreviews = TRUE, path = getwd()) {
                             , data     = pagedata
                             , file     = file.path(buildPath, x$rmd)
                             , partials = partials
+                            , post     = stripEmptyH
                             )
               
               slidedata <- c( config$templates$data
@@ -288,7 +306,11 @@ build <- function(cleanBuild = FALSE, cleanPreviews = TRUE, path = getwd()) {
     smartSuppress({
       rmarkdown::render_site(input = buildPath, env = new.env())
     }, "cannot rename file")
-    
+
+    file.copy( from      = file.path(path, config$build$site$img, "")
+             , to        = file.path(buildPath, "_site")
+             , recursive = TRUE
+             )    
     file.copy( from      = file.path(buildPath, "_site/")
              , to        = distPath
              , recursive = TRUE
@@ -296,6 +318,7 @@ build <- function(cleanBuild = FALSE, cleanPreviews = TRUE, path = getwd()) {
     file.rename( from = file.path(distPath, "_site")
                , to   = file.path(distPath, config$build$site$dist)
                )
+
   }
   
   if (!is.null(config$build$hooks$after)) {

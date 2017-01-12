@@ -24,7 +24,7 @@ createTable <- function(nrows, cols, row.col = "#", file) {
              )
   
   s <- yaml::as.yaml(l)
-  s <- gsub(pattern = "''", replacement = '\n    ""', x = s, fixed = TRUE)
+  #s <- gsub(pattern = "''", replacement = '\n    ""', x = s, fixed = TRUE)
   
   cat(s, file = file)
   invisible(s)

@@ -8,8 +8,6 @@ solution(...)
 }
 \arguments{
 \item{...}{}
-
-\item{pkg}{path to course package for this assignment}
 }
 \value{
 an R Markdown output format definition

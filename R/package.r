@@ -1,3 +1,14 @@
+#' List available assignments
+#'
+#' @param path path to your course project folder
+#' @param pkg path to course package
+#'
+#' @return character vector with assignment names
+#' @export
+listAssignments <- function(pkg) {
+  .listAssignments(pkg)
+}
+
 #' Start an assignment
 #' 
 #' @param name name of the assignment to start
@@ -12,15 +23,13 @@
 startAssignment <- function(name, overwrite = FALSE, path = getwd(), pkg) {
 
   taskPath <- file.path(pkg, "data", "assignments")
-  if (!grepl(".Rmd", name)) {
-    name <- paste0(name, ".Rmd")
-  }
-  source   <- file.path(taskPath, name)
-  if (!file.exists(source)) { 
-    stop("There is not assignment with that name") 
-  }
-  
-  dest <- file.path(path, name)
+  tryCatch( source <- getRMDFile(name, taskPath, exists = TRUE)
+          , error = function(e) {
+              stop(e$message, "\n\nThere is no assignment with that name. Try `listAssignments()`.")
+            }
+          )
+
+  dest <- getRMDFile(name, path, exists = FALSE)
   if (file.exists(dest) && !overwrite) {
     stop("An excercise of that name already exists; use overwrite = TRUE if you'd like to erase your current copy.")
   }
@@ -39,17 +48,26 @@ startAssignment <- function(name, overwrite = FALSE, path = getwd(), pkg) {
 
 #' Check an assignment
 #' 
-#' Allows you to check your current progress on an assignment against a
+#' Allows you to check your current progress on an assignment against a 
 #' reference solution.
 #' 
 #' @param name name of the assignment to check
 #' @param path path to your course project folder
+#' @param autoknit if true your assignment Rmd files will automatically be
+#'   re-knitted when you save changes
 #' @param pkg path to course package
 #'   
 #' @return true if we don't find anything dodgy
 #' @export
-checkAssignment <- function(name, path = getwd(), pkg) {
-  message("Nothing to see here; check back later.")
+checkAssignment <- function(name, path = getwd(), autoknit = TRUE, pkg) {
+
+  file <- getRMDFile(name, path)
+  
+  message("Knitting ", name)
+  rmarkdown::render(file, envir = new.env())
+  
+  launchStudentUI(pkg = pkg, page = name, autoknit = autoknit)
+  
 }
 
 #' Submit an assignment
@@ -65,20 +83,20 @@ checkAssignment <- function(name, path = getwd(), pkg) {
 #' @export
 submitAssignment <- function(name, path = getwd(), pkg) {
   
-  # if (!dir.exists(path, "assignments")) {
-  #   dir.create(path, "assignments")
-  # }
-  # 
-  # source <- file.path(path, paste0(name, ".Rmd"))
-  # if (!file.exists(source)) {
-  #   stop("You don't seem to have a solution file for this assignment: ", source)
-  # }
-  # 
-  # message("Here let me Knit that for you; the assignment will only be submitted if this succeeds...")
-  # tryCatch( { rmarkdown::render(source, envir = new.env()) }
-  #         , error = function(e) stop("Well, that didn't go well.  Assignment not submitted.")
-  #         )
-  message("Nothing to see here; check back later.")
+  file <- getRMDFile(name, path)
+
+  message("Knitting; the assignment will only be submitted if this succeeds...")
+  rmarkdown::render(file, envir = new.env())
+  
+  checks    <- listCheck(pkg)
+  shortHash <- substring(checks[[splitext(name)]], first = 1, last = 7) # git style
+
+  source <- rdsPath(name, studentPath(pkg))
+  dest   <- file.path(studentPath(pkg), "submitted", basename(source))
+  
+  file.copy(from = source, to = dest, overwrite = FALSE)
+  
+  message("Assignment submitted as version: ", shortHash)
   
 }
 
@@ -89,10 +107,21 @@ submitAssignment <- function(name, path = getwd(), pkg) {
 #' assignments; for instructors a grading interface.
 #' 
 #' @param path path to your course project folder
+#' @param autoknit if true your assignment Rmd files will automatically be
+#'   re-knitted when you save changes; ignored in instructor mode.
 #' @param pkg path to course package
 #'   
 #' @export
-checkAssignments <- function(path = getwd(), pkg) {
-  message("Nothing to see here; check back later.")
+checkAssignments <- function(path = getwd(), autoknit = TRUE, pkg) {
+  config <- loadConfig(file.path(pkg, "data"))
+  user   <- Sys.info()["user"]
+  
+  if (!is.null(config$`instructor-users`) && user %in% config$`instructor-users`) {
+    message("instructor UI not yet implemented")
+  } else if (config$`student-users` == "*" || user %in% config$`student-users`) {
+    launchStudentUI(pkg = pkg, page = 'overview', autoknit = autoknit)
+  } else {
+    message("Your username does not appear to be an instructor or student in this course.")
+  }
+  
 }
-

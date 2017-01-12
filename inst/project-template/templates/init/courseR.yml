@@ -32,6 +32,7 @@ build:
     dist:         www
     max-chars:    144         # removes blocks of text from slides; set to false to disable
     url:          http://localhost/{{name}} # no trailing slash
+    img:          img         # project path for static images; copied to dist
     
   # Hooks name closures called in order before or after builds; their called 
   # with the return from `update`: function(update) 
@@ -40,7 +41,6 @@ build:
     #after:  
 
 # Course-specific configuration options; these change the default view for the 
-# assignments shiny app.  * makes all users include that type's view.
+# assignments shiny app.
 instructor-users: "*"
-
-student-users: "*"
+student-users: "*"       # * skips the user name check and shows studentui

@@ -19,6 +19,8 @@ Imports:
   roxygen2,
   xml2,
   rvest
+Depends:
+  shiny
 SystemRequirements: pandoc (>= 1.12.3)
 License: GPL-3
 RoxygenNote: 5.0.1
