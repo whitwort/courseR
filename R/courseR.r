@@ -116,10 +116,10 @@ update <- function(path = getwd()) {
 #' Build a project
 #' 
 #' @param cleanBuild should intermediate build files be deleted when the build 
-#'   is done.  Note this will trounce any knitr caching
+#'   is done.  Note this will trounce any knitr caching.
 #' @param cleanPreviews should .html files created in the main project directory
-#'   by making ad hoc previews in RStudio be deleted
-#' @param path path for the project to build
+#'   by making ad hoc previews in RStudio be deleted.
+#' @param path path for the project to build.
 #'   
 #' @export
 build <- function(cleanBuild = FALSE, cleanPreviews = TRUE, path = getwd()) {
@@ -344,12 +344,12 @@ build <- function(cleanBuild = FALSE, cleanPreviews = TRUE, path = getwd()) {
 newContent <- function(file, title, data = "", path = getwd(), ...) {
   
   newSource( tmpl  = "content.Rmd"
-             , dest  = file
-             , title = title
-             , data  = data
-             , path  = path
-             , ...
-  )
+           , dest  = file
+           , title = title
+           , data  = data
+           , path  = path
+           , ...
+           )
   
 }
 
