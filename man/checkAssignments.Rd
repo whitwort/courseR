@@ -4,10 +4,13 @@
 \alias{checkAssignments}
 \title{Check assignments}
 \usage{
-checkAssignments(path = getwd(), pkg)
+checkAssignments(path = getwd(), autoknit = TRUE, pkg)
 }
 \arguments{
-\item{path}{path to your course project folder}
+\item{path}{optional path to your course project folder}
+
+\item{autoknit}{if TRUE your assignment Rmd files will automatically be
+re-knitted when you save changes; ignored in instructor mode.}
 
 \item{pkg}{path to course package}
 }

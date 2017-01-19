@@ -2,11 +2,15 @@
 NULL
 
 studentServer <- function(pkg, autoknit) {
+  
+  pkgPath <- file.path(normalizePath(pkg), "data")
+  config <- yaml::yaml.load_file(file.path(pkgPath, "courseR.yml"))
+  
   function(input, output, session) {
-    
     interval <- 500  # in ms
 
     changed <- function(before, after) {
+      if (is.null(before) || is.null(after)) { return(FALSE) }
       # if NA changed to a time or...
       (is.na(before) && !is.na(after)) ||
       # new time > old time
@@ -79,10 +83,10 @@ studentServer <- function(pkg, autoknit) {
 
     renderView <- function(studentRDS, solutionRDS, version) {
       s <- studentRDS$html
-      s <- gsub("\\{\\{task-\\d-before\\}\\}", as.character(h4("Your answer:")), s)
+      s <- gsub("\\{\\{task-\\d+-before\\}\\}", as.character(tags$b("Your answer:")), s)
       for (i in 1:length(solutionRDS$html)) {
         p <- paste0("{{task-", i, "-after}}")
-        r <- paste( h4("Answer key output:")
+        r <- paste( tags$b("Answer key output:")
                   , solutionRDS$html[[i]]
                   , sep = "\n"
                   )
@@ -95,33 +99,51 @@ studentServer <- function(pkg, autoknit) {
       
       s <- paste0( s
                  , as.character(fluidRow(column(width = 3, p("Version: ", substring(version, 1, 7)))))
+                 # , as.character(tags$script("$('pre code').each(function(i, block) { hljs.highlightBlock(block) })"))
                  )
       
       HTML(s)
     }
     
-    output$renderCheck  <- renderUI({
-      if (input$navpage != 'overview') {
-        showNotification("A fresh copy of your answers loaded!", type = "message")
-        
-        studentRDS  <- readRDS(rdsPath(input$navpage, path = studentPath(pkg)))
-        solutionRDS <- readRDS(rdsPath(input$navpage, file.path(pkg, "data") , tag = "-solutions"))
-        
-        renderView(studentRDS, solutionRDS, version = answers[[input$navpage]]) # get dirty
-        
-      }
-    })
+    renderCheck <- function(name) {
+      renderUI({
+        if (input$navpage != 'overview') {
+          showNotification("A fresh copy of your answers loaded!", type = "message")
+          
+          studentRDSPath <- rdsPath(input$navpage, path = studentPath(pkg))
+          if (!file.exists(studentRDSPath)) {
+            return(div(p("It looks like you haven't started this assignment yet.  Use the", code(paste0(config$build$package$name, "::startAssignment()")), "function to do so!")))
+          }
+          
+          studentRDS  <- readRDS(studentRDSPath)
+          solutionRDS <- readRDS(rdsPath(input$navpage, file.path(pkg, "data") , tag = "-solutions"))
+          
+          renderView(studentRDS, solutionRDS, version = answers[[input$navpage]]) # get dirty
+        }
+      })
+    }
+    for (name in names(listCheck(pkg))) { output[[paste0('check', "-", name)]] <- renderCheck(name) }
 
-    output$renderSubmit <- renderUI({
-      if (input$navpage != 'overview') {
-        showNotification("A fresh copy of your submission was loaded!", type = "message")
-        
-        studentRDS  <- readRDS(rdsPath(input$navpage, path = file.path(studentPath(pkg), "submitted")))
-        solutionRDS <- readRDS(rdsPath(input$navpage, file.path(pkg, "data") , tag = "-solutions"))
-        
-        renderView(studentRDS, solutionRDS, version = submits[[input$navpage]]) # get dirty
-      }
-    })
+    renderSubmit <- function(name) {
+      renderUI({
+        if (input$navpage != 'overview') {
+          showNotification("A fresh copy of your submission was loaded!", type = "message")
+          
+          name <- substring(input$navpage, first = 8)
+          
+          studentRDSPath <- rdsPath(name, path = file.path(studentPath(pkg), "submitted"))
+          if (!file.exists(studentRDSPath)) {
+            return(div(p("It looks like you haven't submitted this assignment yet.  Use the", code(paste0(config$build$package$name, "::submitAssignment()")), "function to do so!")))
+          }
+          
+          studentRDS  <- readRDS(studentRDSPath)
+          solutionRDS <- readRDS(rdsPath(name, file.path(pkg, "data") , tag = "-solutions"))
+          
+          renderView(studentRDS, solutionRDS, version = submits[[name]]) # get dirty
+        }
+      })
+    }
+    for (name in names(listSubmitted(pkg))) { output[[paste0('submit', "-", name)]] <- renderCheck(name) }
     
     output$status <- shiny::renderTable({
       data.frame( Assignment            = .listAssignments(pkg)
@@ -131,7 +153,7 @@ studentServer <- function(pkg, autoknit) {
                 , check.names = FALSE
                 )
     })
-    
+   
   }
 }
 
@@ -139,12 +161,26 @@ studentUI <- function(pkg, page) {
   pkgPath <- file.path(normalizePath(pkg), "data")
   siteyml <- yaml::yaml.load_file(file.path(pkgPath, "_site.yml"))
   config  <- yaml::yaml.load_file(file.path(pkgPath, "courseR.yml"))
-  print(page)
+  
   navbarPage( id       = 'navpage'
             , selected = page
             , title    = config$build$package$name
-            , theme    = siteyml$output$html_document$theme
             , collapsible = TRUE
+            , header   = tagList( includeCSS(file.path(pkgPath, "site_libs", "bootstrap-3.3.5", "css", paste0(siteyml$output$html_document$theme, ".min.css")))
+                                , includeCSS(file.path(pkgPath, "site_libs", "highlightjs-1.1", "default.css"))
+                                , includeScript(file.path(pkgPath, "site_libs", "highlightjs-1.1", "highlight.js"))
+                                )
+            # , footer = tags$script("hljs.initHighlightingOnLoad();")
+            , footer = tags$script("function rehighlight() {
+                                      $('pre code').each(function(i, block) {
+                                        hljs.highlightBlock(block)
+                                       })
+                                    }
+                                    $(document).on('shiny:value', function(event) { 
+                                      window.setTimeout(rehighlight, 500) 
+                                    })
+                                   "
+                                  )
             , tabPanel( "Overview", value = "overview"
                       , h1("Overview")
                       , p("This table show the current status of your progress
@@ -164,7 +200,7 @@ studentUI <- function(pkg, page) {
                                        , function(name) {
                                            tabPanel( title = splitext(name)
                                                    , value = splitext(name)
-                                                   , uiOutput('renderCheck')
+                                                   , uiOutput(paste0('check', "-", splitext(name)))
                                                    )
                                          }
                                        )
@@ -175,8 +211,8 @@ studentUI <- function(pkg, page) {
                                , lapply( names(listSubmitted(pkg))
                                        , function(name) {
                                            tabPanel( title = splitext(name)
-                                                   , value = splitext(name)
-                                                   , uiOutput('renderSubmit')
+                                                   , value = paste0("submit-", splitext(name))
+                                                   , uiOutput(paste0('submit', "-", splitext(name)))
                                                    )
                                          }
                                        )
@@ -187,8 +223,10 @@ studentUI <- function(pkg, page) {
 }
 
 launchStudentUI <- function(pkg, page, autoknit) {
+
   app <- shinyApp( ui     = studentUI(pkg, page)
                  , server = studentServer(pkg, autoknit)
                  )
   runGadget(app)
+  
 }

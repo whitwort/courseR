@@ -9,10 +9,10 @@ startAssignment(name, overwrite = FALSE, path = getwd(), pkg)
 \arguments{
 \item{name}{name of the assignment to start}
 
-\item{overwrite}{if true this function will overwrite any existing work
+\item{overwrite}{if TRUE this function will overwrite any existing work 
 you've done on this asignment already}
 
-\item{path}{path to your course project folder}
+\item{path}{optional path to your course project folder}
 
 \item{pkg}{path to course package}
 }
@@ -20,6 +20,8 @@ you've done on this asignment already}
 new file path
 }
 \description{
-Start an assignment
+This function will create an RMD file that you can use to start working on
+solutions for an assignment.  It also refreshes the data files in your data/
+directory.
 }
 

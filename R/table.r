@@ -38,25 +38,39 @@ createTable <- function(nrows, cols, row.col = "#", file) {
 #' @param markdown if TRUE text values in the YAML file are preprocessed as
 #'   markdown
 #' @param template table template file
+#' @param widths if not null gives the grid system widths of the columns
 #'   
 #' @return the HTML table taged as HTML tools tags so that it's rendered as HTML
 #'   with the rmd is knit
 #' @export
-renderTable <- function(file, markdown = TRUE, template = "templates/site/table.html") {
+renderTable <- function(file, markdown = TRUE, template = "templates/site/table.html", widths = NULL) {
   
   d <- yaml::yaml.load_file(file)
 
-  colnames <- lapply(names(d[[1]]), function(n) list(name = n))
+  colnames <- lapply( 1:length(d[[1]])
+                    , function(i) {
+                        n <- names(d[[1]])[i]  
+                        if (!is.null(widths)) {
+                          class = paste0('class="col-sm-', widths[i], '"')
+                        } else {
+                          class = NULL
+                        }
+                        list(name = n, class = class)
+                      }
+                    )
+  
   rows     <- lapply( d
                     , function(l) { 
                         list(cols = lapply(names(l), function(n) list(name = n, value = l[[n]]))) 
                       } 
                     )
   
-  data <- list(colnames = colnames, rows = rows)
+  data <- list( colnames = colnames
+              , rows = if (markdown) markdownify(rows) else rows 
+              )
   
   s <- whisker::whisker.render( template = readFile(template)
-                              , data     = if (markdown) markdownify(data) else data
+                              , data     = data
                               )
   
   s <- whisker.unescape(s)

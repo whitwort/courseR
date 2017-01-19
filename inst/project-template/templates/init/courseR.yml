@@ -21,12 +21,10 @@ templates:
 # Build options
 build:
 
-  # Set `package: false` to skip building a course package
   package: 
     dist:   {{name}}
     name:   {{name}}
   
-  # Set `site: false` to skip building the website
   site:
     build:        build       # temporary build path for intermediate rmds
     dist:         www

@@ -1,6 +1,10 @@
 # courseR
 
-This package implements my workflow for (1) creating websites for courses I teach in R and (2) deploying a custom R package that students can use to manage assignments in the class.  For goal (1), as [R Markdown](https://github.com/rstudio/rmarkdown) functionality has improved over the years, this project has evolved into an opinionated boilerplate for using `rmarkdown::render_site` to create a course website.  Goal (2) is most useful if your students are using R in a managed environment (eg. RStudio Server), but can be disabled easily.
+This package implements my workflow for (1) creating websites for courses I teach in R and (2) deploying a custom R package that students can use to manage assignments in the class.  
+
+For goal (1), as [R Markdown](https://github.com/rstudio/rmarkdown) functionality has improved over the years, this project has evolved into a boilerplate for using `rmarkdown::render_site` to create a course website where content renders as both handout style documents and `reveal.js` slides.  
+
+Goal (2) is useful if your students are using R in a managed environment (eg. RStudio Server).
 
 ## Quick start
 
@@ -34,7 +38,7 @@ See `courseR.yml` for configuration options and files in `templates/` to customi
 ## Credits
 
 * [rmarkdown](http://rmarkdown.rstudio.com/) and in-turn [pandoc](http://pandoc.org/) for most of the heavy-lifting behind website creation
-* Twitter [bootstrap](http://getbootstrap.com/) and the Sandstone theme from [bootswatch](https://bootswatch.com/) for layout and styles
+* Twitter [bootstrap](http://getbootstrap.com/) for layout and styles
 * [Shiny](https://shiny.rstudio.com/) for interactive assignments viewer
 
 ## License

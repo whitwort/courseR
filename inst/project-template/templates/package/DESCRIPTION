@@ -6,7 +6,7 @@ Author: Gregg Whitworth
 Maintainer: Gregg Whitworth <whitwort@gmail.com>
 URL: http://github.com/whitwort/courseR
 BugReports: http://github.com/whitwort/courseR/issues
-Description: What the package does (one paragraph).
+Description: This package provides wrapper functions to courseR bound to a course build.
 Imports: courseR
 Depends: R (>= 3.3.2)
 License: GPL-3

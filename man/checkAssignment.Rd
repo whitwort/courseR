@@ -4,12 +4,15 @@
 \alias{checkAssignment}
 \title{Check an assignment}
 \usage{
-checkAssignment(name, path = getwd(), pkg)
+checkAssignment(name, path = getwd(), autoknit = TRUE, pkg)
 }
 \arguments{
 \item{name}{name of the assignment to check}
 
-\item{path}{path to your course project folder}
+\item{path}{optional path to your course project folder}
+
+\item{autoknit}{if TRUE your assignment Rmd files will automatically be
+re-knitted when you save changes}
 
 \item{pkg}{path to course package}
 }
@@ -17,7 +20,7 @@ checkAssignment(name, path = getwd(), pkg)
 true if we don't find anything dodgy
 }
 \description{
-Allows you to check your current progress on an assignment against a
+Allows you to check your current progress on an assignment against a 
 reference solution.
 }
 

@@ -8,6 +8,7 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(cache = TRUE)
+knitr::opts_chunk$set(fig.height = 5)
 ```
 
 {{content}}

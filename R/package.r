@@ -1,6 +1,6 @@
 #' List available assignments
 #'
-#' @param path path to your course project folder
+#' @param path optional path to your course project folder
 #' @param pkg path to course package
 #'
 #' @return character vector with assignment names
@@ -11,12 +11,16 @@ listAssignments <- function(pkg) {
 
 #' Start an assignment
 #' 
-#' @param name name of the assignment to start
-#' @param overwrite if true this function will overwrite any existing work
-#'   you've done on this asignment already
-#' @param path path to your course project folder
-#' @param pkg path to course package
+#' This function will create an RMD file that you can use to start working on
+#' solutions for an assignment.  It also refreshes the data files in your data/
+#' directory.
 #' 
+#' @param name name of the assignment to start
+#' @param overwrite if TRUE this function will overwrite any existing work 
+#'   you've done on this asignment already
+#' @param path optional path to your course project folder
+#' @param pkg path to course package
+#'   
 #' @return new file path
 #'   
 #' @export
@@ -52,8 +56,8 @@ startAssignment <- function(name, overwrite = FALSE, path = getwd(), pkg) {
 #' reference solution.
 #' 
 #' @param name name of the assignment to check
-#' @param path path to your course project folder
-#' @param autoknit if true your assignment Rmd files will automatically be
+#' @param path optional path to your course project folder
+#' @param autoknit if TRUE your assignment Rmd files will automatically be
 #'   re-knitted when you save changes
 #' @param pkg path to course package
 #'   
@@ -66,6 +70,10 @@ checkAssignment <- function(name, path = getwd(), autoknit = TRUE, pkg) {
   message("Knitting ", name)
   rmarkdown::render(file, envir = new.env())
   
+  if (grepl(".[Rr]md$", name)) {
+    name <- substring(name, 1, nchar(name) - 4)
+  }
+  
   launchStudentUI(pkg = pkg, page = name, autoknit = autoknit)
   
 }
@@ -74,10 +82,10 @@ checkAssignment <- function(name, path = getwd(), autoknit = TRUE, pkg) {
 #' 
 #' Submitting an assignment flags the current version of your work as complete 
 #' and/or ready for grading.  You can resubmit assignments; doing so will reset
-#' the current grading information.
+#' the current feedback information.
 #' 
 #' @param name name of the assignment to submit
-#' @param path path to your course project folder
+#' @param path optional path to your course project folder
 #' @param pkg path to course package
 #'   
 #' @export
@@ -106,8 +114,8 @@ submitAssignment <- function(name, path = getwd(), pkg) {
 #' instructor account.  For students, it shows your current progress on all
 #' assignments; for instructors a grading interface.
 #' 
-#' @param path path to your course project folder
-#' @param autoknit if true your assignment Rmd files will automatically be
+#' @param path optional path to your course project folder
+#' @param autoknit if TRUE your assignment Rmd files will automatically be
 #'   re-knitted when you save changes; ignored in instructor mode.
 #' @param pkg path to course package
 #'   
@@ -125,3 +133,18 @@ checkAssignments <- function(path = getwd(), autoknit = TRUE, pkg) {
   }
   
 }
+
+#' Open course website
+#' 
+#' This convenience function will open the course website in the RStudio Viewer
+#' panel.  Only works if run from within RStudio.
+#' 
+#' @param pkg path to course package
+#'   
+#' @export
+website <- function(pkg) {
+  config <- loadConfig(file.path(pkg, "data"))
+  rstudio::viewer(config$build$site$url)
+}
+
+

@@ -3,7 +3,7 @@
 #' @inheritParams courseR::listAssignment
 #' 
 #' @export
-listAssignments <- function(pkg) {
+listAssignments <- function() {
   courseR::listAssignments(pkg = system.file(package = "{{name}}"))
 }
 
@@ -64,4 +64,17 @@ checkAssignments <- function(path = getwd(), autoknit = TRUE) {
 #' @export
 assignment <- function(...) {
   courseR::assignment(pkg = system.file(package = "{{name}}"), ...)
+}
+
+
+#' Open course website
+#' 
+#' This convenience function will open the course website in the RStudio Viewer
+#' panel.  Only works if run from within RStudio.
+#' 
+#' @inheritParams courseR::website
+#'   
+#' @export
+website <- function() {
+  courseR::website(pkg = system.file(package = "{{name}}"))
 }

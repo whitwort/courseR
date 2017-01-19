@@ -9,7 +9,8 @@
 #' @export
 solution <- function(...) {
  
-  taskCollector(type = "solutions", ...)
+  siteyml <- yaml::yaml.load_file("_site.yml")
+  taskCollector(type = "solutions",  siteyml = siteyml, ...)
   
 }
 
@@ -26,14 +27,15 @@ solution <- function(...) {
 assignment <- function(pkg, ...) {
   
   config  <- loadConfig(file.path(pkg, "data"))
-  taskCollector(type = config$build$package$name, ...)
+  siteyml <- yaml::yaml.load_file(file.path(pkg, "data", "_site.yml"))
+  taskCollector(type = config$build$package$name, siteyml = siteyml, ...)
   
 }
 
 # herein lies some serious hackery
-taskCollector <- function(type, ...) {
+taskCollector <- function(type, siteyml, ...) {
   
-  doc <- rmarkdown::html_document(...)
+  doc <- rmarkdown::html_document(..., theme = siteyml$output$html_document$theme)
   
   doc$knitr$knit_hooks <- list(task = function(before, options, ...) { 
     if (before) { 
@@ -47,11 +49,11 @@ taskCollector <- function(type, ...) {
   doc$pre_processor <- function(metadata, input_file, runtime, knit_meta, files_dir, output_dir) { 
     
     s <- readFile(input_file)
-    s <- gsub( "\\{\\{start-task-(\\d)\\}\\}"
+    s <- gsub( "\\{\\{start-task-(\\d+)\\}\\}"
              , '<div>{{task-\\1-before}}</div><div class="assignment-task" id="task-\\1">' 
              , s
              )
-    s <- gsub( "\\{\\{end-task-(\\d)\\}\\}"
+    s <- gsub( "\\{\\{end-task-(\\d+)\\}\\}"
              , '</div><div>{{task-\\1-after}}</div>'
              , s
              )
@@ -117,11 +119,6 @@ taskCollector <- function(type, ...) {
     post(metadata, input_file, output_file, clean, verbose) 
   }
   
-  # # not working; get's trounced by site build?
-  # if (type == 'solutions') {
-  #   doc$self_contained <- TRUE
-  # }
-  
   doc
 }
 
@@ -132,6 +129,9 @@ taskCollector <- function(type, ...) {
 }
 
 # $filename = hash | NA if missing
+hash <-function(filePath) {
+  paste(as.character(openssl::md5(file(filePath))), collapse = "")
+}
 listCheck <- function(pkg, path = studentPath(pkg)) {
   l <- lapply( .listAssignments(pkg)
              , function(name) { 
@@ -139,7 +139,7 @@ listCheck <- function(pkg, path = studentPath(pkg)) {
                  if (!file.exists(filePath)) {
                    NA
                  } else {
-                   as.character(openssl::md5(file(filePath)))
+                   hash(filePath)
                  }
                }
              )
@@ -164,7 +164,7 @@ listSources <- function(pkg, path = studentPath(pkg)) {
                    if (!file.exists(filePath)) {
                      NA
                    } else {
-                     as.character(openssl::md5(file(filePath))  )
+                     hash(filePath)
                    }
                  }
                }

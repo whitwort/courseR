@@ -4,7 +4,8 @@
 \alias{renderTable}
 \title{Render a table in an Rmd chunk}
 \usage{
-renderTable(file, markdown = TRUE, template = "templates/site/table.html")
+renderTable(file, markdown = TRUE, template = "templates/site/table.html",
+  widths = NULL)
 }
 \arguments{
 \item{file}{source YAML file}
@@ -13,6 +14,8 @@ renderTable(file, markdown = TRUE, template = "templates/site/table.html")
 markdown}
 
 \item{template}{table template file}
+
+\item{widths}{if not null gives the grid system widths of the columns}
 }
 \value{
 the HTML table taged as HTML tools tags so that it's rendered as HTML
