@@ -125,7 +125,7 @@ checkAssignments <- function(path = getwd(), autoknit = TRUE, pkg) {
   user   <- Sys.info()["user"]
   
   if (!is.null(config$`instructor-users`) && user %in% config$`instructor-users`) {
-    message("instructor UI not yet implemented")
+    launchInstructorUI(pkg = pkg)
   } else if (config$`student-users` == "*" || user %in% config$`student-users`) {
     launchStudentUI(pkg = pkg, page = 'overview', autoknit = autoknit)
   } else {
