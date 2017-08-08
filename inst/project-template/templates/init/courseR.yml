@@ -32,7 +32,7 @@ build:
     url:          http://localhost/{{name}} # no trailing slash
     img:          img         # project path for static images; copied to dist
     
-  # Hooks name closures called in order before or after builds; their called 
+  # Hooks name closures called in order before or after builds; they're called 
   # with the return from `update`: function(update) 
   #hooks:
     #before: 
@@ -40,5 +40,5 @@ build:
 
 # Course-specific configuration options; these change the default view for the 
 # assignments shiny app.
-instructor-users: "*"
+instructor-user: "*"
 student-users: "*"       # * skips the user name check and always shows studentui

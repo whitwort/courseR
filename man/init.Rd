@@ -15,10 +15,7 @@ init(path = getwd(), name = basename(path), overwrite = TRUE,
 \item{overwrite}{overwrite existing files or not}
 
 \item{examples}{should example content and assignment files be created}
-
-\item{examples}{should the package be installed in the distribution directory}
 }
 \description{
 Creates the needed file structure at the given path
 }
-

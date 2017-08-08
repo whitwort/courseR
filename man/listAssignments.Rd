@@ -17,4 +17,3 @@ character vector with assignment names
 \description{
 List available assignments
 }
-

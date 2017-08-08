@@ -23,4 +23,3 @@ true if we don't find anything dodgy
 Allows you to check your current progress on an assignment against a 
 reference solution.
 }
-

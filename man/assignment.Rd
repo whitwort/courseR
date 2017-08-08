@@ -18,4 +18,3 @@ an R Markdown output format definition
 Flag an Rmd file as an assignment by setting its output type to this
 function; not meant to be called directly.
 }
-

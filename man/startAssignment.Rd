@@ -24,4 +24,3 @@ This function will create an RMD file that you can use to start working on
 solutions for an assignment.  It also refreshes the data files in your data/
 directory.
 }
-

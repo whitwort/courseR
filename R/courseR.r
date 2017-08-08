@@ -6,7 +6,6 @@
 #' @param name name of the new project
 #' @param overwrite overwrite existing files or not
 #' @param examples should example content and assignment files be created
-#' @param examples should the package be installed in the distribution directory
 #'
 #' @export
 init <- function( path      = getwd()
@@ -37,7 +36,7 @@ init <- function( path      = getwd()
         , function(file) {
             renderTemplate( template = file.path(path, "templates", "init", file) 
                           , data     = data
-                          , file = file.path(path, file)
+                          , file     = file.path(path, file)
                           )
           }
         )

@@ -13,4 +13,3 @@ website(pkg)
 This convenience function will open the course website in the RStudio Viewer
 panel.  Only works if run from within RStudio.
 }
-

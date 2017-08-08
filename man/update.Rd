@@ -13,4 +13,3 @@ update(path = getwd())
 Updates files that depend on the current contents.  This is called
 automatically from \code{\link{newContent}} and \code{\link{newAssignment}}.
 }
-

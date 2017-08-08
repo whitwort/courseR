@@ -124,7 +124,7 @@ checkAssignments <- function(path = getwd(), autoknit = TRUE, pkg) {
   config <- loadConfig(file.path(pkg, "data"))
   user   <- Sys.info()["user"]
   
-  if (!is.null(config$`instructor-users`) && user %in% config$`instructor-users`) {
+  if (!is.null(config$`instructor-user`) && user %in% config$`instructor-user`) {
     launchInstructorUI(pkg = pkg)
   } else if (config$`student-users` == "*" || user %in% config$`student-users`) {
     launchStudentUI(pkg = pkg, page = 'overview', autoknit = autoknit)

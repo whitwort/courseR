@@ -19,4 +19,3 @@ This function behaves differently when called from a student versus
 instructor account.  For students, it shows your current progress on all
 assignments; for instructors a grading interface.
 }
-

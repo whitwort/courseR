@@ -24,4 +24,3 @@ the HTML table taged as HTML tools tags so that it's rendered as HTML
 \description{
 Use this function with the file created by code{\link{createTable}}
 }
-

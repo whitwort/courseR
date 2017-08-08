@@ -143,7 +143,7 @@ studentServer <- function(pkg, autoknit) {
         }
       })
     }
-    for (name in names(listSubmitted(pkg))) { output[[paste0('submit', "-", name)]] <- renderCheck(name) }
+    for (name in names(listSubmitted(pkg))) { output[[paste0('submit', "-", name)]] <- renderSubmit(name) }
     
     output$status <- shiny::renderTable({
       data.frame( Assignment            = .listAssignments(pkg)
@@ -158,6 +158,7 @@ studentServer <- function(pkg, autoknit) {
 }
 
 studentUI <- function(pkg, page) {
+  
   pkgPath <- file.path(normalizePath(pkg), "data")
   siteyml <- yaml::yaml.load_file(file.path(pkgPath, "_site.yml"))
   config  <- yaml::yaml.load_file(file.path(pkgPath, "courseR.yml"))
