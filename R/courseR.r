@@ -10,9 +10,8 @@
 #' @export
 init <- function( path      = getwd()
                 , name      = basename(path)
-                , overwrite = TRUE #bugged
+                , overwrite = TRUE #TODO: bugged
                 , examples  = TRUE
-                , install   = TRUE
                 ) {
   
   message("Initializing courseR project: ", name)

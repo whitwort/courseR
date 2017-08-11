@@ -3,9 +3,9 @@ Type: Package
 Title: R Markdown tool for generation course websites and managing assignments
 Description: This package implements my workflow for (1) creating websites for
     teaching courses in R and (2) using an R package to semi-automation student
-    homework assignment tasks in a managed environment (e.x. RStudio server)
-Version: 0.4
-Date: 2017-01-06
+    homework assignment tasks in a managed environment (e.x. RStudio server).
+Version: 0.5
+Date: 2017-08-10
 Author: Gregg Whitworth
 Maintainer: Gregg Whitworth <whitwort@gmail.com>
 URL: http://github.com/whitwort/courseR

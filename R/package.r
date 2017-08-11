@@ -1,6 +1,5 @@
 #' List available assignments
 #'
-#' @param path optional path to your course project folder
 #' @param pkg path to course package
 #'
 #' @return character vector with assignment names

@@ -1,4 +1,4 @@
 library(testthat)
-#library(courseR)
+library(courseR)
 
 test_check("courseR")

@@ -4,12 +4,18 @@ testPath <- normalizePath("temp")
 
 unlink(testPath, recursive = TRUE)
 dir.create(testPath)
-test_that("fresh init and build run without errors", {
+test_that("fresh init without errors", {
   
   expect_equal(courseR::init(path = testPath), testPath)
+  
+})
+
+test_that("fresh build without errors", {
+  
   expect_true(courseR::build(path = testPath))
   
 })
+
 
 test_that("package loads", {
   devtools::install(file.path(testPath, "dist", "temp"))
