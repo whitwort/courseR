@@ -1,3 +1,3 @@
 <hr>
 
-&copy; 2016 Company, Inc.
+&copy; 2017 Company, Inc.

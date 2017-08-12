@@ -91,9 +91,11 @@ update <- function(path = getwd()) {
                 )
   types  <- sapply(rmds, function(x) x$type)
   
-  data <- loadConfig(path)$templates$data
+  config <- loadConfig(path)
+  data   <- config$templates$data
   data$content     <- rmds[types == 'content'] 
   data$assignments <- rmds[types == 'assignment']
+  data$projects    <- if (identical(config$build$projects, FALSE)) FALSE else TRUE
   
   # _navbar
   renderTemplate( template = file.path(path, "templates", "site", "_navbar.html")
@@ -132,14 +134,14 @@ buildProjects <- function(config) {
 
 #' Build a project
 #' 
+#' @param path path for the project to build.
 #' @param cleanBuild should intermediate build files be deleted when the build 
 #'   is done.  Note this will trounce any knitr caching.
 #' @param cleanPreviews should .html files created in the main project directory
 #'   by making ad hoc previews in RStudio be deleted.
-#' @param path path for the project to build.
 #'   
 #' @export
-build <- function(cleanBuild = FALSE, cleanPreviews = TRUE, path = getwd()) {
+build <- function(path = getwd(), cleanBuild = FALSE, cleanPreviews = TRUE) {
   
   update <- update(path)
   rmds   <- update$rmds
@@ -319,9 +321,13 @@ build <- function(cleanBuild = FALSE, cleanPreviews = TRUE, path = getwd()) {
     if (buildProjects(config)) {
       message("Updating projects page...")
       
-      ps <- httr::content( httr::GET(paste0("https://api.github.com/orgs/", config$projects$githubOrg, "/repos"))
-                         , as = "parsed"
-                         )
+      url <- paste0("https://api.github.com/orgs/", config$build$projects$githubOrg, "/repos")
+      ps  <- httr::content( httr::GET(url), as = "parsed")
+      
+      if (!is.null(ps$message) && ps$message == "Not Found") {
+        stop("Incorrect configuration:  github can't find group `", config$build$projects$githubOrg, "` at API URL `", url, "`")
+      }
+      
       pushed_at <- sapply(ps, function(l) l$pushed_at)
       
       projects <- ps[order( strptime(pushed_at, format = "%Y-%m-%dT%H:%M:%SZ", tz = "GMT")
@@ -329,7 +335,14 @@ build <- function(cleanBuild = FALSE, cleanPreviews = TRUE, path = getwd()) {
                           )
                     ]
       
-      renderTemplate( "templates/site/projects-page.Rmd"
+      projects <- lapply( projects
+                        , function(p) {
+                            p$contributors <- httr::content(httr::GET(p$contributors_url), as = "parsed")
+                            p
+                          }
+                        )
+      
+      renderTemplate( file.path(path, "templates", "site", "projects-page.Rmd")
                     , data = c( config$templates$data
                               , list(projects = projects)
                               )
@@ -384,13 +397,13 @@ build <- function(cleanBuild = FALSE, cleanPreviews = TRUE, path = getwd()) {
 #' file.  The current user obviously needs write permissions for the specified
 #' path.
 #' 
+#' @param path  path to the project to publish
 #' @param build should the project be rebuilt before publishing
 #' @param www   should the website be published
 #' @param pkg   should the package be published
-#' @param path  path to the project to publish
 #'   
 #' @export
-publish <- function(build = TRUE, www = buildSite(config), pkg = buildPackage(config), path = getwd()) {
+publish <- function(path = getwd(), build = TRUE, www = buildSite(config), pkg = buildPackage(config)) {
   config   <- loadConfig(path)
   distPath <- file.path(path, config$paths$dist)
   
