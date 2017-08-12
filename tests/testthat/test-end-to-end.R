@@ -5,20 +5,27 @@ testPath <- normalizePath("temp")
 unlink(testPath, recursive = TRUE)
 dir.create(testPath)
 test_that("fresh init without errors", {
-  
   expect_equal(courseR::init(path = testPath), testPath)
-  
 })
 
 test_that("fresh build without errors", {
-  
   expect_true(courseR::build(path = testPath))
-  
 })
-
 
 test_that("package loads", {
   devtools::install(file.path(testPath, "dist", "temp"))
+})
+
+test_that("publish succeeds without errors", {
+  expect_true(courseR::publish(path = testPath))
+})
+
+test_that("clean succeeds without errors", {
+  expect_true(courseR::clean(path = testPath))
+})
+
+test_that("build works after a clean", {
+  expect_true(courseR::build(path = testPath))
 })
 
 test_that("startAssignment works", {

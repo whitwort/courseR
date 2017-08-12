@@ -1,4 +1,4 @@
-# Paths relative to the current working directory where build() expects to find things
+# Paths are relative to the current working directory where build() expects to find things
 paths:
   
   # link content/assignments to data files with the `data: ` header.  Students 
@@ -16,29 +16,39 @@ templates:
   data:
     
     name: {{name}} # project name; defaults to path where init() was called
-    #... all data here as well
+    #... define more pairs to pass along custom data to all templates
     
 # Build options
 build:
 
-  package: 
-    dist:   {{name}}
-    name:   {{name}}
+  package:                  # set to FALSE to skip building a course package
+    dist: {{name}}          # path in dist directory to build package to
+    name: {{name}}          # name of the course package
   
-  site:
-    build:        build       # temporary build path for intermediate rmds
-    dist:         www
-    max-chars:    144         # removes blocks of text from slides; set to false to disable
-    url:          http://localhost/{{name}} # no trailing slash
-    img:          img         # project path for static images; copied to dist
+  site:                     # set to FALSE to skip building a course website
+    build:      build       # temporary build path for intermediate rmds
+    dist:       www         # path in the dist directory to build website to
+    max-chars:  144         # removes blocks of text from slides; set to FALSE to disable
+    url:        http://localhost/{{name}} # no trailing slash
+    img:        img         # project path for static images; copied to dist
+    
+  projects:                                           # set to FALSE to skip building infrastructure for Shiny projects
+    githubOrg:   {{name}}-shiny-projects              # github organization where Shiny project repositories are hosted
+    shinyServer: http://localhost/shiny-server:3838/  # Base URL for the Shiny server that hosts project apps
+    publishPath: /var/shiny-server/{{name}}/          # path where students should checkout github repos to publish their Shiny apps
     
   # Hooks name closures called in order before or after builds; they're called 
   # with the return from `update`: function(update) 
   #hooks:
     #before: 
-    #after:  
+    #after: 
+
+# Publishing options
+publish:
+  package: live  # Location to copy package to when calling the `publish()`
+  site:    live  # Location to copy the website to when calling `publish()`     
 
 # Course-specific configuration options; these change the default view for the 
 # assignments shiny app.
-instructor-user: "*"
-student-users: "*"       # * skips the user name check and always shows studentui
+instructor-user: username
+student-users:   "*" # * skips the user name check and always shows studentui

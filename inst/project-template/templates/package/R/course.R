@@ -78,3 +78,15 @@ assignment <- function(...) {
 website <- function() {
   courseR::website(pkg = system.file(package = "{{name}}"))
 }
+
+#' Publishes the current version of your Shiny project to a public server
+#' 
+#' Publish the current version of a Shiny app project hosted on the course's 
+#' Bio-185 GitHub organization to the RNA Shiny server.
+#' 
+#' @inheritParams courseR::publishApp
+#'   
+#' @export
+publishApp <- function(...) {
+  courseR::publishApp(projectName = projectName, remove = remove, pkg = system.file(package = "{{name}}"))
+}

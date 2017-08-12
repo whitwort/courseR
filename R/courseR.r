@@ -111,6 +111,25 @@ update <- function(path = getwd()) {
   
 }
 
+
+buildPackage <- function(config) {
+  if (!identical(config$build$package, FALSE)) TRUE else FALSE
+}
+buildSite <- function(config) {
+  if (!identical(config$build$site, FALSE)) TRUE else FALSE
+}
+buildProjects <- function(config) {
+  if (!identical(config$build$projects, FALSE)) {
+    if (!buildSite(config)) {
+      stop("Cannot build a projects page if the website is disabled.  See `Build` section of `courseR.yml`")
+    }
+    TRUE 
+  } else { 
+    FALSE
+  }
+}
+
+
 #' Build a project
 #' 
 #' @param cleanBuild should intermediate build files be deleted when the build 
@@ -136,196 +155,284 @@ build <- function(cleanBuild = FALSE, cleanPreviews = TRUE, path = getwd()) {
   dir.create(distPath)
   
   # package
-  message("Building course package...")
-  
-  roxygen2::roxygenize(file.path(path, "package"), roclets=c('rd', 'collate', 'namespace'))
-  file <- devtools::build(pkg = file.path(path, "package"), path = distPath, binary = TRUE, manual = TRUE)
-  system(paste("tar -C", distPath, "-zxf", file))
- 
-  file.copy( from = file.path(path, "courseR.yml")
-           , to   = file.path(distPath, config$build$package$dist, "data")
+  if (buildPackage(config)) {
+    message("Building course package...")
+    
+    roxygen2::roxygenize(file.path(path, "package"), roclets=c('rd', 'collate', 'namespace'))
+    file <- devtools::build(pkg = file.path(path, "package"), path = distPath, binary = TRUE, manual = TRUE)
+    system(paste("tar -C", distPath, "-zxf", file))
+   
+    file.copy( from = file.path(path, "courseR.yml")
+             , to   = file.path(distPath, config$build$package$dist, "data")
+             )
+    file.copy( from = file.path(path, "_site.yml")
+             , to   = file.path(distPath, config$build$package$dist, "data")
+             )
+    
+    taskPath <- file.path(distPath, config$build$package$dist, "data", "assignments")
+    if (!dir.exists(taskPath)) { dir.create(taskPath) }
+    
+    file.copy( from = file.path(path, "data/")
+             , to   = file.path(taskPath)
+             , recursive = TRUE
+             )
+    
+    saveRDS( update
+           , file = file.path(distPath, config$build$package$dist, "data", "course.rds")
            )
-  file.copy( from = file.path(path, "_site.yml")
-           , to   = file.path(distPath, config$build$package$dist, "data")
-           )
-  
-  taskPath <- file.path(distPath, config$build$package$dist, "data", "assignments")
-  if (!dir.exists(taskPath)) { dir.create(taskPath) }
-  
-  file.copy( from = file.path(path, "data/")
-           , to   = file.path(taskPath)
-           , recursive = TRUE
-           )
-  
-  saveRDS( update
-         , file = file.path(distPath, config$build$package$dist, "data", "course.rds")
-         )
-  
+  }
   
   # website
-  message("Building website...")
+  if (buildSite(config)) {
+    message("Building website...")
+    
+    buildPath <- file.path(path, config$build$site$build)
   
-  buildPath <- file.path(path, config$build$site$build)
-
-  if (cleanBuild && dir.exists(buildPath)) {
-    unlink(buildPath, recursive = TRUE)
-  }
-  
-  if (!dir.exists(buildPath)) {
-    dir.create(buildPath)
-  }
-  
-  markdown::markdownToHTML( file = file.path(path, "footer.md")
-                          , output = file.path(buildPath, "footer.html")
-                          , fragment.only = TRUE
-                          )
-  
-  # hack to make content pages ad hoc knit, otherwize they'd be missing a footer file
-  markdown::markdownToHTML( file = file.path(path, "footer.md")
-                          , output = file.path(path, "footer.html")
-                          , fragment.only = TRUE
-                          )
-  
-  file.copy( from = file.path(path, c("_site.yml", "_navbar.html", "index.Rmd", "data")) # index.Rmd can't be spelled .rmd currently
-           , to   = buildPath
-           , recursive = TRUE
-           )
-  
-  partials = loadPartials(file.path(path, "templates", "site", "partials"))
-  
-  # content pages and slides
-  pagePath  <- file.path(path, "templates", "site", "content-page.Rmd")
-  pageHead  <- getHeader(pagePath)
-  pageTmpl  <- subHeader(pagePath, "{{header}}")
-  
-  slidePath <- file.path(path, "templates", "site", "content-slides.Rmd")
-  slideHead <- getHeader(slidePath)
-  slideTmpl <- subHeader(slidePath, "{{header}}")
-  
-  content <- rmds[types == 'content']
-  lapply( content
-        , function(x) {
-            rmd  <- getRMD(file.path(path, x$rmd))
-            head <- getHeader(file.path(path, x$rmd))
-            
-            pagedata   <- c( config$templates$data
-                           , x
-                           , list( content = collapseRMD(rmd)
-                                 , slides  = paste0(splitext(x$file), "-slides.html")
-                                 )
-                           )
-            pagedata$header <- renderTemplate( template = mergeHeader(pageHead, head)
-                                             , pagedata
-                                             , partials = partials
-                                             )
-            
-            renderTemplate( template = pageTmpl
-                          , data     = pagedata
-                          , file     = file.path(buildPath, x$rmd)
-                          , partials = partials
-                          , post     = stripEmptyH
-                          )
-            
-            slidedata <- c( config$templates$data
-                          , x
-                          , list(content = slideRMD(rmd, config))
-                          )
-            slidedata$header <- renderTemplate( template = mergeHeader(slideHead, head)
-                                              , slidedata
-                                              , partials = partials
-                                              )
-            
-            renderTemplate( template = slideTmpl
-                          , data     = slidedata
-                          , file     = file.path(buildPath, paste0(splitext(x$file), "-slides.Rmd"))
-                          , partials = partials
-                          )
-           
-            
-            if (cleanPreviews) {
-              unlink(x$file)
-            }
-          }
-        )
-  
-  # assignments
-  assnPath  <- file.path(path, "templates", "site", "assignment-solution.Rmd")
-  #assnHead  <- getHeader(assnPath)
-  assnTmpl  <- subHeader(assnPath, "{{header}}")
-  
-  assignments <- rmds[types == 'assignment']
-  lapply( assignments
-        , function(x) {
-            rmd  <- getRMD(file.path(path, x$rmd))
-            head <- getHeader(file.path(path, x$rmd))
-            
-            data <- c( config$templates$data
-                     , x
-                     , list( solution   = solutionRMD(rmd)
-                           , tasks      = taskRMD(rmd)
-                           , assignment = splitext(x$rmd)
-                           , rdsPath    = normalizePath(file.path(distPath, config$build$package$dist, "data"))
-                           )
-                     )
-            
-            data$header <- renderTemplate( template = getHeaderString(assnPath) # with this implementation there is no merge of headers on assignments
-                                         , data
-                                         , partials = partials
-                                         )
-
-            # solution htmls
-            renderTemplate( template = assnTmpl
-                          , data     = data
-                          , file     = file.path(buildPath, x$rmd)
-                          , partials = partials
-                          )
-            
-            # task htmls
-            renderTemplate( template = file.path(path, "templates", "site", "assignment-tasks.Rmd")
-                          , data     = data
-                          , file     = file.path(taskPath, x$rmd)
-                          , partials = partials
-                          )
-            
-            if (cleanPreviews) {
-              unlink(x$file)
-            }
-            
-          }
-        )
-  
-  # for some reason -slides are always already copied; supress warning
-  smartSuppress({
-    rmarkdown::render_site(input = buildPath, env = new.env())
-  }, "cannot rename file")
-
-  for (l in update$assignments) {
-    s <- readFile(file.path(buildPath, "_site", l$file))
-    s <- gsub("\\{\\{.*?\\}\\}", "", s)
-    cat(s, file = file.path(buildPath, "_site", l$file))
-  }
-  
-  file.copy( from      = file.path(path, config$build$site$img, "")
-           , to        = file.path(buildPath, "_site")
-           , recursive = TRUE
-           )    
-  file.copy( from      = file.path(buildPath, "_site/")
-           , to        = distPath
-           , recursive = TRUE
-           )
-  file.rename( from = file.path(distPath, "_site")
-             , to   = file.path(distPath, config$build$site$dist)
+    if (cleanBuild && dir.exists(buildPath)) {
+      unlink(buildPath, recursive = TRUE)
+    }
+    
+    if (!dir.exists(buildPath)) {
+      dir.create(buildPath)
+    }
+    
+    markdown::markdownToHTML( file = file.path(path, "footer.md")
+                            , output = file.path(buildPath, "footer.html")
+                            , fragment.only = TRUE
+                            )
+    
+    # hack to make content pages ad hoc knit, otherwize they'd be missing a footer file
+    markdown::markdownToHTML( file = file.path(path, "footer.md")
+                            , output = file.path(path, "footer.html")
+                            , fragment.only = TRUE
+                            )
+    
+    file.copy( from = file.path(path, c("_site.yml", "_navbar.html", "index.Rmd", "data")) # index.Rmd can't be spelled .rmd currently
+             , to   = buildPath
+             , recursive = TRUE
              )
+    
+    partials = loadPartials(file.path(path, "templates", "site", "partials"))
+    
+    # build content pages and slides
+    pagePath  <- file.path(path, "templates", "site", "content-page.Rmd")
+    pageHead  <- getHeader(pagePath)
+    pageTmpl  <- subHeader(pagePath, "{{header}}")
+    
+    slidePath <- file.path(path, "templates", "site", "content-slides.Rmd")
+    slideHead <- getHeader(slidePath)
+    slideTmpl <- subHeader(slidePath, "{{header}}")
+    
+    content <- rmds[types == 'content']
+    lapply( content
+          , function(x) {
+              rmd  <- getRMD(file.path(path, x$rmd))
+              head <- getHeader(file.path(path, x$rmd))
+              
+              pagedata   <- c( config$templates$data
+                             , x
+                             , list( content = collapseRMD(rmd)
+                                   , slides  = paste0(splitext(x$file), "-slides.html")
+                                   )
+                             )
+              pagedata$header <- renderTemplate( template = mergeHeader(pageHead, head)
+                                               , pagedata
+                                               , partials = partials
+                                               )
+              
+              renderTemplate( template = pageTmpl
+                            , data     = pagedata
+                            , file     = file.path(buildPath, x$rmd)
+                            , partials = partials
+                            , post     = stripEmptyH
+                            )
+              
+              slidedata <- c( config$templates$data
+                            , x
+                            , list(content = slideRMD(rmd, config))
+                            )
+              slidedata$header <- renderTemplate( template = mergeHeader(slideHead, head)
+                                                , slidedata
+                                                , partials = partials
+                                                )
+              
+              renderTemplate( template = slideTmpl
+                            , data     = slidedata
+                            , file     = file.path(buildPath, paste0(splitext(x$file), "-slides.Rmd"))
+                            , partials = partials
+                            )
+             
+              
+              if (cleanPreviews) {
+                unlink(x$file)
+              }
+            }
+          )
+    
+    # build assignments
+    assnPath  <- file.path(path, "templates", "site", "assignment-solution.Rmd")
+    assnTmpl  <- subHeader(assnPath, "{{header}}")
+    
+    assignments <- rmds[types == 'assignment']
+    lapply( assignments
+          , function(x) {
+              rmd  <- getRMD(file.path(path, x$rmd))
+              head <- getHeader(file.path(path, x$rmd))
+              
+              data <- c( config$templates$data
+                       , x
+                       , list( solution   = solutionRMD(rmd)
+                             , tasks      = taskRMD(rmd)
+                             , assignment = splitext(x$rmd)
+                             , rdsPath    = normalizePath(file.path(distPath, config$build$package$dist, "data"))
+                             )
+                       )
+              
+              data$header <- renderTemplate( template = getHeaderString(assnPath) # with this implementation there is no merge of headers on assignments
+                                           , data
+                                           , partials = partials
+                                           )
   
-  file.copy( from      = file.path(buildPath, "_site/site_libs/")
-           , to        = file.path(distPath, config$build$package$dist, "data")
-           , recursive = TRUE
-           )
+              # solution htmls
+              renderTemplate( template = assnTmpl
+                            , data     = data
+                            , file     = file.path(buildPath, x$rmd)
+                            , partials = partials
+                            )
+              
+              # task htmls
+              renderTemplate( template = file.path(path, "templates", "site", "assignment-tasks.Rmd")
+                            , data     = data
+                            , file     = file.path(taskPath, x$rmd)
+                            , partials = partials
+                            )
+              
+              if (cleanPreviews) {
+                unlink(x$file)
+              }
+              
+            }
+          )
+
+    
+    # build shiny projects page
+    if (buildProjects(config)) {
+      message("Updating projects page...")
+      
+      ps <- httr::content( httr::GET(paste0("https://api.github.com/orgs/", config$projects$githubOrg, "/repos"))
+                         , as = "parsed"
+                         )
+      pushed_at <- sapply(ps, function(l) l$pushed_at)
+      
+      projects <- ps[order( strptime(pushed_at, format = "%Y-%m-%dT%H:%M:%SZ", tz = "GMT")
+                          , decreasing = TRUE
+                          )
+                    ]
+      
+      renderTemplate( "templates/site/projects-page.Rmd"
+                    , data = c( config$templates$data
+                              , list(projects = projects)
+                              )
+                    , file = file.path(buildPath, "projects-page.Rmd")
+                    )
+      
+    }
+        
+    # render the site to dist/ from sources in build/
+    # for some reason -slides are always already copied; supress warning
+    message("Rendering website...")
+    smartSuppress({
+      rmarkdown::render_site(input = buildPath, env = new.env())
+    }, "cannot rename file")
   
+    for (l in update$assignments) {
+      s <- readFile(file.path(buildPath, "_site", l$file))
+      s <- gsub("\\{\\{.*?\\}\\}", "", s)
+      cat(s, file = file.path(buildPath, "_site", l$file))
+    }
+    
+    file.copy( from      = file.path(path, config$build$site$img, "")
+             , to        = file.path(buildPath, "_site")
+             , recursive = TRUE
+             )    
+    file.copy( from      = file.path(buildPath, "_site/")
+             , to        = distPath
+             , recursive = TRUE
+             )
+    file.rename( from    = file.path(distPath, "_site")
+               , to      = file.path(distPath, config$build$site$dist)
+               )
+    
+    file.copy( from      = file.path(buildPath, "_site/site_libs/")
+             , to        = file.path(distPath, config$build$package$dist, "data")
+             , recursive = TRUE
+             )
+  }
+
   if (!is.null(config$build$hooks$after)) {
     lapply(config$build$hooks$after, function(f) do.call(f, args = list(update = update)))
   }
   
+  TRUE
+}
+
+
+#' Publish the latest build of the project
+#' 
+#' Copies the lastest build of (optionally) the website and package to paths 
+#' specified in in the `publish` section of the `courseR.yml` configuration
+#' file.  The current user obviously needs write permissions for the specified
+#' path.
+#' 
+#' @param build should the project be rebuilt before publishing
+#' @param www   should the website be published
+#' @param pkg   should the package be published
+#' @param path  path to the project to publish
+#'   
+#' @export
+publish <- function(build = TRUE, www = buildSite(config), pkg = buildPackage(config), path = getwd()) {
+  config   <- loadConfig(path)
+  distPath <- file.path(path, config$paths$dist)
+  
+  if (!build && !file.exists(distPath)) {
+    stop("The target project has not been built.  Please use `courseR::build` or specify `build = TRUE`.")
+  }
+  
+  if (build) { build(path = path) }
+  if (www) {
+    wwwPath <- file.path(path, config$publish$site, "/")
+    if (!dir.exists(wwwPath)) {
+      dir.create(wwwPath)
+    }
+    file.copy( from = file.path(distPath, config$build$site$dist)
+             , to   = wwwPath
+             , recursive = TRUE
+             )
+    message("Website published to: ", wwwPath)
+  }
+  if (pkg) {
+    pkgPath <- file.path(path, config$publish$package, "/")
+    if (!dir.exists(pkgPath)) {
+      dir.create(pkgPath)
+    }
+    file.copy( from = file.path(distPath, config$build$package$dist)
+             , to   = pkgPath
+             , recursive = TRUE
+             )
+    message("Course package published to: ", wwwPath)
+  }
+  
+  TRUE
+}
+
+
+#' Delete intermediate and final build files from the project
+#'
+#' @param path project path
+#'
+#' @export
+clean <- function(path = getwd()) {
+  unlink(x = file.path(path, c("_site", "build", "dist")), recursive = TRUE)
   TRUE
 }
 

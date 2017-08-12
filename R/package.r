@@ -146,4 +146,42 @@ website <- function(pkg) {
   rstudio::viewer(config$build$site$url)
 }
 
+#' Publish the current version of a Shiny app project hosted on the course's 
+#' Bio-185 GitHub organization to the RNA Shiny server.
+#' 
+#' @param projectName string with your group's project name.  This must match
+#'   your group's repository name on GitHub.
+#' @param remove if TRUE will remove the old version of your app and update.
+#' @param pkg path to course package
+#'   
+#' @export
+publishApp <- function(projectName, remove = TRUE, pkg) {
+  config <- loadConfig(file.path(pkg, "data"))
+  
+  basePath <- config$projects$publishPath
+  path     <- file.path(basePath, projectName)
+  
+  if (dir.exists(path) && remove) {
+    message("Removing old version...")
+    unlink(path, recursive = TRUE, force = TRUE)
+  } else if (dir.exists(path) && !remove) {
+    message("Can't publish; an app with that name already exists.  Try 'remove = TRUE'.")
+  }
+  
+  gitURL <- paste0("https://github.com/", config$build$projects$githubOrg, "/", projectName, ".git")
+  message("Trying to clone: ", gitURL)
+  
+  system(paste0( "git clone "
+               , gitURL
+               , " "
+               , path
+               )
+        )
+  
+  system(paste0("chmod -R g+w ", path))
+  
+  message("If there were no errors, your app was published to:")
+  message(paste0(config$projects$shinyServer, projectName, "/"))
+  
+}
 

@@ -8,8 +8,6 @@ listAssignments(pkg)
 }
 \arguments{
 \item{pkg}{path to course package}
-
-\item{path}{optional path to your course project folder}
 }
 \value{
 character vector with assignment names

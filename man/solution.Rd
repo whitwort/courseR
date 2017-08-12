@@ -7,7 +7,7 @@
 solution(...)
 }
 \arguments{
-\item{...}{}
+\item{...}{document parameters}
 }
 \value{
 an R Markdown output format definition

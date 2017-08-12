@@ -18,7 +18,8 @@ Imports:
   devtools, 
   roxygen2,
   xml2,
-  rvest
+  rvest,
+  httr
 Depends:
   shiny
 SystemRequirements: pandoc (>= 1.12.3)

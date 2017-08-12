@@ -9,7 +9,7 @@ assignment(pkg, ...)
 \arguments{
 \item{pkg}{path to course package for this assignment}
 
-\item{...}{}
+\item{...}{document parameters}
 }
 \value{
 an R Markdown output format definition

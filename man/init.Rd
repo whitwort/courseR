@@ -5,7 +5,7 @@
 \title{Initialize a new project}
 \usage{
 init(path = getwd(), name = basename(path), overwrite = TRUE,
-  examples = TRUE, install = TRUE)
+  examples = TRUE)
 }
 \arguments{
 \item{path}{path to use to create a new project}
