@@ -22,26 +22,27 @@ templates:
 build:
 
   package:                  # set to FALSE to skip building a course package
-    dist: {{name}}          # path in dist directory to build package to
-    name: {{name}}          # name of the course package
+    dist:       {{name}}    # path in dist directory to build package to
+    name:       {{name}}    # name of the course package
   
   site:                     # set to FALSE to skip building a course website
     build:      build       # temporary build path for intermediate rmds
     dist:       www         # path in the dist directory to build website to
     max-chars:  144         # removes blocks of text from slides; set to FALSE to disable
-    url:        http://localhost/{{name}} # no trailing slash
+    url:        http://localhost/{{name}}
     img:        img         # project path for static images; copied to dist
     
-  projects:                                           # set to FALSE to skip building infrastructure for Shiny projects
-    githubOrg:   {{name}}-shiny-projects              # github organization where Shiny project repositories are hosted
-    shinyServer: http://localhost/shiny-server:3838/  # Base URL for the Shiny server that hosts project apps
-    publishPath: /var/shiny-server/{{name}}/          # path where students should checkout github repos to publish their Shiny apps
+  projects:     FALSE       # Remove this line and uncomment example below to enable
+  #projects:                                           
+  #  githubOrg:   {{name}}-shiny-projects              # github organization where Shiny project repositories are hosted
+  #  shinyServer: http://localhost/shiny-server:3838/  # Base URL for the Shiny server that hosts project apps
+  #  publishPath: /var/shiny-server/{{name}}/          # path where students should checkout github repos to publish their Shiny apps
     
   # Hooks name closures called in order before or after builds; they're called 
   # with the return from `update`: function(update) 
   #hooks:
-    #before: 
-    #after: 
+  #  before: 
+  #  after: 
 
 # Publishing options
 publish:
