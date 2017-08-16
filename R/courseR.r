@@ -129,8 +129,9 @@ buildProjects <- function(config) {
 #' Build a project
 #' 
 #' @param path path for the project to build.
-#' @param cleanBuild if TRUE completely rebuilds the project; erases knitr
-#'   caches and the contents of 'build/' and 'dist/'.
+#' @param cleanBuild if TRUE completely rebuilds the project; erases knitr 
+#'   caches and the contents of 'build/' and 'dist/'.  Set to TRUE if you have
+#'   changed any of the website templates since the last build.
 #' @param cleanPreviews should .html files created in the main project directory
 #'   by making ad hoc previews in RStudio be deleted.
 #'   
