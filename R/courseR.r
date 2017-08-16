@@ -1,4 +1,4 @@
-.#' Initialize a new project
+#' Initialize a new project
 #'
 #' Creates the needed file structure at the given path
 #'
