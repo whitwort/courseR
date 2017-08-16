@@ -1,7 +1,7 @@
 #' Create a table source file
 #' 
-#' The resulting YAML file can be easily hand editted and included as a table in
-#' an Rmd file with the code{\link{renderTable}} function.
+#' The resulting YAML file can be easily hand editted and used to included as a
+#' table in an Rmd file with the code{\link{includeTable}} function.
 #' 
 #' @param nrows number of rows
 #' @param cols column names
@@ -32,18 +32,19 @@ createTable <- function(nrows, cols, row.col = "#", file) {
 
 #' Render a table in an Rmd chunk
 #' 
-#' Use this function with the file created by code{\link{createTable}}
+#' Use this function with the YML template file created by 
+#' code{\link{createTable}}.
 #' 
 #' @param file source YAML file
-#' @param markdown if TRUE text values in the YAML file are preprocessed as
+#' @param markdown if TRUE text values in the YAML file are preprocessed as 
 #'   markdown
 #' @param template table template file
 #' @param widths if not null gives the grid system widths of the columns
 #'   
-#' @return the HTML table taged as HTML tools tags so that it's rendered as HTML
-#'   with the rmd is knit
+#' @return the HTML table tagged by htmltools so that it's rendered as HTML when
+#'   an the rmd is knitted.
 #' @export
-renderTable <- function(file, markdown = TRUE, template = "templates/site/table.html", widths = NULL) {
+includeTable <- function(file, markdown = TRUE, template = "templates/site/table.html", widths = NULL) {
   
   d <- yaml::yaml.load_file(file)
 
@@ -73,7 +74,7 @@ renderTable <- function(file, markdown = TRUE, template = "templates/site/table.
                               , data     = data
                               )
   
-  s <- whisker.unescape(s)
+  # s <- whisker.unescape(s)
   
   htmltools::HTML(s)
   

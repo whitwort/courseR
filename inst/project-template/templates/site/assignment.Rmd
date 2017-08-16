@@ -3,33 +3,131 @@ title:  "{{title}}"
 type:   assignment
 ---
 
-## R Markdown
+# Assignments
 
-Print out a summary of the `cars` data set:
+Assignment RMarkdown files differ from standard content files in that they can contain special code chunks named `solution`.  When the website is build source Assignment markdowns are used to make two different output documents:  assignment tasks Rmd files, which contain templates for students to use to complete the assignment, and assignment solution HTML which contains only the solution chunk outputs without the solution code, for students to use as an answer key.
+
+Here's an example task chunk: print a `summary` of the `cars` data frame.
 
 ```{r solution}
-# name chuncks with solution code 'solution'
-
 summary(cars)
 ```
 
-## Including Plots
+Note that you don't need to handle giving your `solution` chunks unique names; that will be done automatically when the assignment markdown is built.  This saves some headache when writing assignments at the expense of being able to run *ad hoc* knits.
 
-Plot the variable `pressure`:
-
-```{r solution}
-plot(pressure)
-```
-
-Additional chunk options are carried over:
-
-```{r solution, comment="Something interesting"}
-plot(pressure)
-```
-
-Chunks not named `solution` are left unchanged:
+Other chunks are left unchanged and included as-is in both task and solution outputs:
 
 ```{r}
 print("hello normal chunk!")
 ```
 
+The courseR assignment framework only works if you're also building a course package.  It is important that student accounts have read access to wherever this package is deployed.
+
+# Examples
+
+Here we'll use a couple of modified versions of the excercises from Hadley Wickham's [R for Data Science](http://r4ds.had.co.nz/) textbook to demonstrate the features of solution chunks.
+
+## Answer key generation
+
+For some tasks, like making plots, it doesn't make sense to try to include any kind of automated checking.  For example:
+
+**3.2.4 #5**.  Using the `mpg` data set, make a plot of `hwy` versus `cyl`:
+
+```{r solution}
+library(ggplot2)
+ggplot(data = mpg) + geom_point(aes(x = cyl, y = hwy))
+```
+
+When students run the `courseR::checkAssigment` app they'll be able to check their plot against the one created by the `solution` block (but they won't see the code for the solution block).  When instructors run the `courseR::gradeAssignments` app they'll see the reference solution followed by both the code chunk and output from each assignment submitted by students.  This makes it quick and easy to grade submissions.  Available grades are defined in `courseR.yml`.
+
+## Automated testing with checkr
+
+There are other cases where it is possible to provide sane automated tests to provide students with instant feedback before submitting an assignment for grading.  Currently, `courseR` supports writing task code tests using the [checkr](https://github.com/dtkaplan/checkr) package.  Currently being developed to work with the [learnr](https://rstudio.github.io/learnr), there are some key differences between how `learnr` and `courseR` test code chunks and interopertate with `checkr`.  `courseR` is more opinionated than `learnr` but handles the boilerplate for you:
+
+* When courseR assignments are built, all code chunks are evaluated in the same environment (unique to that R Markdown source).  In `learnr`, each chunk within a document is evaluated in it's own environment.
+* You flag a chunk as containing a set of tests for a task by giving it the name `checkr`; unique names will automatically be generated.  `solution` chunks can be followed by zero, one or many `checkr` chunks.  
+* Tests within a `checkr` chunk are joined by '%>%'.  You don't explicitly write the pipe sequence for tests in a chunk, this is done automatically based on their order.  You also don't explicitly pipe in captured user code, this is also handled by the framework.  There's also no reason to need a branch, as you can have as many `checkr` chunks for each task as you like; they are implicitly joined by `AND`.
+* In courseR, `checkr` chunks are initially evaluated when the site is being built (with `courseR::build`).  All of the test functions in `checkr` return functions with the signature `function(capture)`; *any* function created in a `checkr` chunk that has this signature will be saved *at build time* and included in the test pipe.  This of course allows these closures to bind any data in the R markdown document present in the parent environment when the assignment is built.  This includes values in solution chunks that students won't see.
+* Code is then actually tested by students using saved test pipes when they run `checkAssignment`.  Note this avoids security concerns as student code is only ever evaluated within students' own R sessions.
+* Solution code is also tested at build time for sanity!
+
+On with some examples!
+
+**3.2.4 #2a**. How many rows are in the `mpg` data set?
+
+```{r solution}
+library(datasets)
+nrow(mpg)
+```
+
+Obviously, if you have an answer key for this question it's easy to cheese a solution.  So we can use `checkr` to make sure they got the right number (duh) but also used the `nrow` function.
+
+```{r checkr}
+library(checkr)
+rows <- nrow(mpg)
+
+find_call("nrow(whatever)", "You're not using the `nrow` function.  Look it up!")
+check_value(match_number(rows), "That's an incorrect number of rows.")
+```
+
+Note the closure returned by `check_value` captures `rows` from the parental environment.
+
+**3.2.4 #2b**. How many columns are in the `mpg` data set?
+
+```{r solution}
+ncol(mpg)
+```
+
+We'll use this contrived example to demonstrate using multiple `checkr` chunks:
+
+```{r checkr}
+final_
+check_value(match_number(11), "That's an incorrect number of columns.")
+```
+
+`courseR::check_final` is just a shorthand for `final_ %>% check_value`:
+
+```{r checkr}
+library(courseR)
+check_final(match_number(ncol(mpg)), "That's an incorrect number of columns.")
+```
+
+**5.2.4 #3**.  How many flights in `nycflights::flights` have a missing `dep_time`?
+
+```{r solution}
+library(nycflights13)
+sum(is.na(flights$dep_time))
+```
+
+You aren't limited to using the test functions generated by `checkr`, you can use any function that adheres to the `function(capture)` signature:
+
+```{r checkr}
+function(capture) {
+  # We can be evil...
+  capture$passed  <- FALSE
+  capture$message <- "You will never complete this task."
+  capture
+}
+```
+
+**5.2.4 #1**. Create a new table from `flights` containing only flights that had an arrival delay of two hours or more.
+
+This is a better real world example:
+
+```{r solution}
+library(dplyr)
+ref <- flights %>% filter(arr_delay >= 120)
+ref
+```
+
+```{r checkr}
+check_final(match_data_frame(ref, names_match = TRUE), "Your table doesn't have the right columns.")
+check_final(match_data_frame(ref, nrow = TRUE), "Your table doesn't have the right number of rows.")
+```
+
+These are such common things to check in the context of data transformation or manipulation excercises, courseR exports these shortcuts:
+
+```{r checkr}
+check_cols(ref)
+check_rows(ref)
+```

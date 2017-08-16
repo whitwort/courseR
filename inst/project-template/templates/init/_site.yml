@@ -1,3 +1,6 @@
+# This is a standard R Markdown Website configuration file; see 
+# http://rmarkdown.rstudio.com/rmarkdown_websites.html for examples and details.
+
 name: {{name}}
 output:
   html_document:

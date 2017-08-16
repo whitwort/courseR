@@ -14,7 +14,7 @@ templates:
   # all key-value pairs defined here will be available as variables when 
   # templates are rendered
   data:
-    
+ 
     name: {{name}} # project name; defaults to path where init() was called
     #... define more pairs to pass along custom data to all templates
     
@@ -24,6 +24,10 @@ build:
   package:                  # set to FALSE to skip building a course package
     dist:       {{name}}    # path in dist directory to build package to
     name:       {{name}}    # name of the course package
+    grades:                 # Defines the grades that can be assigned to assignment tasks
+      Done:        TRUE     # if a name is set to TRUE, this grade is flags a task as completed
+      Incomplete:  FALSE    # if a name is set to FALSE, the task isn't complete
+      Error:       FALSE    
   
   site:                     # set to FALSE to skip building a course website
     build:      build       # temporary build path for intermediate rmds

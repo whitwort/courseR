@@ -19,6 +19,6 @@ createTable(nrows, cols, row.col = "#", file)
 the YAML string invisibly
 }
 \description{
-The resulting YAML file can be easily hand editted and included as a table in
-an Rmd file with the code{\link{renderTable}} function.
+The resulting YAML file can be easily hand editted and used to included as a
+table in an Rmd file with the code{\link{includeTable}} function.
 }

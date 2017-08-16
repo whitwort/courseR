@@ -4,17 +4,17 @@
 \alias{publish}
 \title{Publish the latest build of the project}
 \usage{
-publish(build = TRUE, www = buildSite(config), pkg = buildPackage(config),
-  path = getwd())
+publish(path = getwd(), build = TRUE, www = buildSite(config),
+  pkg = buildPackage(config))
 }
 \arguments{
+\item{path}{path to the project to publish}
+
 \item{build}{should the project be rebuilt before publishing}
 
 \item{www}{should the website be published}
 
 \item{pkg}{should the package be published}
-
-\item{path}{path to the project to publish}
 }
 \description{
 Copies the lastest build of (optionally) the website and package to paths 

@@ -2,8 +2,11 @@ Package: courseR
 Type: Package
 Title: R Markdown tool for generation course websites and managing assignments
 Description: This package implements my workflow for (1) creating websites for
-    teaching courses in R and (2) using an R package to semi-automation student
-    homework assignment tasks in a managed environment (e.x. RStudio server).
+    teaching courses in R, (2) using an R package to semi-automation student
+    homework assignment tasks in a managed environment, as on an RStudio server, 
+    and (3) provides an interface for students to manage Shiny app projects on 
+    github and then deploy them to a Shiny server instance.  Any of these 3 
+    components can be disabled.
 Version: 0.5
 Date: 2017-08-10
 Author: Gregg Whitworth
@@ -19,7 +22,10 @@ Imports:
   roxygen2,
   xml2,
   rvest,
-  httr
+  httr,
+  magrittr,
+  nycflights13,
+  datasets
 Depends:
   shiny
 SystemRequirements: pandoc (>= 1.12.3)

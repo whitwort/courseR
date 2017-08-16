@@ -1,7 +1,7 @@
 #' Custom RMarkdown document type that parses assignment solution files
 #' 
-#' Flag an Rmd file as an assignment by setting its output type to this
-#' function; not meant to be called directly.
+#' Flag an Rmd file as solutions by setting its output type to this function;
+#' not meant to be called directly.
 #' 
 #' @param ... document parameters
 #'   
@@ -14,9 +14,9 @@ solution <- function(...) {
   
 }
 
-#' Custom RMarkdown document type that parses student assignments
+#' Custom RMarkdown document type that parses student answers to assignments
 #' 
-#' Flag an Rmd file as an assignment by setting its output type to this
+#' Flag an Rmd file as an assignment by setting its output type to this 
 #' function; not meant to be called directly.
 #' 
 #' @param pkg path to course package for this assignment
@@ -32,18 +32,44 @@ assignment <- function(pkg, ...) {
   
 }
 
-# herein lies some serious hackery
+# herein lies some serious knitr/rmarkdown hackery
 taskCollector <- function(type, siteyml, ...) {
   
   doc <- rmarkdown::html_document(..., theme = siteyml$output$html_document$theme)
   
-  doc$knitr$knit_hooks <- list(task = function(before, options, ...) { 
+  # custom hooks
+  task     <- function(before, options, envir) {
     if (before) { 
       paste0("{{start-task-", options$task, "}}") 
     } else { 
       paste0("{{end-task-", options$task, "}}") 
     }
-  })
+  }
+  
+  # and here be mutation of document-wide globals
+  checkrs  <- list()
+  checkr   <- function(before, options, envir) {
+    if (!before) {
+      code <- paste(options$code, collapse = "\n")
+      res  <- capture.code.envir(code_text = code, envir = envir)
+      
+      checkrs[[paste(options$task, options$checkr, sep = ".")]] <<- res
+    }
+  }
+  
+  solution <- function(before, options, envir) {
+    
+  }
+  
+  answer   <- function(before, options, envir) {
+    
+  }
+  
+  doc$knitr$knit_hooks <- list( task     = task
+                              , checkr   = checkr
+                              , solution = solution
+                              , answer   = answer
+                              )
   
   pre <- doc$pre_processor
   doc$pre_processor <- function(metadata, input_file, runtime, knit_meta, files_dir, output_dir) { 
@@ -79,7 +105,7 @@ taskCollector <- function(type, siteyml, ...) {
     
     if (type == "solutions") {
       # we don't seem to be able to force self_contained during a site build; so
-      # we have URI encode manually
+      # we URI encode manually
       imgs <- sapply( list.files( file.path(paste0(metadata$assignment, "_files"), "figure-html")
                                 , full.names = TRUE
                                 )
@@ -95,7 +121,7 @@ taskCollector <- function(type, siteyml, ...) {
                          } 
                        )
       
-      saveRDS( list(html = embeded)
+      saveRDS( list(html = embeded, checkrs = checkrs)
              , file.path(metadata$rdsPath, paste0(metadata$assignment, "-solutions.rds"))
              )
     } else {
@@ -111,7 +137,7 @@ taskCollector <- function(type, siteyml, ...) {
       
       saveRDS( d
              , file = file.path( studentPath(type)
-                               , paste(metadata$assignment, "answers.rds", sep = "-")
+                               , paste0(metadata$assignment, "-answers.rds")
                                )
              )
     }

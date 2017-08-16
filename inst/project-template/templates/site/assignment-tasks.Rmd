@@ -4,4 +4,4 @@ output:     {{build.package.name}}::assignment
 assignment: "{{assignment}}"
 ---
 
-{{tasks}}
+{{{tasks}}}

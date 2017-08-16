@@ -1,4 +1,4 @@
-#' Initialize a new project
+.#' Initialize a new project
 #'
 #' Creates the needed file structure at the given path
 #'
@@ -273,7 +273,7 @@ build <- function(path = getwd(), cleanBuild = FALSE, cleanPreviews = TRUE) {
     
     # build assignments
     assnPath  <- file.path(path, "templates", "site", "assignment-solution.Rmd")
-    assnTmpl  <- subHeader(assnPath, "{{header}}")
+    assnTmpl  <- subHeader(assnPath, "{{{header}}}")
     
     assignments <- rmds[types == 'assignment']
     lapply( assignments
@@ -295,14 +295,14 @@ build <- function(path = getwd(), cleanBuild = FALSE, cleanPreviews = TRUE) {
                                            , partials = partials
                                            )
   
-              # solution htmls
+              # solution Rmds
               renderTemplate( template = assnTmpl
                             , data     = data
                             , file     = file.path(buildPath, x$rmd)
                             , partials = partials
                             )
               
-              # task htmls
+              # task Rmds
               renderTemplate( template = file.path(path, "templates", "site", "assignment-tasks.Rmd")
                             , data     = data
                             , file     = file.path(taskPath, x$rmd)
@@ -357,7 +357,8 @@ build <- function(path = getwd(), cleanBuild = FALSE, cleanPreviews = TRUE) {
     smartSuppress({
       rmarkdown::render_site(input = buildPath, env = new.env())
     }, "cannot rename file")
-  
+    
+    message("Copying additional files...")
     for (l in update$assignments) {
       s <- readFile(file.path(buildPath, "_site", l$file))
       s <- gsub("\\{\\{.*?\\}\\}", "", s)

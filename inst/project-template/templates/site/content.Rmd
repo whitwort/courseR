@@ -3,30 +3,22 @@ title:  "{{title}}"
 type:   content
 ---
 
-# R Markdown
+# Content pages
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+Content R Markdown documents are built into HTML documents and included in the "Pages" dropdown on the website navigation bar.  For the default "page view", the final document included in the website will be very similar/identical to what you would get with a normal **ad hoc** knit of the source document.  However, content sources are also built to a "slide view" using the [reveal.js](https://github.com/hakimel/reveal.js/) template.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+# Slide View
 
-```{r cars}
-summary(cars)
-```
+## Lists
 
-# Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
-
-# Slides
+For slide view, lists are animated by default:
 
 * list items
 * animate by default
+
+## Clickies
+
+Top headings (H1) scroll to the right, sub-headings (H2) scroll down.  For example:
 
 ## This slide will go down
 
@@ -36,6 +28,18 @@ down...
 
 ...floor!
 
+##
+
+You can also use blank headings to explicitly insert slide transitions
+
+##
+
+As in this example.
+
 ## Large blocks of text are removed by default
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>. This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>. This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+By default, when slides are generated large blocks of text are removed.
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+You can configure the cutoff in `courseR.yml`.

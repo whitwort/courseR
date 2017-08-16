@@ -8,7 +8,7 @@ renderTemplate <- function(template, data, file = NULL, partials = list(), post 
                               )
   
   # un-escape stuff whisker escaped
-  s <- whisker.unescape(s)
+  # s <- whisker.unescape(s)
   s <- post(s)
   
   if (!is.null(file)) { cat(s, "\n", file = file) }
@@ -177,6 +177,69 @@ markdownify <- function(l, de.p = FALSE, add.p = TRUE) {
 }
 
 # there really must be an easier way to do this
-shinyToNode <- function(s) {
-  xml_child(xml_child(read_html(as.character(s))))
+# shinyToNode <- function(s) {
+#   xml_child(xml_child(read_html(as.character(s))))
+# }
+
+# adapted nearly verbatim from https://github.com/dtkaplan/checkr
+capture.code.envir <- function(code_text, envir) {
+  
+  #this could break
+  insert_magrittr_input <- function(command, input_name) {
+    res <- sub("(+[a-zA-Z0-9._]*\\()", sprintf("\\1%s, ", input_name), 
+               command)
+    gsub(", \\)", ")", res)
+  }
+  
+  expand_chain <- function(chain_string) {
+    components <- unlist(strsplit(chain_string, "%>%", fixed = TRUE))
+    if (length(components) <= 1) 
+      return(chain_string)
+    assigned_to <- stringr::str_match(components[1], "^( *[a-zA-Z0-9._]*) *<-")[2]
+    if (is.na(assigned_to)) 
+      first_bit <- components[1]
+    else components[1] <- stringr::str_match(components[1], "^.*<- *(.*) *$")[2]
+    components[1] <- paste(components[1], "-> ..tmp1..")
+    for (k in 2:length(components)) {
+      components[k] <- insert_magrittr_input(components[k], 
+                                             sprintf("..tmp%d..", k - 1))
+      if (k == length(components) && !is.na(assigned_to)) {
+        components[k] <- paste(components[k], sprintf("-> %s", 
+                                                      assigned_to))
+      }
+      else {
+        components[k] <- paste(components[k], sprintf("-> ..tmp%d..", 
+                                                      k))
+      }
+    }
+    paste0(components, collapse = "; ")
+  }
+  
+  code_text <- as.character(parse(text = code_text))
+  for (k in seq_along(code_text)) {
+    code_text[k] <- expand_chain(code_text[k])
+  }
+  code_text <- paste0(code_text, "\n")
+  commands <- parse(text = paste(code_text, collapse = "\n"))
+  R <- list()
+  environments <- list()
+  statements <- as.character(commands)
+  for (k in seq_along(commands)) {
+    if (k > 1) {
+      parent_environment <- environments[[k - 1]]
+    }
+    else {
+      parent_environment <- envir
+    }
+    environments[[k]] <- new.env(parent = parent_environment)
+    res <- try(eval(commands[k], envir = environments[[k]]), 
+               silent = TRUE)
+    R[[k]] <- res
+  }
+  statements <- lapply(statements, FUN = as.character)
+  res <- list(returns = R, names = environments, statements = statements, 
+              expressions = commands, valid_lines = 1:length(R), passed = TRUE, 
+              line = 0, message = "", created_by = "capturing code")
+  class(res) <- "capture"
+  res
 }

@@ -10,29 +10,12 @@
       <a class="navbar-brand" href="{{build.site.url}}">{{name}}</a>
     </div>
     <div id="navbar" class="navbar-collapse collapse">
-      <ul class="nav navbar-nav navbar-right">
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Pages <span class="caret"></span></a>
-          <ul class="dropdown-menu">
-            {{#content}}
-              {{> nav-dropdown-li}}
-            {{/content}}
-          </ul>
-        </li>
-        <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Assignments <span class="caret"></span></a>
-          <ul class="dropdown-menu">
-            {{#assignments}}
-              {{> nav-dropdown-li}}
-            {{/assignments}}
-          </ul>
-        </li>
-        {{#projects}}
-        <li>
-          <a href="projects-page.html">Projects</a>  
-        </li>
-        {{/projects}}
-      </ul>
+      <!-- placeholder for navbar content; will be populated on page load on built website -->
+      <script type = "text/javascript">
+        $(function() {
+          $("#navbar").load("includes.html #navbar");
+        });
+      </script>
     </div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
