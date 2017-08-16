@@ -88,14 +88,18 @@ update <- function(path = getwd()) {
   
   config <- loadConfig(path)
   data   <- config$templates$data
-  data$contents    <- rmds[types == 'content'] 
-  data$assignments <- rmds[types == 'assignment']
+  
+  nonameRMDs <- rmds
+  names(nonameRMDs) <- NULL
+  
+  data$contents    <- nonameRMDs[types == 'content'] 
+  data$assignments <- nonameRMDs[types == 'assignment']
   data$projects    <- if (identical(config$build$projects, FALSE)) FALSE else TRUE
   
   invisible(list( rmds        = rmds
                 , types       = types
-                , contents    = data$contents
-                , assignments = data$assignments
+                , contents    = rmds[types == 'content'] 
+                , assignments = rmds[types == 'assignment']
                 , data        = data
                 , config      = config
                 )
@@ -394,13 +398,6 @@ build <- function(path = getwd(), cleanBuild = FALSE, cleanPreviews = TRUE) {
              , recursive = TRUE
              )
     
-    # render includes.html containing navbar and footer content
-    renderTemplate( template = file.path(buildPath, "templates", "site", "includes.html")
-                  , data     = update$data
-                  , file     = file.path(buildPath, "_site", "includes.html")
-                  , partials = partials
-                  )
-    
     # copy rendered files and rename output path
     sitePath <- file.path(distPath, config$build$site$dist)
     if (!dir.exists(sitePath)) { dir.create(sitePath) }
@@ -409,9 +406,13 @@ build <- function(path = getwd(), cleanBuild = FALSE, cleanPreviews = TRUE) {
              , recursive = TRUE
              , overwrite = TRUE
              )
-    # file.rename( from    = file.path(distPath, "_site")
-    #            , to      = file.path(distPath, config$build$site$dist)
-    #            )
+
+    # render includes.html containing navbar and footer content
+    renderTemplate( template = file.path(path, "templates", "site", "includes.html")
+                  , data     = update$data
+                  , file     = file.path(sitePath, "includes.html")
+                  , partials = partials
+                  )
     
     # Copy .js and .css files to project package if it's included in the build
     if (buildPackage(config)) {
