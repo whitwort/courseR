@@ -1,10 +1,6 @@
 # Paths are relative to the current working directory where build() expects to find things
 paths:
-  
-  # link content/assignments to data files with the `data: ` header.  Students 
-  # get local copies of data files when they start assignments.
-  data: data
-  
+
   # location for final build targets
   dist: dist
   
@@ -22,8 +18,7 @@ templates:
 build:
 
   package:                  # set to FALSE to skip building a course package
-    dist:       {{name}}    # path in dist directory to build package to
-    name:       {{name}}    # name of the course package
+    name:          {{name}} # name of the course package
     grades:                 # Defines the grades that can be assigned to assignment tasks
       Done:        TRUE     # if a name is set to TRUE, this grade is flags a task as completed
       Incomplete:  FALSE    # if a name is set to FALSE, the task isn't complete
@@ -50,7 +45,7 @@ build:
 
 # Publishing options
 publish:
-  package: live  # Location to copy package to when calling the `publish()`
+  package: live  # Location to copy package to when calling `publish()`
   site:    live  # Location to copy the website to when calling `publish()`     
 
 # Course-specific configuration options; these change the default view for the 

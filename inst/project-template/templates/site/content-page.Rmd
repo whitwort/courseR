@@ -9,4 +9,4 @@ knitr::opts_chunk$set(cache = TRUE)
 
 View as a [slideshow]({{slides}}).
 
-{{content}}
+{{{content}}}

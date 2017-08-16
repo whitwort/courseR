@@ -155,9 +155,6 @@ taskCollector <- function(type, siteyml, ...) {
 }
 
 # $filename = hash | NA if missing
-hash <-function(filePath) {
-  paste(as.character(openssl::md5(file(filePath))), collapse = "")
-}
 listCheck <- function(pkg, path = studentPath(pkg)) {
   l <- lapply( .listAssignments(pkg)
              , function(name) { 

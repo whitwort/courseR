@@ -37,6 +37,11 @@ readFile <- function(path) {
   paste0(readLines(path), collapse = "\n")
 }
 
+hash <-function(filePaths) {
+  contents <- vapply(filePaths, readFile, FUN.VALUE = "" , USE.NAMES = FALSE)
+  openssl::md5(contents)
+}
+
 loadConfig <- function(path) {
   config <- yaml::yaml.load_file(file.path(path, "courseR.yml"))
   config$templates$data <- c(config$templates$data, config)
@@ -74,19 +79,6 @@ mergeHeader <- function(a, b) {
 splitext <- function(path) {
   s <- strsplit(basename(path), ".", fixed = TRUE)
   sapply(s, function(x) x[1])
-}
-
-newSource <- function(tmpl, dest, path, ...) {
-  
-  config   <- loadConfig(path)
-  renderTemplate( template = file.path(path, "templates", "site", tmpl)
-                , data     = c(config$templates$data, list(...))
-                , file     = file.path(path, dest)
-                , partials = loadPartials(file.path(path, "templates", "site", "partials"))
-                )
-  
-  update(path)
-  
 }
 
 # only for named lists; recursive only works for lists
