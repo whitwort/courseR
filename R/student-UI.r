@@ -4,7 +4,7 @@ NULL
 studentServer <- function(pkg, autoknit) {
   
   pkgPath <- file.path(normalizePath(pkg), "data")
-  config <- yaml::yaml.load_file(file.path(pkgPath, "courseR.yml"))
+  config  <- yaml::yaml.load_file(file.path(pkgPath, "courseR.yml"))
   
   function(input, output, session) {
     interval <- 500  # in ms
@@ -108,7 +108,7 @@ studentServer <- function(pkg, autoknit) {
     renderCheck <- function(name) {
       renderUI({
         if (input$navpage != 'overview') {
-          showNotification("A fresh copy of your answers loaded!", type = "message")
+          # showNotification("A fresh copy of your answers was loaded!", type = "message")
           
           studentRDSPath <- rdsPath(input$navpage, path = studentPath(pkg))
           if (!file.exists(studentRDSPath)) {
@@ -127,7 +127,7 @@ studentServer <- function(pkg, autoknit) {
     renderSubmit <- function(name) {
       renderUI({
         if (input$navpage != 'overview') {
-          showNotification("A fresh copy of your submission was loaded!", type = "message")
+          # showNotification("A fresh copy of your submission was loaded!", type = "message")
           
           name <- substring(input$navpage, first = 8)
           

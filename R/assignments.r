@@ -1,7 +1,7 @@
 #' Custom RMarkdown document type that parses assignment solution files
 #' 
-#' Flag an Rmd file as solutions by setting its output type to this function;
-#' not meant to be called directly.
+#' Flag an Rmd file as containing assignment solutions by setting its output
+#' type to this function; not meant to be called directly.
 #' 
 #' @param ... document parameters
 #'   
@@ -16,8 +16,8 @@ solution <- function(...) {
 
 #' Custom RMarkdown document type that parses student answers to assignments
 #' 
-#' Flag an Rmd file as an assignment by setting its output type to this 
-#' function; not meant to be called directly.
+#' Flag an Rmd file as containing a set of answers to an assignment by setting
+#' its output type to this function; not meant to be called directly.
 #' 
 #' @param pkg path to course package for this assignment
 #' @param ... document parameters
@@ -46,23 +46,36 @@ taskCollector <- function(type, siteyml, ...) {
     }
   }
   
-  # and here be mutation of document-wide globals
+  # and here there be mutation of document-wide globals; avert your eyes.
   checkrs  <- list()
   checkr   <- function(before, options, envir) {
     if (!before) {
-      code <- paste(options$code, collapse = "\n")
-      res  <- capture.code.envir(code_text = code, envir = envir)
+      code  <- paste(options$code, collapse = "\n")
+      value <- capture.code.envir(code_text = code, envir = envir)
       
-      checkrs[[paste(options$task, options$checkr, sep = ".")]] <<- res
+      captureFunc <- function(f) { is.function(f) && !is.null(formals(f)$capture) }
+      funcs       <- Filter(captureFunc, value$returns)
+      
+      checkrs[[paste(options$task, options$checkr, sep = ".")]] <<- reducer(funcs = funcs)
     }
   }
   
+  solutions <- list()
   solution <- function(before, options, envir) {
-    
+    if (!before) {
+      code  <- paste(options$code, collapse = "\n")
+      value <- capture.code.envir(code_text = code, envir = envir)
+      solutions[[as.character(options$task)]] <<- value
+    }
   }
   
+  answers <- list()
   answer   <- function(before, options, envir) {
-    
+    if (!before) {
+      code  <- paste(options$code, collapse = "\n")
+      value <- capture.code.envir(code_text = code, envir = envir)
+      answers[[as.character(options$task)]] <<- value
+    }
   }
   
   doc$knitr$knit_hooks <- list( task     = task
@@ -121,9 +134,21 @@ taskCollector <- function(type, siteyml, ...) {
                          } 
                        )
       
+      # check that all solutions actually pass their own checking code
+      checkMessages <- check(solutions, checkrs)
+      for (taskName in names(checkMessages)) {
+        if (!is.na(checkMessages[[taskName]])) {
+          warning( "In assignment `", input_file, "` the solution for task `"
+                 , taskName, "` failed to pass checking code.  Message: '"
+                 , checkMessages[[taskName]], "'"
+                 )
+        }
+      }
+      
       saveRDS( list(html = embeded, checkrs = checkrs)
              , file.path(metadata$rdsPath, paste0(metadata$assignment, "-solutions.rds"))
              )
+      
     } else {
       # create a template for the check-UI
       b      <- rvest::html_node(h, "body")
@@ -134,6 +159,7 @@ taskCollector <- function(type, siteyml, ...) {
                                 , name = splitext(basename(output_file))
                                 )
       d$sourceHTML <- normalizePath(output_file)
+      d$answers    <- answers
       
       saveRDS( d
              , file = file.path( studentPath(type)

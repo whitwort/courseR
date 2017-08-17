@@ -9,8 +9,9 @@ build(path = getwd(), cleanBuild = FALSE, cleanPreviews = TRUE)
 \arguments{
 \item{path}{path for the project to build.}
 
-\item{cleanBuild}{should intermediate build files be deleted when the build 
-is done.  Note this will trounce any knitr caching.}
+\item{cleanBuild}{if TRUE completely rebuilds the project; erases knitr 
+caches and the contents of 'build/' and 'dist/'.  Set to TRUE if you have
+changed any of the website templates since the last build.}
 
 \item{cleanPreviews}{should .html files created in the main project directory
 by making ad hoc previews in RStudio be deleted.}

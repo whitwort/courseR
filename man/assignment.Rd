@@ -2,7 +2,7 @@
 % Please edit documentation in R/assignments.r
 \name{assignment}
 \alias{assignment}
-\title{Custom RMarkdown document type that parses student assignments}
+\title{Custom RMarkdown document type that parses student answers to assignments}
 \usage{
 assignment(pkg, ...)
 }
@@ -15,6 +15,6 @@ assignment(pkg, ...)
 an R Markdown output format definition
 }
 \description{
-Flag an Rmd file as an assignment by setting its output type to this
-function; not meant to be called directly.
+Flag an Rmd file as containing a set of answers to an assignment by setting
+its output type to this function; not meant to be called directly.
 }

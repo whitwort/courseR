@@ -13,6 +13,6 @@ solution(...)
 an R Markdown output format definition
 }
 \description{
-Flag an Rmd file as solutions by setting its output type to this function;
-not meant to be called directly.
+Flag an Rmd file as containing assignment solutions by setting its output
+type to this function; not meant to be called directly.
 }

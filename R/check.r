@@ -8,7 +8,7 @@
 #' @export
 check_final <- function(...) {
   function(capture) {
-    capture %>% checkr::final_ %>% checkr::check_value(...)()
+    checkr::check_value(...)(checkr::final_(capture))
   }
 }
 
@@ -32,4 +32,22 @@ check_cols <- function(x) {
 #' @export
 check_rows <- function(x) {
   check_final(checkr::match_data_frame(x, nrow = TRUE), "Your table doesn't have the right number of rows.")
+}
+
+# for each answer returns NA if no checks or all checks passed; message string if not.
+check <- function(answers, checks) {
+  checkNames <- names(checks)
+  vapply( names(answers)
+        , function(name) {
+            checkFuns <- checks[grepl(paste0(name, ".\\d"), x = checkNames)]
+            capture   <- answers[[name]]
+            for (f in checkFuns) {
+              res <- f(capture)
+              if (!res$passed) { return(res$message) }
+            }
+            as.character(NA)
+          }
+        , FUN.VALUE = ""
+        , USE.NAMES = TRUE
+        )
 }

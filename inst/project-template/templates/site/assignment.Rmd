@@ -33,7 +33,7 @@ For some tasks, like making plots, it doesn't make sense to try to include any k
 
 **3.2.4 #5**.  Using the `mpg` data set, make a plot of `hwy` versus `cyl`:
 
-```{r solution}
+```{r solution, fig.width=5}
 library(ggplot2)
 ggplot(data = mpg) + geom_point(aes(x = cyl, y = hwy))
 ```
@@ -55,7 +55,7 @@ On with some examples!
 
 **3.2.4 #2a**. How many rows are in the `mpg` data set?
 
-```{r solution}
+```{r solution-named}
 library(datasets)
 nrow(mpg)
 ```

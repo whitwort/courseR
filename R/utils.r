@@ -168,10 +168,13 @@ markdownify <- function(l, de.p = FALSE, add.p = TRUE) {
   x
 }
 
-# there really must be an easier way to do this
-# shinyToNode <- function(s) {
-#   xml_child(xml_child(read_html(as.character(s))))
-# }
+# This is a reduce; why doesn't the base R Reduce work this way?
+reducer <- function(funcs) {
+  function(x) {
+    for (f in funcs) { x <- f(x) }
+    x
+  }
+}
 
 # adapted nearly verbatim from https://github.com/dtkaplan/checkr
 capture.code.envir <- function(code_text, envir) {

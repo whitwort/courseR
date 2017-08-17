@@ -152,7 +152,6 @@ build <- function(path = getwd(), cleanBuild = FALSE, cleanPreviews = TRUE) {
   if (buildPackage(config)) {
     message("Building course package...")
     pkgPath <- file.path(distPath, config$build$package$name)
-    if (dir.exists(pkgPath)) { unlink(pkgPath, recursive = TRUE) }
     
     roxygen2::roxygenize(file.path(path, "package"), roclets=c('rd', 'collate', 'namespace'))
     file <- devtools::build(pkg = file.path(path, "package"), path = distPath, binary = TRUE, manual = TRUE)
@@ -190,6 +189,9 @@ build <- function(path = getwd(), cleanBuild = FALSE, cleanPreviews = TRUE) {
     
     if (!dir.exists(buildPath)) { dir.create(buildPath) }
 
+    pkgDataPath <- file.path(buildPath, ".pkgData")
+    if (buildPackage(config) && !dir.exists(pkgDataPath)) { dir.create(pkgDataPath) }
+    
     # copy core rmarkdown website files
     file.copy( from = file.path(path, c("_site.yml", "_navbar.html", "footer.html", "index.Rmd", "data")) # index.Rmd can't be spelled .rmd currently
              , to   = buildPath
@@ -220,7 +222,7 @@ build <- function(path = getwd(), cleanBuild = FALSE, cleanPreviews = TRUE) {
         
         # if dependant data have changed, purge the knitr cache and build
         if (!identical(lastRMD$datahash, rmd$datahash)) {
-          knitrCache <- file.path(buildPath, splitext(rmd$file), "_files")
+          knitrCache <- file.path(buildPath, splitext(rmd$file), "_cache")
           if (dir.exists(knitrCache)) { unlink(knitrCache, recursive = TRUE) }
           return(TRUE)
         }
@@ -314,7 +316,7 @@ build <- function(path = getwd(), cleanBuild = FALSE, cleanPreviews = TRUE) {
                            , list( solution   = solutionRMD(rmd)
                                  , tasks      = taskRMD(rmd)
                                  , assignment = splitext(x$rmd)
-                                 , rdsPath    = normalizePath(file.path(distPath, config$build$package$name, "data"))
+                                 , rdsPath    = normalizePath(pkgDataPath)
                                  )
                            )
               
@@ -331,6 +333,8 @@ build <- function(path = getwd(), cleanBuild = FALSE, cleanPreviews = TRUE) {
                             )
               
               # task Rmds
+              taskPath <- file.path(pkgDataPath, "assignments")
+              if (!dir.exists(taskPath)) { dir.create(taskPath) }
               renderTemplate( template = file.path(path, "templates", "site", "assignment-tasks.Rmd")
                             , data     = assndata
                             , file     = file.path(taskPath, x$rmd)
@@ -415,12 +419,20 @@ build <- function(path = getwd(), cleanBuild = FALSE, cleanPreviews = TRUE) {
                   , partials = partials
                   )
     
-    # Copy .js and .css files to project package if it's included in the build
     if (buildPackage(config)) {
+      # Copy .js and .css files to project package if it's included in the build
       file.copy( from      = file.path(buildPath, "_site/site_libs/")
                , to        = file.path(distPath, config$build$package$name, "data")
                , recursive = TRUE
                )
+      
+      # copy contents of build/.pkgData to the package's data folder
+      file.copy( from      = list.files(pkgDataPath, full.names = TRUE)
+               , to        = file.path(distPath, config$build$package$name, "data")
+               , recursive = TRUE
+               , overwrite = TRUE
+               )
+      
     }
 
   }
