@@ -1,0 +1,35 @@
+---
+title:  "{{name}} Shiny Projects"
+output: 
+  html_document:
+    toc:    false
+---
+
+The table below lists the group projects in the class.  Each project uses [Shiny](https://shiny.rstudio.com/) to create an interactive data-driven web application.  Project links open the latest, hopefully stable, version of each app.  See source code pages for a full description of source data.
+
+<!--html_preserve-->
+<table class="table table-striped">
+  <thead>
+    <tr>
+        <th class="col-sm-2">Project</th>
+        <th class="col-sm-6">Description</th>
+        <th class="col-sm-2">Contributors</th>
+        <th class="col-sm-2">Source Code</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#projects}}
+      <tr>
+          <td><a href="https://rna.wlu.edu/shiny-apps/bio185/{{name}}/">{{name}}</a></td>
+          <td>{{description}}</td>
+          <td>
+            {{#contributors}}
+              <p><a href="{{html_url}}">{{login}}</a></p>
+            {{/contributors}}
+          </td>
+          <td><a href="{{html_url}}">GitHub</a></td>
+      </tr>
+    {{/projects}}
+  </tbody>
+</table>
+<!--/html_preserve-->

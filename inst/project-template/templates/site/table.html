@@ -1,0 +1,18 @@
+<table class="table table-striped">
+  <thead>
+    <tr>
+      {{#colnames}}
+        <th {{class}}>{{{name}}}</th>
+      {{/colnames}}
+    </tr>
+  </thead>
+  <tbody>
+    {{#rows}}
+      <tr>
+        {{#cols}}
+          <td>{{{value}}}</td>
+        {{/cols}}
+      </tr>
+    {{/rows}}
+  </tbody>
+</table>

@@ -1,0 +1,35 @@
+<!-- This file contains templates for the navbar (top of page) and footer (bottom of page) -->
+<!DOCTYPE html>
+
+<!-- navbar content displayed on built websites -->
+<div id="navbar" class="navbar-collapse collapse">
+  <ul class="nav navbar-nav navbar-right">
+    <li class="dropdown">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Pages <span class="caret"></span></a>
+      <ul class="dropdown-menu">
+        {{#contents}}
+          {{> nav-dropdown-li}}
+        {{/contents}}
+      </ul>
+    </li>
+    <li class="dropdown">
+      <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Assignments <span class="caret"></span></a>
+      <ul class="dropdown-menu">
+        {{#assignments}}
+          {{> nav-dropdown-li}}
+        {{/assignments}}
+      </ul>
+    </li>
+    {{#projects}}
+    <li>
+      <a href="projects-page.html">Projects</a>  
+    </li>
+    {{/projects}}
+  </ul>
+</div><!--/.nav-collapse -->
+
+<!-- footer content displayed on built websites -->
+<div id="footer-content">
+  <hr>
+  <p>&copy; 2017 Company, Inc. </p>
+</div>
