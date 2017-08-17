@@ -102,6 +102,9 @@ mergeLists <- function(a, b, overwrite = FALSE, recursive = TRUE) {
 listify <- function(v) { sapply(v, function(x) x, simplify = FALSE) }
 
 getRMDFile <- function(name, path, onlyone = TRUE, exists = TRUE) {
+  if (name == "") {
+    stop("You need to enter an assignment name.  See `listAssignments()` for names.")
+  }
   if (file.exists(file.path(path, name))) {
     file.path(path, name)
   } else {
@@ -174,6 +177,11 @@ reducer <- function(funcs) {
     for (f in funcs) { x <- f(x) }
     x
   }
+}
+
+nonames <- function(l) {
+  names(l) <- NULL
+  l
 }
 
 # adapted nearly verbatim from https://github.com/dtkaplan/checkr

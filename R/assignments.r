@@ -151,17 +151,22 @@ taskCollector <- function(type, siteyml, ...) {
       
     } else {
       # create a template for the check-UI
-      b      <- rvest::html_node(h, "body")
-      d$html <- as.character(b)
+      b    <- rvest::html_node(h, "body")
+      body <- as.character(b)
       
       # save the source file path
-      d$sourceRMD  <- getRMDFile( path = normalizePath(dirname(output_file))
-                                , name = splitext(basename(output_file))
-                                )
-      d$sourceHTML <- normalizePath(output_file)
-      d$answers    <- answers
+      sourceRMD  <- getRMDFile( path = normalizePath(dirname(output_file))
+                              , name = splitext(basename(output_file))
+                              )
+      sourceHTML <- normalizePath(output_file)
       
-      saveRDS( d
+      saveRDS( list( html       = body
+                   , sourceRMD  = sourceRMD
+                   , sourceHTML = sourceHTML
+                   , sourceHASH = hash(sourceRMD)
+                   , answers    = answers
+                   , taskHTML   = d
+                   )
              , file = file.path( studentPath(type)
                                , paste0(metadata$assignment, "-answers.rds")
                                )
@@ -180,47 +185,44 @@ taskCollector <- function(type, siteyml, ...) {
   sapply(data$assignments, function(l) { splitext(l$rmd) } )
 }
 
-# $filename = hash | NA if missing
-listCheck <- function(pkg, path = studentPath(pkg)) {
-  l <- lapply( .listAssignments(pkg)
-             , function(name) { 
-                 filePath <- rdsPath(name, path)
-                 if (!file.exists(filePath)) {
-                   NA
-                 } else {
-                   hash(filePath)
-                 }
-               }
-             )
-  names(l) <- .listAssignments(pkg)
-  l
-}
-
 rdsPath <- function(name, path, tag = "-answers") {
   file.path(path, paste0(splitext(name), tag, ".rds"))
 }
 
-listSubmitted <- function(pkg, path = studentPath(pkg)) {
-  listCheck(pkg, path = file.path(path, "submitted"))
+# $filename = hash | NA if missing
+listChecked <- function(pkg, path = studentPath(pkg)) {
+  vapply( .listAssignments(pkg)
+        , function(name) {
+            filePath <- rdsPath(name, path)
+            if (!file.exists(filePath)) {
+              as.character(NA)
+            } else {
+              rds <- readRDS(filePath)
+              rds$sourceHASH
+            }
+          }
+        , FUN.VALUE = ""
+        , USE.NAMES = TRUE
+        )
 }
 
-listSources <- function(pkg, path = studentPath(pkg)) {
-  checks <- listCheck(pkg, path)
-  l <- lapply( names(checks)
-             , function(name) {
-                 if (!is.na(checks[[name]])) {
-                   filePath <- readRDS(rdsPath(name, path))$sourceRMD
-                   if (!file.exists(filePath)) {
-                     NA
-                   } else {
-                     hash(filePath)
-                   }
-                 }
-               }
-             )
-    
-  names(l) <- names(checks)
-  l
+listSubmitted <- function(pkg, path = studentPath(pkg)) {
+  listChecked(pkg, path = file.path(path, "submitted"))
+}
+
+listSources <- function(pkg, path) {
+  vapply( splitext(.listAssignments(pkg))
+        , function(name) {
+            filePath <- getRMDFile(name, path, exists = FALSE)
+            if (!file.exists(filePath)) {
+              as.character(NA)
+            } else {
+              hash(filePath)
+            }
+          }
+        , FUN.VALUE = ""
+        , USE.NAMES = TRUE
+        )
 }
 
 studentPath <- function(pkg) {

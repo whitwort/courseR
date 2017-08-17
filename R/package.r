@@ -41,7 +41,7 @@ startAssignment <- function(name, overwrite = FALSE, path = getwd(), pkg) {
   file.copy(from = source, to = dest, overwrite = overwrite)
   
   message("Refreshing `data/` folder")
-  file.copy( from = file.path(taskPath, "data/")
+  file.copy( from = file.path(taskPath, "data/") # TODO check hashes
            , to   = file.path(path)
            , recursive = TRUE
            )
@@ -73,15 +73,14 @@ checkAssignment <- function(name, path = getwd(), autoknit = TRUE, pkg) {
     name <- substring(name, 1, nchar(name) - 4)
   }
   
-  launchStudentUI(pkg = pkg, page = name, autoknit = autoknit)
+  launchStudentUI(pkg = pkg, page = name, autoknit = autoknit, wd = path)
   
 }
 
 #' Submit an assignment
 #' 
-#' Submitting an assignment flags the current version of your work as complete 
-#' and/or ready for grading.  You can resubmit assignments; doing so will reset
-#' the current feedback information.
+#' Submits the last version of the assignment that was checked with
+#' \code{\link{checkAssignment}} or \code{\link{checkAssignments}}.
 #' 
 #' @param name name of the assignment to submit
 #' @param path optional path to your course project folder
@@ -90,20 +89,22 @@ checkAssignment <- function(name, path = getwd(), autoknit = TRUE, pkg) {
 #' @export
 submitAssignment <- function(name, path = getwd(), pkg) {
   
+  source  <- rdsPath(name, studentPath(pkg))
+  if (!file.exists(source)) {
+    stop("It doesn't look like you've ever checked your answers to this assignment.  Please do so with the `checkAssignment` function.")
+  }
+  
   file <- getRMDFile(name, path)
-
-  message("Knitting; the assignment will only be submitted if this succeeds...")
-  rmarkdown::render(file, envir = new.env())
+  data <- readRDS(source)
   
-  checks    <- listCheck(pkg)
-  shortHash <- substring(checks[[splitext(name)]], first = 1, last = 7) # git style
-
-  source <- rdsPath(name, studentPath(pkg))
-  dest   <- file.path(studentPath(pkg), "submitted", basename(source))
+  if (data$sourceHASH != hash(file)) {
+    warning("It looks like you've changed your source file for this assignment since the last time you checked it.  You are currently submitting the last CHECKED version.  You may want to run `checkAssignment` to check your current source file and then resubmit.")
+  }
   
+  dest <- rdsPath(name, file.path(studentPath(pkg), "submitted"))
   file.copy(from = source, to = dest, overwrite = FALSE)
   
-  message("Assignment submitted as version: ", shortHash)
+  message("Assignment submitted (Version: ", substring(data$sourceHASH, 1, 7), ")")
   
 }
 
@@ -126,7 +127,7 @@ checkAssignments <- function(path = getwd(), autoknit = TRUE, pkg) {
   if (!is.null(config$`instructor-user`) && user %in% config$`instructor-user`) {
     launchInstructorUI(pkg = pkg)
   } else if (config$`student-users` == "*" || user %in% config$`student-users`) {
-    launchStudentUI(pkg = pkg, page = 'overview', autoknit = autoknit)
+    launchStudentUI(pkg = pkg, page = 'overview', autoknit = autoknit, wd = path)
   } else {
     message("Your username does not appear to be an instructor or student in this course.")
   }

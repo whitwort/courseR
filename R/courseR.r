@@ -89,11 +89,11 @@ update <- function(path = getwd()) {
   config <- loadConfig(path)
   data   <- config$templates$data
   
-  nonameRMDs <- rmds
-  names(nonameRMDs) <- NULL
+  # nonameRMDs <- rmds
+  # names(nonameRMDs) <- NULL
   
-  data$contents    <- nonameRMDs[types == 'content'] 
-  data$assignments <- nonameRMDs[types == 'assignment']
+  data$contents    <- nonames(rmds)[types == 'content'] 
+  data$assignments <- nonames(rmds)[types == 'assignment']
   data$projects    <- if (identical(config$build$projects, FALSE)) FALSE else TRUE
   
   invisible(list( rmds        = rmds
