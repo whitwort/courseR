@@ -82,13 +82,7 @@ studentServer <- function(pkg, autoknit, wd) {
 
       s <- gsub("<body>", "", s, fixed = TRUE)
       s <- gsub("</body>", "", s, fixed = TRUE)
-
-      s <- paste0( as.character(fluidRow(column(width = 3, p("Version: ", substring(studentRDS$sourceHASH, 1, 7)))))
-                 , s
-                 # , as.character(tags$script("$('pre code').each(function(i, block) { hljs.highlightBlock(block) })"))
-                 )
-
-      HTML(s)
+      s
     }
 
     renderCheck <- function(name) {
@@ -130,15 +124,31 @@ studentServer <- function(pkg, autoknit, wd) {
             }
           }
 
-          version     <- checked[[name]]  # here to dirty output when a new version is available
+          version     <- checked[[paste0(name, ".html")]]  # here to dirty output when a new version is available
           studentRDS  <- readRDS(studentRDSPath)
           solutionRDS <- readRDS(rdsPath(input$navpage, file.path(pkg, "data") , tag = "-solutions"))
-
-          renderView(studentRDS, solutionRDS)
+          
+          subButton <- if (!identical(version, submitted[[paste0(name, ".html")]])) {
+            actionButton( inputId = paste0('submit-', name)
+                        , label   = "Submit"
+                        )
+          }
+          
+          tagList( fluidRow( column(width = 3, p("Version:", substring(version, 1, 7)))
+                           , column(width = 3, offset = 6, span(class = "pull-right", subButton))
+                           )
+                 , HTML(renderView(studentRDS, solutionRDS))
+                 )
         }
       })
     }
-    for (name in .listAssignments(pkg)) { output[[paste0('check', "-", name)]] <- renderCheck(name) }
+
+    for (name in .listAssignments(pkg)) { 
+      output[[paste0("check-", name)]]  <- renderCheck(name)
+      observeEvent(input[[paste0("submit-", name)]], {
+        submitAssignment(name, path = wd, pkg = pkg)
+      })
+    }
 
     renderSubmit <- function(name) {
       renderUI({
@@ -166,7 +176,7 @@ studentServer <- function(pkg, autoknit, wd) {
           studentRDS  <- readRDS(studentRDSPath)
           solutionRDS <- readRDS(rdsPath(name, file.path(pkg, "data") , tag = "-solutions"))
 
-          renderView(studentRDS, solutionRDS)
+          HTML(renderView(studentRDS, solutionRDS))
         }
       })
     }
@@ -180,7 +190,7 @@ studentServer <- function(pkg, autoknit, wd) {
                 , check.names = FALSE
                 )
     })
-   
+    
   }
 }
 
@@ -193,10 +203,11 @@ studentUI <- function(pkg, page) {
   navbarPage( id       = 'navpage'
             , selected = page
             , title    = config$build$package$name
-            , collapsible = TRUE
+            , collapsible = FALSE
             , header   = tagList( includeCSS(file.path(pkgPath, "site_libs", "bootstrap-3.3.5", "css", paste0(siteyml$output$html_document$theme, ".min.css")))
                                 , includeCSS(file.path(pkgPath, "site_libs", "highlightjs-1.1", "default.css"))
                                 , includeScript(file.path(pkgPath, "site_libs", "highlightjs-1.1", "highlight.js"))
+                                , includeScript(file.path(pkgPath, "site_libs", "navigation-1.1", "tabsets.js"))
                                 )
             # , footer = tags$script("hljs.initHighlightingOnLoad();")
             , footer = tags$script("function rehighlight() {
@@ -204,7 +215,7 @@ studentUI <- function(pkg, page) {
                                         hljs.highlightBlock(block)
                                        })
                                     }
-                                    $(document).on('shiny:value', function(event) { 
+                                    $(document).on('shiny:value', function(event) {
                                       window.setTimeout(rehighlight, 500) 
                                     })
                                    "
@@ -228,7 +239,7 @@ studentUI <- function(pkg, page) {
                                        , function(name) {
                                            tabPanel( title = splitext(name)
                                                    , value = splitext(name)
-                                                   , uiOutput(paste0('check', "-", splitext(name)))
+                                                   , uiOutput(paste0('check-', splitext(name)))
                                                    )
                                          }
                                        )
@@ -240,7 +251,7 @@ studentUI <- function(pkg, page) {
                                        , function(name) {
                                            tabPanel( title = splitext(name)
                                                    , value = paste0("submit-", splitext(name))
-                                                   , uiOutput(paste0('submit', "-", splitext(name)))
+                                                   , uiOutput(paste0('submit-', splitext(name)))
                                                    )
                                          }
                                        )

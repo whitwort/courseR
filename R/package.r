@@ -102,7 +102,7 @@ submitAssignment <- function(name, path = getwd(), pkg) {
   }
   
   dest <- rdsPath(name, file.path(studentPath(pkg), "submitted"))
-  file.copy(from = source, to = dest, overwrite = FALSE)
+  file.copy(from = source, to = dest, overwrite = TRUE)
   
   message("Assignment submitted (Version: ", substring(data$sourceHASH, 1, 7), ")")
   
