@@ -28,12 +28,12 @@ assignment <- function(pkg, ...) {
   
   config  <- loadConfig(file.path(pkg, "data"))
   siteyml <- yaml::yaml.load_file(file.path(pkg, "data", "_site.yml"))
-  taskCollector(type = config$build$package$name, siteyml = siteyml, ...)
+  taskCollector(type = config$build$package$name, siteyml = siteyml, pkg = pkg)
   
 }
 
 # herein lies some serious knitr/rmarkdown hackery
-taskCollector <- function(type, siteyml, ...) {
+taskCollector <- function(type, siteyml, pkg = NULL, ...) {
   
   doc <- rmarkdown::html_document(..., theme = siteyml$output$html_document$theme)
   
@@ -61,7 +61,7 @@ taskCollector <- function(type, siteyml, ...) {
   }
   
   solutions <- list()
-  solution <- function(before, options, envir) {
+  solution  <- function(before, options, envir) {
     if (!before) {
       code  <- paste(options$code, collapse = "\n")
       value <- capture.code.envir(code_text = code, envir = envir)
@@ -70,7 +70,7 @@ taskCollector <- function(type, siteyml, ...) {
   }
   
   answers <- list()
-  answer   <- function(before, options, envir) {
+  answer  <- function(before, options, envir) {
     if (!before) {
       code  <- paste(options$code, collapse = "\n")
       value <- capture.code.envir(code_text = code, envir = envir)
@@ -160,12 +160,17 @@ taskCollector <- function(type, siteyml, ...) {
                               )
       sourceHTML <- normalizePath(output_file)
       
+      # check answers against the checkrs in the package
+      solutionrds   <- readRDS(file.path(pkg, "data", paste0(metadata$assignment, "-solutions.rds")))
+      checkMessages <- check(answers, solutionrds$checkrs)
+      
       saveRDS( list( html       = body
                    , sourceRMD  = sourceRMD
                    , sourceHTML = sourceHTML
                    , sourceHASH = hash(sourceRMD)
                    , answers    = answers
                    , taskHTML   = d
+                   , checks     = checkMessages
                    )
              , file = file.path( studentPath(type)
                                , paste0(metadata$assignment, "-answers.rds")

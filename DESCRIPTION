@@ -25,7 +25,8 @@ Imports:
   httr,
   magrittr,
   nycflights13,
-  datasets
+  datasets,
+  shinythemes
 Depends:
   shiny
 SystemRequirements: pandoc (>= 1.12.3)

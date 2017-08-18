@@ -14,7 +14,6 @@ submitAssignment(name, path = getwd(), pkg)
 \item{pkg}{path to course package}
 }
 \description{
-Submitting an assignment flags the current version of your work as complete 
-and/or ready for grading.  You can resubmit assignments; doing so will reset
-the current feedback information.
+Submits the last version of the assignment that was checked with
+\code{\link{checkAssignment}} or \code{\link{checkAssignments}}.
 }

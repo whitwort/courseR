@@ -41,6 +41,9 @@ check <- function(answers, checks) {
         , function(name) {
             checkFuns <- checks[grepl(paste0(name, ".\\d"), x = checkNames)]
             capture   <- answers[[name]]
+            if (length(capture$returns) == 0) {
+              return("Your code does not appear to do anything.")
+            }
             for (f in checkFuns) {
               res <- f(capture)
               if (!res$passed) { return(res$message) }

@@ -23,7 +23,7 @@ taskRMD <- function(lines) {
            , x = s
            )
   s <- gsub( pattern     = "\n```\\{r checkr(.*?)\n```(\\s*?)\n"
-           , replacement = ""
+           , replacement = "\n"
            , x = s
            )
   

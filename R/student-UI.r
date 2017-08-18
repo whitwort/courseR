@@ -1,23 +1,34 @@
-#' @import shiny 
+#' @import shiny
 NULL
 
 knitAssignment <- function(name, sourcePath) {
   message("Knitting updated assignment file: ", name)
   showNotification( paste("Re-Knitting assignment source file:", name, "...")
-                  , duration = 10
+                  , duration = 120
                   , type     = "warning"
                   , id       = "knitting"
                   )
   
   result <- try({ rmarkdown::render(sourcePath, envir = new.env()) })
+  removeNotification("knitting")
+  
   if (class(result) == "try-error") {
     showNotification( "Looks like re-knitting your source file didn't go well; this page was not updated.  See the console for error messages."
                     , type     = "error"
                     , duration = 10
                     )
+  } else {
+    showNotification("Your assignment source file was successfully reloaded.", type = "message")
   }
   
-  removeNotification("knitting")
+}
+
+panel <- function(heading, body, footer = NA, class = "default") {
+  div( class = paste0("panel panel-", class)
+     , div(class = "panel-heading", heading)
+     , div(class = "panel-body", body)
+     , if (!is.na(footer)) { div(class = "panel-footer", footer) }
+     )
 }
 
 studentServer <- function(pkg, autoknit, wd) {
@@ -67,28 +78,68 @@ studentServer <- function(pkg, autoknit, wd) {
       }
     })
 
+    # renderView <- function(studentRDS, solutionRDS) {
+    #   s <- studentRDS$html
+    #   s <- gsub("\\{\\{task-\\d+-before\\}\\}", as.character(tags$b("Your answer:")), s)
+    #   for (i in 1:length(solutionRDS$html)) {
+    #     p <- paste0("{{task-", i, "-after}}")
+    #     r <- paste( tags$b("Answer key output:")
+    #               , solutionRDS$html[[i]]
+    #               , sep = "\n"
+    #               )
+    # 
+    #     s <- gsub(p, r, s, fixed = TRUE)
+    #   }
+    # 
+    #   s <- gsub("<body>", "", s, fixed = TRUE)
+    #   s <- gsub("</body>", "", s, fixed = TRUE)
+    #   s
+    # }
+    
     renderView <- function(studentRDS, solutionRDS) {
       s <- studentRDS$html
-      s <- gsub("\\{\\{task-\\d+-before\\}\\}", as.character(tags$b("Your answer:")), s)
-      for (i in 1:length(solutionRDS$html)) {
-        p <- paste0("{{task-", i, "-after}}")
-        r <- paste( tags$b("Answer key output:")
-                  , solutionRDS$html[[i]]
-                  , sep = "\n"
-                  )
-
-        s <- gsub(p, r, s, fixed = TRUE)
-      }
-
-      s <- gsub("<body>", "", s, fixed = TRUE)
+      s <- gsub("<body>",  "", s, fixed = TRUE)
       s <- gsub("</body>", "", s, fixed = TRUE)
+      
+      status <- lapply( names(studentRDS$answers)
+                      , function(taskName) {
+                          grade <- NA  # TODO plug into actual grading data structure
+                          if (!is.na(grade)) {
+                            
+                          } else {
+                            message <- studentRDS$checks[[taskName]]
+                            if (!is.na(message)) {
+                              list(heading = "Problems found", footer = message, class = "warning") 
+                            } else {
+                              list(heading = "Not yet graded", footer = NA, class = "default")
+                            }
+                          }
+                        }
+                      )
+      
+      for (i in 1:length(solutionRDS$html)) {
+        # pattern <- paste0("\\{\\{task-", i, "-before\\}\\}\\n(*.?)\\n\\{\\{task-", i, "-after\\}\\}")
+        pattern <- paste0("\\{\\{task-", i, "-before\\}\\}\\n(.*?)\\n\\{\\{task-", i, "-after\\}\\}")
+        stat    <- status[[i]]
+        replace <- as.character(panel( heading = h4(stat$heading)
+                                     , body    = div( p(tags$b("Your answer:"))
+                                                    , "\\1"
+                                                    , p(tags$b("Answer key:"))
+                                                    , HTML(solutionRDS$html[[i]])
+                                                    )
+                                     , footer  = stat$footer
+                                     , class   = stat$class
+                                     )
+                               )
+        s <- sub(pattern = pattern, replacement = replace, x = s)
+      }
+      
       s
     }
 
     renderCheck <- function(name) {
       renderUI({
         if (input$navpage != 'overview') {
-          # showNotification("A fresh copy of your answers was loaded!", type = "message")
 
           rmdPath        <- getRMDFile(input$navpage, path = wd, exists = FALSE)
           studentRDSPath <- rdsPath(input$navpage, path = studentPath(pkg))
@@ -131,6 +182,7 @@ studentServer <- function(pkg, autoknit, wd) {
           subButton <- if (!identical(version, submitted[[paste0(name, ".html")]])) {
             actionButton( inputId = paste0('submit-', name)
                         , label   = "Submit"
+                        , class   = "btn btn-default action-button btn-primary"
                         )
           }
           
@@ -153,10 +205,7 @@ studentServer <- function(pkg, autoknit, wd) {
     renderSubmit <- function(name) {
       renderUI({
         if (input$navpage != 'overview') {
-          # showNotification("A fresh copy of your submission was loaded!", type = "message")
-
           name <- substring(input$navpage, first = 8)
-
           studentRDSPath <- rdsPath(name, path = file.path(studentPath(pkg), "submitted"))
           if (!file.exists(studentRDSPath)) {
             return(
@@ -176,7 +225,9 @@ studentServer <- function(pkg, autoknit, wd) {
           studentRDS  <- readRDS(studentRDSPath)
           solutionRDS <- readRDS(rdsPath(name, file.path(pkg, "data") , tag = "-solutions"))
 
-          HTML(renderView(studentRDS, solutionRDS))
+          HTML( fluidRow(column(width = 3, p("Version:", substring(version, 1, 7))))
+              , renderView(studentRDS, solutionRDS)
+              )
         }
       })
     }
@@ -200,15 +251,15 @@ studentUI <- function(pkg, page) {
   siteyml <- yaml::yaml.load_file(file.path(pkgPath, "_site.yml"))
   config  <- yaml::yaml.load_file(file.path(pkgPath, "courseR.yml"))
   
-  navbarPage( id       = 'navpage'
-            , selected = page
-            , title    = config$build$package$name
+  navbarPage( id          = 'navpage'
+            , selected    = page
+            , title       = config$build$package$name
             , collapsible = FALSE
-            , header   = tagList( includeCSS(file.path(pkgPath, "site_libs", "bootstrap-3.3.5", "css", paste0(siteyml$output$html_document$theme, ".min.css")))
-                                , includeCSS(file.path(pkgPath, "site_libs", "highlightjs-1.1", "default.css"))
-                                , includeScript(file.path(pkgPath, "site_libs", "highlightjs-1.1", "highlight.js"))
-                                , includeScript(file.path(pkgPath, "site_libs", "navigation-1.1", "tabsets.js"))
-                                )
+            , theme       = shinythemes::shinytheme(siteyml$output$html_document$theme)
+            , header = tagList( includeCSS(file.path(pkgPath, "site_libs", "highlightjs-1.1", "default.css"))
+                              , includeScript(file.path(pkgPath, "site_libs", "highlightjs-1.1", "highlight.js"))
+                              , includeScript(file.path(pkgPath, "site_libs", "navigation-1.1", "tabsets.js"))
+                              )
             # , footer = tags$script("hljs.initHighlightingOnLoad();")
             , footer = tags$script("function rehighlight() {
                                       $('pre code').each(function(i, block) {
@@ -216,7 +267,7 @@ studentUI <- function(pkg, page) {
                                        })
                                     }
                                     $(document).on('shiny:value', function(event) {
-                                      window.setTimeout(rehighlight, 500) 
+                                      window.setTimeout(rehighlight, 1.00) 
                                     })
                                    "
                                   )
