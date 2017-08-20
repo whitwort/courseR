@@ -140,8 +140,13 @@ saveGrades <- function(pkgPath, grades) {
   gradePath <- getGradePath(pkgPath, create = TRUE)
   
   for (username in names(grades)) {
+    
+    studentFile <- file.path(gradePath, paste0(username, ".rds"))
+    if (file.exists(studentFile)) {
+      file.copy(from = studentFile, to = paste0(studentFile, ".bak"), overwrite = TRUE)
+    }
     saveRDS( object = grades[[username]]
-           , file   = file.path(gradePath, paste0(username, ".rds"))
+           , file   = studentFile
            )
   }
 }

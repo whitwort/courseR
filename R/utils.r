@@ -1,4 +1,4 @@
-renderTemplate <- function(template, data, file = NULL, partials = list(), post = function(s) { s }) {
+renderTemplate <- function(template, data, file = NULL, partials = list(), post = function(s) { s }, overwrite = TRUE) {
   if (file.exists(template)) {
     template <- readFile(template)
   }
@@ -11,7 +11,11 @@ renderTemplate <- function(template, data, file = NULL, partials = list(), post 
   # s <- whisker.unescape(s)
   s <- post(s)
   
-  if (!is.null(file)) { cat(s, "\n", file = file) }
+  if (!is.null(file)) { 
+    if (overwrite || !file.exists(file)) {
+      cat(s, "\n", file = file) 
+    }
+  }
   
   invisible(s)
 }

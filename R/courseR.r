@@ -10,7 +10,7 @@
 #' @export
 init <- function( path      = getwd()
                 , name      = basename(path)
-                , overwrite = TRUE #TODO: bugged
+                , overwrite = TRUE
                 , examples  = TRUE
                 ) {
   
@@ -33,9 +33,10 @@ init <- function( path      = getwd()
   
   lapply( list.files(file.path(path, "templates", "init"))
         , function(file) {
-            renderTemplate( template = file.path(path, "templates", "init", file) 
-                          , data     = data
-                          , file     = file.path(path, file)
+            renderTemplate( template  = file.path(path, "templates", "init", file) 
+                          , data      = data
+                          , file      = file.path(path, file)
+                          , overwrite = overwrite
                           )
           }
         )
@@ -54,14 +55,16 @@ init <- function( path      = getwd()
            , overwrite = overwrite
            )
   
-  renderTemplate( template = file.path(path, "package", "DESCRIPTION")
-                , data = data
-                , file = file.path(path, "package", "DESCRIPTION")
+  renderTemplate( template  = file.path(path, "package", "DESCRIPTION")
+                , data      = data
+                , file      = file.path(path, "package", "DESCRIPTION")
+                , overwrite = overwrite
                 )
   
-  renderTemplate( template = file.path(path, "package", "R", "course.R")
-                , data = data
-                , file = file.path(path, "package", "R", "course.R")
+  renderTemplate( template  = file.path(path, "package", "R", "course.R")
+                , data      = data
+                , file      = file.path(path, "package", "R", "course.R")
+                , overwrite = overwrite
                 )
   
   path
