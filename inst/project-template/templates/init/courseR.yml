@@ -1,4 +1,4 @@
-# Paths are relative to the current working directory where build() expects to find things
+# Paths are relative to the current working directory where `courseR::build()` expects to find things
 paths:
 
   # location for final build targets
@@ -11,7 +11,7 @@ templates:
   # templates are rendered
   data:
  
-    name: {{name}} # project name; defaults to path where init() was called
+    name: {{name}} # project name; defaults to path where `courseR::init()` was called
     #... define more pairs to pass along custom data to all templates
     
 # Build options
@@ -19,16 +19,20 @@ build:
 
   package:                  # set to FALSE to skip building a course package
     name:          {{name}} # name of the course package
-    grades:                 # Defines the grades that can be assigned to assignment tasks
-      Done:        TRUE     # if a name is set to TRUE, this grade is flags a task as completed
-      Incomplete:  FALSE    # if a name is set to FALSE, the task isn't complete
-      Error:       FALSE    
-  
+    grades:                 # Defines the grades that can be assigned to tasks in assignments
+      Done:        TRUE     # if a name is set to TRUE it flags a task as completed
+      Error:       FALSE    # if a name is set to FALSE, the task isn't complete
+      Incomplete:  FALSE
+      Poor style:  FALSE
+    autograde:              # set to FALSE to disable grade inference
+      pass:        Done     # grade to assign to passing tasks when inferring grades
+      fail:        Error    # grade to assign to failing tasks when inferring grades
+
   site:                     # set to FALSE to skip building a course website
     build:      build       # temporary build path for intermediate rmds
     dist:       www         # path in the dist directory to build website to
     max-chars:  144         # removes blocks of text from slides; set to FALSE to disable
-    url:        http://localhost/{{name}}
+    url:        http://localhost/{{name}}  # root URL for the website
     img:        img         # project path for static images; copied to dist
     
   projects:     FALSE       # Remove this line and uncomment example below to enable
@@ -38,17 +42,18 @@ build:
   #  publishPath: /var/shiny-server/{{name}}/          # path where students should checkout github repos to publish their Shiny apps
     
   # Hooks name closures called in order before or after builds; they're called 
-  # with the return from `update`: function(update) 
+  # with the return from `update`.  See `courseR::update` for documentation.
   #hooks:
   #  before: 
   #  after: 
 
 # Publishing options
 publish:
-  package: live  # Location to copy package to when calling `publish()`
-  site:    live  # Location to copy the website to when calling `publish()`     
+  package: live  # Location to copy package to when calling `courseR::publish()`
+  site:    live  # Location to copy the website to when calling `courseR::publish()`     
 
 # Course-specific configuration options; these change the default view for the 
-# assignments shiny app.
-instructor-user: username
-student-users:   "*" # * skips the user name check and always shows studentui
+# assignments shiny app and setup expected file locations.
+instructor-user: username # user account for the course instructor
+student-users:   "*"      # "*"" skips the user name check and always shows studentui; otherwise this should be a list of student user accounts
+home-directory:  "/home"  # path on the file system where student users' home directories can be found

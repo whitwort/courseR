@@ -27,7 +27,7 @@ panel <- function(heading, body, footer = NA, class = "default") {
   div( class = paste0("panel panel-", class)
      , div(class = "panel-heading", heading)
      , div(class = "panel-body", body)
-     , if (!is.na(footer)) { div(class = "panel-footer", footer) }
+     , if (!identical(footer, NA)) { div(class = "panel-footer", footer) }
      )
 }
 
@@ -42,7 +42,11 @@ studentServer <- function(pkg, autoknit, wd) {
     checked   <- do.call(reactiveValues, args = as.list(listChecked(pkg)))
     submitted <- do.call(reactiveValues, args = as.list(listSubmitted(pkg)))
     
-    # watch rds files for new checks and submissions
+    gradePath <- file.path(getGradePath(pkgPath), paste0(getUser(),".rds"))
+    grades    <- do.call(reactiveValues, args = if (file.exists(gradePath)) readRDS(gradePath) else list())
+    lastGrade <- file.mtime(gradePath)
+    
+    # watch rds files for new checks, submissions and grades
     observe({
       invalidateLater(interval)
 
@@ -59,7 +63,12 @@ studentServer <- function(pkg, autoknit, wd) {
           submitted[[name]] <- newSubmitted[[name]]
         }
       }
-
+      
+      currGrade <- file.mtime(gradePath)
+      if (currGrade != lastGrade) {
+        grades    <- do.call(reactiveValues, readRDS(gradePath))
+        lastGrade <- currGrade
+      }
     })
     
     sources <- do.call(reactiveValues, args = as.list(listSources(pkg, path = wd)))
@@ -77,51 +86,28 @@ studentServer <- function(pkg, autoknit, wd) {
         }
       }
     })
-
-    # renderView <- function(studentRDS, solutionRDS) {
-    #   s <- studentRDS$html
-    #   s <- gsub("\\{\\{task-\\d+-before\\}\\}", as.character(tags$b("Your answer:")), s)
-    #   for (i in 1:length(solutionRDS$html)) {
-    #     p <- paste0("{{task-", i, "-after}}")
-    #     r <- paste( tags$b("Answer key output:")
-    #               , solutionRDS$html[[i]]
-    #               , sep = "\n"
-    #               )
-    # 
-    #     s <- gsub(p, r, s, fixed = TRUE)
-    #   }
-    # 
-    #   s <- gsub("<body>", "", s, fixed = TRUE)
-    #   s <- gsub("</body>", "", s, fixed = TRUE)
-    #   s
-    # }
     
-    renderView <- function(studentRDS, solutionRDS) {
+    editBtnObservers <- ""
+    renderView <- function(name, studentRDS, solutionRDS, editButton = FALSE) {
       s <- studentRDS$html
       s <- gsub("<body>",  "", s, fixed = TRUE)
       s <- gsub("</body>", "", s, fixed = TRUE)
       
-      status <- lapply( names(studentRDS$answers)
-                      , function(taskName) {
-                          grade <- NA  # TODO plug into actual grading data structure
-                          if (!is.na(grade)) {
-                            
-                          } else {
-                            message <- studentRDS$checks[[taskName]]
-                            if (!is.na(message)) {
-                              list(heading = "Problems found", footer = message, class = "warning") 
-                            } else {
-                              list(heading = "Not yet graded", footer = NA, class = "default")
-                            }
-                          }
-                        }
-                      )
+      status        <- getStatus(name, studentRDS, grades)
+      names(status) <- names(studentRDS$answers)
       
       for (i in 1:length(solutionRDS$html)) {
-        # pattern <- paste0("\\{\\{task-", i, "-before\\}\\}\\n(*.?)\\n\\{\\{task-", i, "-after\\}\\}")
+        
+        editBtn <- if (editButton && require(rstudioapi) && rstudioapi::isAvailable()) {
+          btnName <- paste("edit", name, i, sep = "-")
+          actionButton(inputId = btnName, label = "Edit")
+        }
+        
         pattern <- paste0("\\{\\{task-", i, "-before\\}\\}\\n(.*?)\\n\\{\\{task-", i, "-after\\}\\}")
-        stat    <- status[[i]]
-        replace <- as.character(panel( heading = h4(stat$heading)
+        stat    <- status[[as.character(i)]]
+        replace <- as.character(panel( heading = fluidRow( column(6, h4(stat$heading))
+                                                         , column(6, span(class = "pull-right", editBtn))
+                                                         )
                                      , body    = div( p(tags$b("Your answer:"))
                                                     , "\\1"
                                                     , p(tags$b("Answer key:"))
@@ -138,6 +124,7 @@ studentServer <- function(pkg, autoknit, wd) {
     }
 
     renderCheck <- function(name) {
+      force(name)
       renderUI({
         if (input$navpage != 'overview') {
 
@@ -179,6 +166,38 @@ studentServer <- function(pkg, autoknit, wd) {
           studentRDS  <- readRDS(studentRDSPath)
           solutionRDS <- readRDS(rdsPath(input$navpage, file.path(pkg, "data") , tag = "-solutions"))
           
+          if (length(studentRDS$taskHTML) != length(solutionRDS$html)) {
+            return(
+              div(p( "It looks like your R markdown file for this assignment is invalid:  it contains "
+                   , code(length(studentRDS$taskHTML))
+                   , " task chunks but should contain "
+                   , code(length(solutionRDS$html))
+                   , ".  You can get a fresh copy of the assignment markdown by temporarily renaming your current file and then running "
+                   , code(paste0(config$build$package$name, '::startAssignment("'
+                                 , input$navpage , '")'
+                                 )
+                         )
+                   )
+                 )
+            )
+          }
+          
+          # note: student-UI logic is robust enough to handle an out of order
+          # task chunk, but this seems a recipe for confusion and complicates
+          # the grading implementation.
+          len   <- length(studentRDS$answers)
+          names <- names(studentRDS$answers)
+          if (!identical(as.character(1:len), names)) {
+            return(
+              div(p( "Your task chunks appear to be out of order in this assignment markdown.
+                     Task chunks must be correctly ordered to be reviewed and graded.
+                     Your current order is:"
+                   , code(paste(names(studentRDS$answers), collapse = " "))
+                   )
+                 )
+            )
+          }
+          
           subButton <- if (!identical(version, submitted[[paste0(name, ".html")]])) {
             actionButton( inputId = paste0('submit-', name)
                         , label   = "Submit"
@@ -189,20 +208,55 @@ studentServer <- function(pkg, autoknit, wd) {
           tagList( fluidRow( column(width = 3, p("Version:", substring(version, 1, 7)))
                            , column(width = 3, offset = 6, span(class = "pull-right", subButton))
                            )
-                 , HTML(renderView(studentRDS, solutionRDS))
+                 , HTML(renderView(name, studentRDS, solutionRDS, editButton = TRUE))
                  )
         }
       })
     }
 
-    for (name in .listAssignments(pkg)) { 
+    for (name in .listAssignments(pkg)) {
+      # assignment pages
       output[[paste0("check-", name)]]  <- renderCheck(name)
+      
+      # submit button handler
       observeEvent(input[[paste0("submit-", name)]], {
         submitAssignment(name, path = wd, pkg = pkg)
       })
     }
 
+    # edit button observers    
+    obs <- lapply( names(.listAssignments(pkg))
+                 , function(name) {
+                     solutionRDS <- readRDS(rdsPath(name, file.path(pkg, "data") , tag = "-solutions"))
+                     lapply( 1:length(solutionRDS$html)
+                           , function(i) {
+                               btnName <- paste("edit", splitext(name), i, sep = "-")
+                               observeEvent(force(input[[btnName]]), {
+                                 if (require(rstudioapi) && rstudioapi::isAvailable()) {
+                                   
+                                   studentRDSPath <- rdsPath(splitext(name), path = studentPath(pkg))
+                                   studentRDS     <- readRDS(studentRDSPath)
+                                   if (file.exists(studentRDS$sourceRMD)){ 
+                                     rmd <- readLines(studentRDS$sourceRMD)
+                                     taskLine <- grep(paste0("task=", i), rmd)
+                                   }
+                                  
+                                   rstudioapi::navigateToFile( studentRDS$sourceRMD
+                                                             , line = if (length(taskLine) > 0) {
+                                                                taskLine[1]
+                                                               } else {
+                                                                1  
+                                                               }
+                                                             ) 
+                                 }
+                               })
+                             }
+                           )
+                   }
+                 )
+    
     renderSubmit <- function(name) {
+      force(name)
       renderUI({
         if (input$navpage != 'overview') {
           name <- substring(input$navpage, first = 8)
@@ -221,25 +275,50 @@ studentServer <- function(pkg, autoknit, wd) {
             )
           }
 
-          version     <- submitted[[name]]  # here to dirty output when a new version is available
+          version     <- submitted[[paste0(name, ".html")]]  # here to dirty output when a new version is available
           studentRDS  <- readRDS(studentRDSPath)
           solutionRDS <- readRDS(rdsPath(name, file.path(pkg, "data") , tag = "-solutions"))
 
-          HTML( fluidRow(column(width = 3, p("Version:", substring(version, 1, 7))))
-              , renderView(studentRDS, solutionRDS)
-              )
+          tagList( fluidRow(column(width = 3, p("Version:", substring(version, 1, 7))))
+                 , HTML(renderView(name, studentRDS, solutionRDS))
+                 )
         }
       })
     }
     for (name in .listAssignments(pkg)) { output[[paste0('submit', "-", name)]] <- renderSubmit(name) }
     
     output$status <- shiny::renderTable({
+      
+      status <- vapply( .listAssignments(pkg)
+                      , function(assignment) {
+
+                          if (is.na(submitted[[paste0(assignment, ".html")]])) {
+                            return("")
+                          }
+                          if (is.null(grades[[assignment]]) || (length(grades[[assignment]]) == 0) ) {
+                            return("Not yet graded")
+                          }
+                          solutionRDS <- readRDS(rdsPath(assignment, file.path(pkg, "data") , tag = "-solutions"))
+                          if (length(grades[[assignment]]) < length(solutionRDS$html)) {
+                            return("Partially graded")
+                          }
+                          if (!all(vapply(grades[[assignment]], function(x) x$completed, FUN.VALUE = TRUE))) {
+                            "Incomplete"
+                          } else {
+                            "Complete"
+                          }
+                        
+                        }
+                      , FUN.VALUE = ""
+                      )
+      
       data.frame( Assignment            = .listAssignments(pkg)
                 , `In progress version` = substring(as.character(reactiveValuesToList(checked)), 1, 7)
                 , `Submitted version`   = substring(as.character(reactiveValuesToList(submitted)), 1, 7)
-                , Status                = "" # TODO
-                , check.names = FALSE
+                , Status                = status
+                , check.names           = FALSE
                 )
+      
     })
     
   }
@@ -254,7 +333,7 @@ studentUI <- function(pkg, page) {
   navbarPage( id          = 'navpage'
             , selected    = page
             , title       = config$build$package$name
-            , collapsible = FALSE
+            , collapsible = TRUE
             , theme       = shinythemes::shinytheme(siteyml$output$html_document$theme)
             , header = tagList( includeCSS(file.path(pkgPath, "site_libs", "highlightjs-1.1", "default.css"))
                               , includeScript(file.path(pkgPath, "site_libs", "highlightjs-1.1", "highlight.js"))
@@ -268,6 +347,8 @@ studentUI <- function(pkg, page) {
                                     }
                                     $(document).on('shiny:value', function(event) {
                                       window.setTimeout(rehighlight, 1.00) 
+                                      $(\"td:contains('Incomplete')\").removeClass().addClass(\"danger\")
+                                      $(\"td:contains('Complete')\").removeClass().addClass(\"success\")
                                     })
                                    "
                                   )

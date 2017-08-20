@@ -23,6 +23,10 @@ stripEmptyH <- function(s) {
   s
 }
 
+getUser <- function() {
+  Sys.info()["user"]
+}
+
 loadPartials <- function(path, recursive = TRUE) {
   paths <- list.files(path, recursive = recursive)
   x <- lapply( paths

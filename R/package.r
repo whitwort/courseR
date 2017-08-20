@@ -102,13 +102,14 @@ submitAssignment <- function(name, path = getwd(), pkg) {
   }
   
   dest <- rdsPath(name, file.path(studentPath(pkg), "submitted"))
-  file.copy(from = source, to = dest, overwrite = TRUE)
+  saveRDS(object = data, file = dest)
   
   message("Assignment submitted (Version: ", substring(data$sourceHASH, 1, 7), ")")
   
 }
 
 #' Check assignments
+#' 
 #' 
 #' This function behaves differently when called from a student versus 
 #' instructor account.  For students, it shows your current progress on all
@@ -122,7 +123,7 @@ submitAssignment <- function(name, path = getwd(), pkg) {
 #' @export
 checkAssignments <- function(path = getwd(), autoknit = TRUE, pkg) {
   config <- loadConfig(file.path(pkg, "data"))
-  user   <- Sys.info()["user"]
+  user   <- getUser()
   
   if (!is.null(config$`instructor-user`) && user %in% config$`instructor-user`) {
     launchInstructorUI(pkg = pkg)

@@ -159,17 +159,22 @@ build <- function(path = getwd(), cleanBuild = FALSE, cleanPreviews = TRUE) {
    
     file.copy( from = file.path(path, "courseR.yml")
              , to   = file.path(pkgPath, "data")
+             , overwrite = TRUE
              )
     file.copy( from = file.path(path, "_site.yml")
              , to   = file.path(pkgPath, "data")
+             , overwrite = TRUE
              )
     
     taskPath <- file.path(pkgPath, "data", "assignments")
     if (!dir.exists(taskPath)) { dir.create(taskPath) }
+    gradePath <- file.path(pkgPath, "data", "feedback")
+    if (!dir.exists(gradePath)) { dir.create(gradePath) }
     
     file.copy( from = file.path(path, "data/")
              , to   = file.path(taskPath)
              , recursive = TRUE
+             , overwrite = TRUE
              )
     
     saveRDS( update

@@ -160,9 +160,23 @@ taskCollector <- function(type, siteyml, pkg = NULL, ...) {
                               )
       sourceHTML <- normalizePath(output_file)
       
-      # check answers against the checkrs in the package
+      # check answers against the checkrs in the package and answer keys
       solutionrds   <- readRDS(file.path(pkg, "data", paste0(metadata$assignment, "-solutions.rds")))
       checkMessages <- check(answers, solutionrds$checkrs)
+      
+      inner <- function(x) {
+        if (!is.na(x)) {
+          as.character(rvest::html_children(rvest::html_children(rvest::html_children(xml2::read_html(x)))))  
+        }
+      }
+      matchesKey    <- vapply( 1:(length(d))
+                             , function(n) {
+                                 sol <- inner(solutionrds$html[[n]])
+                                 ans <- inner(d[[n]])
+                                 identical(sol, ans[2])
+                               }
+                             , FUN.VALUE = TRUE
+                             )
       
       saveRDS( list( html       = body
                    , sourceRMD  = sourceRMD
@@ -170,7 +184,9 @@ taskCollector <- function(type, siteyml, pkg = NULL, ...) {
                    , sourceHASH = hash(sourceRMD)
                    , answers    = answers
                    , taskHTML   = d
+                   , taskHASH   = vapply(d, openssl::md5, FUN.VALUE = "")
                    , checks     = checkMessages
+                   , matchesKey = matchesKey
                    )
              , file = file.path( studentPath(type)
                                , paste0(metadata$assignment, "-answers.rds")
@@ -230,13 +246,16 @@ listSources <- function(pkg, path) {
         )
 }
 
-studentPath <- function(pkg) {
-  path <- file.path("~", ".courseR")
+studentPath <- function(pkg, home = "~", create = TRUE) {
+  path <- file.path(home, ".courseR")
   pkg  <- basename(pkg)
-  
-  if (!dir.exists(path)) { dir.create(path) }
   pkgPath <- file.path(path, pkg)
-  if (!dir.exists(pkgPath)) { dir.create(pkgPath) }
-  if (!dir.exists(file.path(pkgPath, "submitted"))) { dir.create(file.path(pkgPath, "submitted")) }
+  
+  if (create) {
+    if (!dir.exists(path)) { dir.create(path) }
+    if (!dir.exists(pkgPath)) { dir.create(pkgPath) }
+    if (!dir.exists(file.path(pkgPath, "submitted"))) { dir.create(file.path(pkgPath, "submitted")) }
+  }
+
   pkgPath
 }
