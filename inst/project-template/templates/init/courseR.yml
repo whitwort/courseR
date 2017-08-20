@@ -40,6 +40,8 @@ build:
   #  githubOrg:   {{name}}-shiny-projects              # github organization where Shiny project repositories are hosted
   #  shinyServer: http://localhost/shiny-server:3838/  # Base URL for the Shiny server that hosts project apps
   #  publishPath: /var/shiny-server/{{name}}/          # path where students should checkout github repos to publish their Shiny apps
+  
+  scripts:      TRUE        # should admin scripts be built to scripts/; TRUE or FALSE
     
   # Hooks name closures called in order before or after builds; they're called 
   # with the return from `update`.  See `courseR::update` for documentation.

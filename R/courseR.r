@@ -401,7 +401,7 @@ build <- function(path = getwd(), cleanBuild = FALSE, cleanPreviews = TRUE) {
       rmarkdown::render_site(input = buildPath, env = new.env())
     }, "cannot rename file")
     
-    message("Copying files...")
+    message("Copying additional files...")
     # remove placeholder markup from assignment files
     for (l in assignments) {
       s <- readFile(file.path(buildPath, "_site", l$file))
@@ -424,20 +424,43 @@ build <- function(path = getwd(), cleanBuild = FALSE, cleanPreviews = TRUE) {
              , overwrite = TRUE
              )
     
-    # overwrite any custom site_libs files
-    overwriteLibs  <- file.path(path, "templates", "site_libs")
-    overwriteFiles <- list.files(overwriteLibs, recursive = TRUE)
-    file.copy( from      = file.path(overwriteLibs, overwriteFiles)
-             , to        = file.path(sitePath, "site_libs", overwriteFiles)
-             , overwrite = TRUE
-             )
-
     # render includes.html containing navbar and footer content
     renderTemplate( template = file.path(path, "templates", "site", "includes.html")
                   , data     = update$data
                   , file     = file.path(sitePath, "includes.html")
                   , partials = partials
                   )
+    
+    # the templating data for site_libs and scripts is the project configuration
+    configTemplate <- c(config, config$templates$data)
+    
+    # overwrite any custom site_libs files
+    overwriteLibs  <- file.path(path, "templates", "site_libs")
+    overwriteFiles <- list.files(overwriteLibs, recursive = TRUE)
+    lapply( overwriteFiles
+          , function(f) {
+              renderTemplate( template  = file.path(overwriteLibs, f)
+                            , data      = configTemplate
+                            , file      = file.path(sitePath, "site_libs", f)
+                            , overwrite = TRUE
+                            )
+            }
+          )
+
+    if (identical(config$build$scripts, TRUE)) {
+      scriptPath <- file.path(path, "scripts")
+      if (!dir.exists(scriptPath)) { dir.create(scriptPath) }
+      scripts <- list.files(file.path(path, "templates", "scripts"))
+      lapply( scripts
+            , function(f) {
+              renderTemplate( template  = file.path(path, "templates", "scripts", f)
+                            , data      = configTemplate
+                            , file      = file.path(path, "scripts", f)
+                            , overwrite = TRUE
+                            )
+              }
+            )
+    }
     
     if (buildPackage(config)) {
       # Copy .js and .css files to project package if it's included in the build
