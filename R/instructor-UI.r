@@ -174,6 +174,39 @@ instructorServer <- function(pkg, initGrades, submissions) {
                      )
              )
     })
+    
+    output$overview <- renderTable({
+      
+      d <- data.frame(student = names(reactiveValuesToList(grades)), stringsAsFactors = FALSE)
+      
+      for (assnName in splitext(.listAssignments(pkg))) {
+        d[[assnName]] <- vapply( d$student
+                               , function(student) {
+                                   currGrades <- grades[[student]][[assnName]]
+                                   if (is.null(currGrades)) {
+                                     if (is.null(submissions[[assnName]][["1"]][[student]])) {
+                                       "No submission"
+                                     } else {
+                                       "Waiting for grading"
+                                     }
+                                   } else {
+                                     taskGrades <- vapply( currGrades
+                                                         , function (x) x$completed
+                                                         , FUN.VALUE = TRUE
+                                                         )
+                                     if (all(taskGrades)) {
+                                       "Done"
+                                     } else {
+                                       "Errors"
+                                     }
+                                   }
+                                 }
+                               , FUN.VALUE = ""
+                               )
+      }
+      
+      d
+    })
   
     # hack: for some reason apps disconnects after 60s of inactivity when
     # launched in Rstudio server
@@ -200,7 +233,10 @@ instructorUI <- function(pkg, submissions, solutions) {
   pkgPath <- file.path(normalizePath(pkg), "data")
   config  <- yaml::yaml.load_file(file.path(pkgPath, "courseR.yml"))
   
-  items <- c( list(tabItem(tabName = "overview", box(title = "Overview", width = 12)))
+  items <- c( list(tabItem( tabName = "overview"
+                          , fluidRow(box(title = "Overview", tableOutput("overview"), width = 12))
+                          )
+                  )
             , lapply( names(submissions)
                     , function(assnName) {
                         a <- lapply( names(submissions[[assnName]])
@@ -227,20 +263,41 @@ instructorUI <- function(pkg, submissions, solutions) {
                                    )
                         a$title <- assnName
                         a$width <- 12
-                        tabItem(tabName = assnName, do.call(tabBox, a))
+                        tabItem(tabName = assnName, fluidRow(do.call(tabBox, a)))
                       }
                     )
             )
   
-  dashboardPage( header  = dashboardHeader(title = config$build$package$name, uiOutput('heartbeat'))
+  dashboardPage( header  = dashboardHeader( title = config$build$package$name
+                                          , uiOutput('heartbeat')
+                                          )
                , sidebar = dashboardSidebar( sidebarMenu( menuItem("Overview"
                                                                   , tabName = "overview"
                                                                   , icon    = icon("th")
                                                                   )
                                                         )
                                            , sidebarMenuOutput("assignmentMenu")
+                                           , tags$head(tagList( includeCSS(file.path(pkgPath, "site_libs", "highlightjs-1.1", "default.css"))
+                                                              , includeScript(file.path(pkgPath, "site_libs", "highlightjs-1.1", "highlight.js"))
+                                                              )
+                                                      )
                                            )
-               , body    = dashboardBody(do.call(tabItems, items))
+               , body    = dashboardBody( do.call(tabItems, items)
+                                        , tags$footer( tags$script("function rehighlight() {
+                                                                      $('pre code').each(function(i, block) {
+                                                                        hljs.highlightBlock(block)
+                                                                       })
+                                                                    }
+                                                                    $(document).on('shiny:value', function(event) {
+                                                                      window.setTimeout(rehighlight, 1.00) 
+                                                                      $(\"td:contains('Errors')\").removeClass().addClass(\"danger\")
+                                                                      $(\"td:contains('Done')\").removeClass().addClass(\"success\")
+                                                                    })
+                                                                   "
+                                                                  )
+                                          
+                                                     )
+                                        )
                , title   = config$build$package$name
                , skin    = "black"
                )

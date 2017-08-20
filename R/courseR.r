@@ -67,6 +67,10 @@ init <- function( path      = getwd()
                 , overwrite = overwrite
                 )
   
+  # to avoid confusion remove init and package from templates
+  unlink(file.path(path, "templates", "init"), recursive = TRUE)
+  unlink(file.path(path, "templates", "package"), recursive = TRUE)
+  
   path
 }
 
@@ -411,12 +415,20 @@ build <- function(path = getwd(), cleanBuild = FALSE, cleanPreviews = TRUE) {
              , recursive = TRUE
              )
     
-    # copy rendered files and rename output path
+    # copy rendered files to the dist path
     sitePath <- file.path(distPath, config$build$site$dist)
     if (!dir.exists(sitePath)) { dir.create(sitePath) }
     file.copy( from      = list.files(file.path(buildPath, "_site/"), full.names = TRUE)
              , to        = sitePath
              , recursive = TRUE
+             , overwrite = TRUE
+             )
+    
+    # overwrite any custom site_libs files
+    overwriteLibs  <- file.path(path, "templates", "site_libs")
+    overwriteFiles <- list.files(overwriteLibs, recursive = TRUE)
+    file.copy( from      = file.path(overwriteLibs, overwriteFiles)
+             , to        = file.path(sitePath, "site_libs", overwriteFiles)
              , overwrite = TRUE
              )
 
@@ -429,7 +441,7 @@ build <- function(path = getwd(), cleanBuild = FALSE, cleanPreviews = TRUE) {
     
     if (buildPackage(config)) {
       # Copy .js and .css files to project package if it's included in the build
-      file.copy( from      = file.path(buildPath, "_site/site_libs/")
+      file.copy( from      = file.path(sitePath, "site_libs/")
                , to        = file.path(distPath, config$build$package$name, "data")
                , recursive = TRUE
                )
