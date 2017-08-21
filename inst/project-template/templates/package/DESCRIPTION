@@ -1,12 +1,12 @@
 Package: {{name}}
 Title: Course package for {{name}}
-Version: 0.1
-Date: 2017-01-06
+Version: {{version}}
+Date: {{date}}
 Author: Gregg Whitworth
 Maintainer: Gregg Whitworth <whitwort@gmail.com>
 URL: http://github.com/whitwort/courseR
 BugReports: http://github.com/whitwort/courseR/issues
-Description: This package provides wrapper functions to courseR that are bound to a specific course build.
+Description: This package provides wrapper functions to courseR that are bound to a specific course project.  Only edit the version of this file found in 'templates/package' as it is automatically regenerated in 'package/' during builds.
 Imports: courseR
 Depends: R (>= 3.3.2)
 RoxygenNote: 6.0.1

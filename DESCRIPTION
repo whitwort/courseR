@@ -7,7 +7,7 @@ Description: This package implements my workflow for (1) creating websites for
     and (3) provides an interface for students to manage Shiny app projects on 
     github and then deploy them to a Shiny server instance.  Any of these 3 
     components can be disabled.
-Version: 0.5
+Version: 0.5.0
 Date: 2017-08-10
 Author: Gregg Whitworth
 Maintainer: Gregg Whitworth <whitworthg@wlu.edu>

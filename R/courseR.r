@@ -67,9 +67,8 @@ init <- function( path      = getwd()
                 , overwrite = overwrite
                 )
   
-  # to avoid confusion remove init and package from templates
+  # to avoid confusion remove init from templates
   unlink(file.path(path, "templates", "init"), recursive = TRUE)
-  unlink(file.path(path, "templates", "package"), recursive = TRUE)
   
   path
 }
@@ -159,6 +158,15 @@ build <- function(path = getwd(), cleanBuild = FALSE, cleanPreviews = TRUE) {
   if (buildPackage(config)) {
     message("Building course package...")
     pkgPath <- file.path(distPath, config$build$package$name)
+    
+    descData         <- config$templates$data
+    descData$version <- as.character(packageVersion("courseR"))
+    descData$date    <- as.character(date())
+    renderTemplate( template  = file.path(path, "templates", "package", "DESCRIPTION")
+                  , data      = descData
+                  , file      = file.path(path, "package", "DESCRIPTION")
+                  , overwrite = TRUE
+                  )
     
     roxygen2::roxygenize(file.path(path, "package"), roclets=c('rd', 'collate', 'namespace'))
     file <- devtools::build(pkg = file.path(path, "package"), path = distPath, binary = TRUE, manual = TRUE)
