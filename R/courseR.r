@@ -95,9 +95,6 @@ update <- function(path = getwd()) {
   config <- loadConfig(path)
   data   <- config$templates$data
   
-  # nonameRMDs <- rmds
-  # names(nonameRMDs) <- NULL
-  
   data$contents    <- nonames(rmds)[types == 'content'] 
   data$assignments <- nonames(rmds)[types == 'assignment']
   data$projects    <- if (identical(config$build$projects, FALSE)) FALSE else TRUE
@@ -554,10 +551,9 @@ publish <- function(path = getwd(), build = TRUE, www = buildSite(config), pkg =
 #'
 #' @export
 clean <- function(path = getwd()) {
-  unlink(x = file.path(path, c("_site", "build", "dist")), recursive = TRUE)
+  unlink(x = file.path(path, c("_site", "build", "dist", "scripts")), recursive = TRUE)
   TRUE
 }
-
 
 newSource <- function(tmpl, dest, path, ...) {
   config  <- loadConfig(path)
