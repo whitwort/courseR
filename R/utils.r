@@ -42,7 +42,7 @@ loadPartials <- function(path, recursive = TRUE) {
 }
 
 readFile <- function(path) {
-  paste0(readLines(path), collapse = "\n")
+  paste0(readLines(path, warn = FALSE), collapse = "\n")
 }
 
 hash <-function(filePaths) {

@@ -377,26 +377,30 @@ build <- function(path = getwd(), cleanBuild = FALSE, cleanPreviews = TRUE) {
         stop("Incorrect configuration:  github can't find group `", config$build$projects$githubOrg, "` at API URL `", url, "`")
       }
       
-      pushed_at <- sapply(ps, function(l) l$pushed_at)
-      
-      projects <- ps[order( strptime(pushed_at, format = "%Y-%m-%dT%H:%M:%SZ", tz = "GMT")
-                          , decreasing = TRUE
-                          )
-                    ]
-      
-      projects <- lapply( projects
-                        , function(p) {
-                            p$contributors <- httr::content(httr::GET(p$contributors_url), as = "parsed")
-                            p
-                          }
-                        )
-      
-      renderTemplate( file.path(path, "templates", "site", "projects-page.Rmd")
-                    , data = c( config$templates$data
-                              , list(projects = projects)
-                              )
-                    , file = file.path(buildPath, "projects-page.Rmd")
-                    )
+      if (is.character(ps[[1]])) {  # TODO this is brittle
+        warning("Can't update project page because the github API rate limit had been exceeded.")
+      } else {
+        pushed_at <- sapply(ps, function(l) { l$pushed_at } )
+        
+        projects <- ps[order( strptime(pushed_at, format = "%Y-%m-%dT%H:%M:%SZ", tz = "GMT")
+                            , decreasing = TRUE
+                            )
+                      ]
+        
+        projects <- lapply( projects
+                          , function(p) {
+                              p$contributors <- httr::content(httr::GET(p$contributors_url), as = "parsed")
+                              p
+                            }
+                           )
+        
+        renderTemplate( file.path(path, "templates", "site", "projects-page.Rmd")
+                      , data = c( config$templates$data
+                                , list(projects = projects)
+                                )
+                      , file = file.path(buildPath, "projects-page.Rmd")
+                      )  
+      }
       
     }
         

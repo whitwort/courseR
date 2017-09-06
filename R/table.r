@@ -33,7 +33,7 @@ createTable <- function(nrows, cols, row.col = "#", file) {
 #' Render a table in an Rmd chunk
 #' 
 #' Use this function with the YML template file created by 
-#' code{\link{createTable}}.
+#' code {\link{createTable}}.
 #' 
 #' @param file source YAML file
 #' @param markdown if TRUE text values in the YAML file are preprocessed as 

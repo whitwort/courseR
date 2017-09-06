@@ -37,7 +37,9 @@ check <- function(answers, checks) {
   checkNames <- names(checks)
   vapply( names(answers)
         , function(name) {
-            checkFuns <- checks[grepl(paste0(name, ".\\d"), x = checkNames)]
+            message(name)
+            checkFuns <- checks[grepl(paste0("^", name, ".\\d"), x = checkNames)]
+            print(checkFuns)
             capture   <- answers[[name]]
             if (length(capture$returns) == 0) {
               return("Your code does not appear to do anything.")

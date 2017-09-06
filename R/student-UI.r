@@ -65,7 +65,7 @@ studentServer <- function(pkg, autoknit, wd) {
       }
       
       currGrade <- file.mtime(gradePath)
-      if (currGrade != lastGrade) {
+      if (!identical(currGrade, lastGrade)) {
         grades    <- do.call(reactiveValues, readRDS(gradePath))
         lastGrade <- currGrade
       }
