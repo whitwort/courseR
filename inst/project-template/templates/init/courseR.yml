@@ -41,15 +41,22 @@ build:
   #  shinyServer: http://localhost/shiny-server:3838/  # Base URL for the Shiny server that hosts project apps
   #  publishPath: /var/shiny-server/{{name}}/          # path where students should checkout github repos to publish their Shiny apps
   
-  scripts:      TRUE        # should admin scripts be built to scripts/; TRUE or FALSE
+  scripts:      TRUE        # should admin scripts and support files be built to scripts/; TRUE or FALSE
 
 # Publishing options
 publish:
   package: live  # Location to copy package to when calling `courseR::publish()`
   site:    live  # Location to copy the website to when calling `courseR::publish()`     
 
-# Course-specific configuration options; these change the default view for the 
-# assignments shiny app and setup expected file locations.
+# Course-specific configuration options; there are mainly useful in a managed 
+# environment for handling account creation.
 instructor-user: username # user account for the course instructor
-student-users:   "*"      # "*"" skips the user name check and always shows studentui; otherwise this should be a list of student user accounts
-home-directory:  "/home"  # path on the file system where student users' home directories can be found
+student-users:   "*"      # "*"" skips the user name check and always shows studentui; 
+                          # otherwise this should be a list of student user accounts.  
+                          # This must be the latter if you plan on using admin scripts 
+                          # to manage account creation.
+home-directory:  "/home"  # path on the file system where student users' home 
+                          # directories can be found.  It's require if using the 
+                          # grading app or admin scripts.
+course-group:   {{name}}  # A user group for the course; required for using admin 
+                          # scripts to create users.

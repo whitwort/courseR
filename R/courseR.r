@@ -442,6 +442,9 @@ build <- function(path = getwd(), cleanBuild = FALSE, cleanPreviews = TRUE) {
     
     # the templating data for site_libs and scripts is the project configuration
     configTemplate <- c(config, config$templates$data)
+    configTemplate$`student-usernames` <- lapply( config$`student-users`
+                                                , function(name) list(name = name)
+                                                )
     
     # overwrite any custom site_libs files
     overwriteLibs  <- file.path(path, "templates", "site_libs")
