@@ -108,7 +108,7 @@ instructorServer <- function(pkg, initGrades, submissions) {
                                      }
                                     )
                             , list(actionButton( inputId = clearButtonBinding
-                                               , label   = "clearFeedback"
+                                               , label   = "Clear feedback"
                                                )
                                   )
                             )
