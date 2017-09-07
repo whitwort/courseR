@@ -278,7 +278,7 @@ instructorUI <- function(pkg, submissions, solutions) {
                                                         )
                                            , sidebarMenuOutput("assignmentMenu")
                                            , tags$head(tagList( includeCSS(file.path(pkgPath, "site_libs", "highlightjs-1.1", "default.css"))
-                                                              , includeScript(file.path(pkgPath, "site_libs", "highlightjs-1.1", "highlight.js"))
+                                                              #, includeScript(file.path(pkgPath, "site_libs", "highlightjs-1.1", "highlight.js"))
                                                               )
                                                       )
                                            )

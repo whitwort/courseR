@@ -336,7 +336,7 @@ studentUI <- function(pkg, page) {
             , collapsible = TRUE
             , theme       = shinythemes::shinytheme(siteyml$output$html_document$theme)
             , header = tagList( includeCSS(file.path(pkgPath, "site_libs", "highlightjs-1.1", "default.css"))
-                              , includeScript(file.path(pkgPath, "site_libs", "highlightjs-1.1", "highlight.js"))
+                              # , includeScript(file.path(pkgPath, "site_libs", "highlightjs-1.1", "highlight.js"))
                               , includeScript(file.path(pkgPath, "site_libs", "navigation-1.1", "tabsets.js"))
                               )
             # , footer = tags$script("hljs.initHighlightingOnLoad();")
