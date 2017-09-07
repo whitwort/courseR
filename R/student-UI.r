@@ -344,11 +344,11 @@ studentUI <- function(pkg, page) {
                                       $('pre code').each(function(i, block) {
                                         hljs.highlightBlock(block)
                                        })
-                                    }
-                                    $(document).on('shiny:value', function(event) {
-                                      window.setTimeout(rehighlight, 1.00) 
                                       $(\"td:contains('Incomplete')\").removeClass().addClass(\"danger\")
                                       $(\"td:contains('Complete')\").removeClass().addClass(\"success\")
+                                    }
+                                    $(document).on('shiny:value', function(event) {
+                                      window.setTimeout(rehighlight, 1.00)
                                     })
                                    "
                                   )

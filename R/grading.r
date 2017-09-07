@@ -153,6 +153,22 @@ saveGrades <- function(pkgPath, grades) {
   }
 }
 
+# loadStandardFeedback <- function(pkgPath) {
+#   gradePath <- getGradePath(pkgPath)
+#   filePath  <- file.path(gradePath, "standard-feedback.rds")
+#   feedback  <- if(file.exists(filePath)) { 
+#                  readRDS(filePath)
+#                } else {
+#                  list(global = c(pasteSolution = "Paste solution"))
+#                }
+#   feedback
+# }
+# 
+# saveStandardFeedback <- function(pkgPath, feedback) {
+#   gradePath <- getGradePath(pkgPath)
+#   saveRDS(feedback, file = file.path(gradePath, "standard-feedback.rds"))
+# }
+
 # submissions layout:
 # assignment:
 #   task:

@@ -9,6 +9,37 @@ styledButton <- function (..., class = "btn btn-default action-button") {
   b
 }
 
+splitDropdownButton <- function( inputId
+                               , label
+                               , actionLinkIds  # Label = id; character vector
+                               , width
+                               , class = "btn btn-default action-button"
+                               ) {
+  
+  div( class = "btn-group"
+     , styledButton(inputId = inputId, label = label, class = class)
+     , tags$button( type            = "button"
+                  , class           = paste(class, "dropdown-toggle")
+                  , `data-toggle`   = "dropdown" 
+                  , `aria-haspopup` = "true" 
+                  , `aria-expanded` = "false"
+                  , tags$span(class = "carret")
+                  , tags$span(class = "sr-only", "Toggle Dropdown")
+                  )
+     , tags$ul( class = "dropdown-menu"
+              , tag( "ul"
+                   , lapply( names(actionLinkIds)
+                           , function(label) {
+                               id <- actionLinkIds[label]
+                               tags$li(actionLink(inputId = id, label = label))
+                             }
+                           )
+                   )
+              )
+     )
+  
+}
+
 instructorServer <- function(pkg, initGrades, submissions) {
   
   pkgPath <- file.path(normalizePath(pkg), "data")
@@ -16,7 +47,7 @@ instructorServer <- function(pkg, initGrades, submissions) {
   
   function(input, output, session) {
     
-    grades <- do.call(reactiveValues, args = initGrades)
+    grades   <- do.call(reactiveValues, args = initGrades)
 
     createGradeBinding <- function(assnName, task, student) {
       if (is.null(grades[[student]])) {
@@ -52,31 +83,46 @@ instructorServer <- function(pkg, initGrades, submissions) {
         }
       })
       
+      clearButtonBinding <- paste("clear", assnName, task, student, sep = "-")
+      
+      gradeButtons <- tag( "div"
+                         , c( lapply( names(config$build$package$grades)
+                                    , function(gradeName) {
+                                        completes     <- config$build$package$grades[[gradeName]]
+                                        buttonBinding <- paste("grade", assnName, task, student, gradeName, sep = "-")
+                                          
+                                        observeEvent(input[[buttonBinding]], {
+                                            
+                                          createGradeBinding(assnName, task, student)
+                                          grades[[student]][[assnName]][[task]]$completed <- completes
+                                          grades[[student]][[assnName]][[task]]$grade     <- gradeName
+                                          grades[[student]][[assnName]][[task]]$taskHASH  <- submissions[[assnName]][[task]][[student]]$taskHASH
+                                            
+                                        })
+                                          
+                                        styledButton( inputId = buttonBinding
+                                                    , label   = gradeName
+                                                    , class   = if (completes) "btn btn-success action-button" else "btn btn-warning action-button" # -warning is more accessible than -danger for R/G
+                                                    , width   = "100px"
+                                                    )
+                                     }
+                                    )
+                            , list(actionButton( inputId = clearButtonBinding
+                                               , label   = "clearFeedback"
+                                               )
+                                  )
+                            )
+                         )
+
       feedbackBinding <- paste("feedback", assnName, task, student, sep = "-")
-      gradeButtons <- do.call( div
-                             , lapply( names(config$build$package$grades)
-                                     , function(gradeName) {
-                                         completes     <- config$build$package$grades[[gradeName]]
-                                         buttonBinding <- paste("grade", assnName, task, student, gradeName, sep = "-")
-
-                                         observeEvent(input[[buttonBinding]], {
-                                           
-                                           createGradeBinding(assnName, task, student)
-                                           grades[[student]][[assnName]][[task]]$completed <- completes
-                                           grades[[student]][[assnName]][[task]]$feedback  <- input[[feedbackBinding]]
-                                           grades[[student]][[assnName]][[task]]$grade     <- gradeName
-                                           grades[[student]][[assnName]][[task]]$taskHASH  <- submissions[[assnName]][[task]][[student]]$taskHASH
-
-                                         })
-
-                                         styledButton( inputId = buttonBinding
-                                                     , label   = gradeName
-                                                     , class   = if (completes) "btn btn-success action-button" else "btn btn-warning action-button" # -warning is more accessible than -danger for R/G
-                                                     )
-                                       }
-                                     )
-                             )
-
+      observe({
+        grades[[student]][[assnName]][[task]]$feedback <- input[[feedbackBinding]]
+      })
+      
+      observeEvent(input[[clearButtonBinding]], {
+        updateTextInput(session, feedbackBinding, value = "")
+      })
+      
       renderUI({
         subm  <- submissions[[assnName]][[task]][[student]]
         grade <- grades[[student]][[assnName]][[task]]
@@ -221,6 +267,9 @@ instructorServer <- function(pkg, initGrades, submissions) {
         message("Saving grades...")
         g <- reactiveValuesToList(grades)
         saveGrades(pkgPath = pkgPath, grades = g)
+        # message("Saving standard feedback...")
+        # f <- reactiveValuesToList(feedback)
+        # saveStandardFeedback(pkgPath = pkgPath, feedback = f)
         message("Saved.")
       })
     }, session = session)
