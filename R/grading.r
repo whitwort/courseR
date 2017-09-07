@@ -232,7 +232,7 @@ collectSubmissions <- function(pkgPath, assignments) {
 getUsernames <- function(pkgPath) {
   config    <- loadConfig(pkgPath)
   subPath   <- file.path(".courseR", config$build$package$name)
-  usernames <- if (config$`student-users` == "*") { 
+  usernames <- if (identical(config$`student-users`, "*")) { 
                  list.dirs(config$`home-directory`, recursive = FALSE, full.names = FALSE)
                } else {
                  config$`student-users`
