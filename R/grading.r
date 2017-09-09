@@ -222,15 +222,6 @@ collectSubmissions <- function(pkgPath, assignments) {
                             
                           }
                           
-                          # if it was graded AND the hash has changed, clear the
-                          # entry from grades
-                          # if (!is.null(grades[[username]][[assignment]][[as.character(taskN)]]) &&
-                          #     grades[[username]][[assignment]][[as.character(taskN)]]$taskHASH != answerRDS$taskHASH[taskN]
-                          # ) { 
-                          #   message("clearing", username, assignment, taskN)
-                          #   grades[[username]][[assignment]][[as.character(taskN)]] <<- NULL
-                          #   
-                          # }
                         }
                       }
                       
