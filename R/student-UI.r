@@ -53,21 +53,26 @@ studentServer <- function(pkg, autoknit, wd) {
       newChecked <- listChecked(pkg)
       for (name in names(checked)) {
         if (!identical(newChecked[[name]], checked[[name]])) {
-          checked[[name]] <- newChecked[[name]]
+          checked[[name]] <<- newChecked[[name]]
         }
       }
 
       newSubmitted <- listSubmitted(pkg)
       for (name in names(submitted)) {
         if (!identical(newSubmitted[[name]], submitted[[name]])) {
-          submitted[[name]] <- newSubmitted[[name]]
+          submitted[[name]] <<- newSubmitted[[name]]
         }
       }
       
-      currGrade <- file.mtime(gradePath)
+      currGrade <- file.mtime(gradePath) # TODO this isn't invalidating assignment pages or the summary table
       if (!identical(currGrade, lastGrade)) {
-        grades    <- do.call(reactiveValues, readRDS(gradePath))
-        lastGrade <- currGrade
+        #grades    <<- do.call(reactiveValues, readRDS(gradePath))
+        newGrades <- readRDS(gradePath)
+        for (name in names(newGrades)) {
+          grades[[name]] <<- newGrades[[name]]
+        }
+        
+        lastGrade <<- currGrade
       }
     })
     
@@ -287,11 +292,19 @@ studentServer <- function(pkg, autoknit, wd) {
     }
     for (name in .listAssignments(pkg)) { output[[paste0('submit', "-", name)]] <- renderSubmit(name) }
     
-    output$status <- shiny::renderTable({
+    output$status <- renderTable({
       
       status <- vapply( .listAssignments(pkg)
                       , function(assignment) {
+                        
+                          submitPanelId <- paste("submit", assignment, sep = "-")
+                          actionLinkId  <- paste("showTab", submitPanelId, sep = "-")
 
+                          observeEvent(input[[actionLinkId]], {
+                            #showTab(inputId = "navpage", target = submitPanelId, select = TRUE)
+                            updateTabsetPanel(session, inputId = 'navpage', selected = submitPanelId)
+                          })
+                          
                           if (is.na(submitted[[paste0(assignment, ".html")]])) {
                             return("")
                           }
@@ -300,14 +313,36 @@ studentServer <- function(pkg, autoknit, wd) {
                           }
                           solutionRDS <- readRDS(rdsPath(assignment, file.path(pkg, "data") , tag = "-solutions"))
                           if (length(grades[[assignment]]) < length(solutionRDS$html)) {
-                            return("Partially graded")
+                            return(
+                              HTML(as.character(tags$a( id    = actionLinkId
+                                                      , href  ="#"
+                                                      , class = "action-button"
+                                                      , style = 'color: #333;'
+                                                      , "Partially graded"
+                                                      )
+                                               )
+                                  )
+                            )
                           }
                           if (!all(vapply(grades[[assignment]], function(x) x$completed, FUN.VALUE = TRUE))) {
-                            "Incomplete"
+                            HTML(as.character(tags$a( id    = actionLinkId
+                                                    , href  ="#"
+                                                    , class = "action-button"
+                                                    , style = 'color: #333;'
+                                                    ,"Incomplete"
+                                                    )
+                                             )
+                                )
                           } else {
-                            "Complete"
+                            HTML(as.character(tags$a( id    = actionLinkId
+                                                    , href  ="#"
+                                                    , class = "action-button"
+                                                    , style = 'color: #333;'
+                                                    , "Complete"
+                                                    )
+                                             )
+                                )
                           }
-                        
                         }
                       , FUN.VALUE = ""
                       )
@@ -319,7 +354,7 @@ studentServer <- function(pkg, autoknit, wd) {
                 , check.names           = FALSE
                 )
       
-    })
+    }, sanitize.text.function = function(x) x )
     
   }
 }

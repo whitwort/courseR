@@ -217,19 +217,20 @@ collectSubmissions <- function(pkgPath, assignments) {
                                                                                   , check     = answerRDS$checks[taskN]
                                                                                   , matches   = answerRDS$matchesKey[taskN]
                                                                                   , lastGrade = grades[[username]][[assignment]][[as.character(taskN)]]
+                                                                                  , changed   = grades[[username]][[assignment]][[as.character(taskN)]]$taskHASH != answerRDS$taskHASH[taskN]
                                                                                   )
                             
                           }
                           
                           # if it was graded AND the hash has changed, clear the
                           # entry from grades
-                          if (!is.null(grades[[username]][[assignment]][[as.character(taskN)]]) &&
-                              grades[[username]][[assignment]][[as.character(taskN)]]$taskHASH != answerRDS$taskHASH[taskN]
-                          ) { 
-                            
-                            grades[[username]][[assignment]][[as.character(taskN)]] <- NULL
-                            
-                          }
+                          # if (!is.null(grades[[username]][[assignment]][[as.character(taskN)]]) &&
+                          #     grades[[username]][[assignment]][[as.character(taskN)]]$taskHASH != answerRDS$taskHASH[taskN]
+                          # ) { 
+                          #   message("clearing", username, assignment, taskN)
+                          #   grades[[username]][[assignment]][[as.character(taskN)]] <<- NULL
+                          #   
+                          # }
                         }
                       }
                       

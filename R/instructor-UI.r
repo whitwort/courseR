@@ -79,26 +79,30 @@ instructorServer <- function(pkg, initGrades, submissions) {
             grades[[student]][[assnName]][[task]]$feedback  <- submissions[[assnName]][[task]][[student]]$check
             grades[[student]][[assnName]][[task]]$grade     <- config$build$package$autograde$fail
             grades[[student]][[assnName]][[task]]$taskHASH  <- submissions[[assnName]][[task]][[student]]$taskHASH
+          } else if (submissions[[assnName]][[task]][[student]]$changed) {
+            grades[[student]][[assnName]][[task]]$feedback <- ""
           }
         }
       })
       
       clearButtonBinding <- paste("clear", assnName, task, student, sep = "-")
+      gradeButtonIds     <- character(0)
       
       gradeButtons <- tag( "div"
                          , c( lapply( names(config$build$package$grades)
                                     , function(gradeName) {
                                         completes     <- config$build$package$grades[[gradeName]]
                                         buttonBinding <- paste("grade", assnName, task, student, gradeName, sep = "-")
-                                          
+                                        gradeButtonIds <<- c(gradeButtonIds, buttonBinding)
+                                        
                                         observeEvent(input[[buttonBinding]], {
-                                            
+                                          
                                           createGradeBinding(assnName, task, student)
                                           grades[[student]][[assnName]][[task]]$completed <- completes
                                           grades[[student]][[assnName]][[task]]$grade     <- gradeName
                                           grades[[student]][[assnName]][[task]]$taskHASH  <- submissions[[assnName]][[task]][[student]]$taskHASH
                                             
-                                        })
+                                        }, priority = 100)
                                           
                                         styledButton( inputId = buttonBinding
                                                     , label   = gradeName
@@ -115,7 +119,7 @@ instructorServer <- function(pkg, initGrades, submissions) {
                          )
 
       feedbackBinding <- paste("feedback", assnName, task, student, sep = "-")
-      observe({
+      observeEvent(input[[feedbackBinding]], {
         grades[[student]][[assnName]][[task]]$feedback <- input[[feedbackBinding]]
       })
       
@@ -124,41 +128,44 @@ instructorServer <- function(pkg, initGrades, submissions) {
       })
       
       renderUI({
-        subm  <- submissions[[assnName]][[task]][[student]]
-        grade <- grades[[student]][[assnName]][[task]]
-
-        disp  <- if (is.null(grade)) {
-                   if(!is.na(subm$check)) {
-                     list(footer = subm$check, class = "warning")
-                   } else if (subm$matches) {
-                     list(footer = "No problems; output matches answer key.", class = "info")
+        for (id in gradeButtonIds) { input[[id]] }
+        
+        isolate({
+          subm  <- submissions[[assnName]][[task]][[student]]
+          grade <- grades[[student]][[assnName]][[task]]
+          
+          disp  <- if (is.null(grade)) {
+                     if(!is.na(subm$check)) {
+                       list(footer = subm$check, class = "warning")
+                     } else if (subm$matches) {
+                       list(footer = "No problems; output matches answer key.", class = "info")
+                     } else {
+                       list(footer = "", class = "default")
+                     }
                    } else {
-                     list(footer = "", class = "default")
+                     if (grade$completed) {
+                       list(footer = grade$feedback, class = "success")
+                     } else {
+                       list(footer = grade$feedback, class = "danger")
+                     }
                    }
-                 } else {
-                   if (grade$completed) {
-                     list(footer = grade$feedback, class = "success")
-                   } else {
-                     list(footer = grade$feedback, class = "danger")
-                   }
-                 }
-
-        panel( heading = fluidRow( column(6, p(student))
-                                          , column(6, span(class = "pull-right", substring(subm$taskHASH, 1, 7)))
-                                          )
-             , body    = HTML(subm$taskHTML)
-             , footer  = div( textAreaInput( inputId = feedbackBinding
-                                           , label  = "Feedback"
-                                           , value  = disp$footer
-                                           )
-                            , gradeButtons
-                            )
-             , class   = disp$class
-             )
-
+  
+          panel( heading = fluidRow( column(6, p(student))
+                                            , column(6, span(class = "pull-right", substring(subm$taskHASH, 1, 7)))
+                                            )
+               , body    = HTML(subm$taskHTML)
+               , footer  = div( textAreaInput( inputId = feedbackBinding
+                                             , label  = "Feedback"
+                                             , value  = disp$footer
+                                             )
+                              , gradeButtons
+                              )
+               , class   = disp$class
+               )
+        })
       })
-
     }
+    
     for (assnName in names(submissions)) {
       for (task in names(submissions[[assnName]])) {
         for (student in names(submissions[[assnName]][[task]])) {
@@ -237,7 +244,7 @@ instructorServer <- function(pkg, initGrades, submissions) {
                                      }
                                    } else {
                                      taskGrades <- vapply( currGrades
-                                                         , function (x) x$completed
+                                                         , function (x) identical(x$completed, TRUE)
                                                          , FUN.VALUE = TRUE
                                                          )
                                      if (all(taskGrades)) {
