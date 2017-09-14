@@ -234,11 +234,19 @@ listSubmitted <- function(pkg, path = studentPath(pkg)) {
 listSources <- function(pkg, path) {
   vapply( splitext(.listAssignments(pkg))
         , function(name) {
-            filePath <- getRMDFile(name, path, exists = FALSE)
-            if (!file.exists(filePath)) {
+          
+            rdsFile <- rdsPath(name, path = studentPath(pkg))
+            rmdFile <- if (file.exists(rdsFile)) {
+                         data <- readRDS(rdsFile)
+                         data$sourceRMD
+                       } else { 
+                         getRMDFile(name, path, exists = FALSE)
+                       }
+
+            if (!file.exists(rmdFile)) {
               as.character(NA)
             } else {
-              hash(filePath)
+              hash(rmdFile)
             }
           }
         , FUN.VALUE = ""
