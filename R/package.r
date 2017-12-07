@@ -188,9 +188,10 @@ publishApp <- function(projectName, remove = TRUE, pkg) {
   
 }
 
-#' Copies any current error logs for your published shiny app into your current
-#' working directory. Note the logs are only available while your app is still
-#' running; once you close the window they will be erased.
+#' Copies any current error logs for your published shiny app into your current 
+#' working directory so that you can view them. Note the source log files are 
+#' only available while your app is still running; when you close the window the
+#' they are erased.
 #' 
 #' @param projectName string with your group's project name.  This must match 
 #'   your group's repository name on GitHub.
@@ -200,7 +201,6 @@ publishApp <- function(projectName, remove = TRUE, pkg) {
 copyErrorLogs <- function(projectName, pkg) {
   config <- loadConfig(file.path(pkg, "data"))
   s <- paste0("cp ", config$build$projects$logPath, projectName, "*.log ./")
-  message("Copying logs from:", s)
+  message("Trying to copy error logs...")
   system(s)
 }
-

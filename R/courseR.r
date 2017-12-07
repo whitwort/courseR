@@ -374,10 +374,11 @@ build <- function(path = getwd(), cleanBuild = FALSE, cleanPreviews = TRUE) {
       ps  <- httr::content( httr::GET(url), as = "parsed")
       
       if (!is.null(ps$message) && ps$message == "Not Found") {
-        stop("Incorrect configuration:  github can't find group `", config$build$projects$githubOrg, "` at API URL `", url, "`")
+        stop("Incorrect configuration: github can't find group `", config$build$projects$githubOrg, "` at API URL `", url, "`")
       }
       
-      if (is.character(ps[[1]])) {  # TODO this is brittle
+      rateLimit <- httr::content(httr::GET("https://api.github.com/rate_limit"), as = "parsed")
+      if (rateLimit$resources$core$remaining < length(ps)) {
         warning("Can't update project page because the github API rate limit had been exceeded.")
       } else {
         pushed_at <- sapply(ps, function(l) { l$pushed_at } )
@@ -392,7 +393,7 @@ build <- function(path = getwd(), cleanBuild = FALSE, cleanPreviews = TRUE) {
                               p$contributors <- httr::content(httr::GET(p$contributors_url), as = "parsed")
                               p
                             }
-                           )
+                          )
         
         renderTemplate( file.path(path, "templates", "site", "projects-page.Rmd")
                       , data = c( config$templates$data
@@ -411,6 +412,7 @@ build <- function(path = getwd(), cleanBuild = FALSE, cleanPreviews = TRUE) {
     }, "cannot rename file")
     
     message("Copying additional files...")
+    
     # remove placeholder markup from assignment files
     for (l in assignments) {
       s <- readFile(file.path(buildPath, "_site", l$file))
