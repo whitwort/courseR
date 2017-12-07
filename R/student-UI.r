@@ -85,14 +85,14 @@ studentServer <- function(pkg, autoknit, wd) {
         newSources <- listSources(pkg, path = wd)
         for (name in names(sources)) {
           if (!identical(newSources[[name]], sources[[name]])) {
-            knitAssignment(name, getRMDFile(name, path = wd))
+            knitAssignment(name, getAssignmentRMD(name, path = wd, pkg))
             sources[[name]] <- newSources[[name]]
           }
         }
       }
     })
     
-    editBtnObservers <- ""
+    # editBtnObservers <- ""
     renderView <- function(name, studentRDS, solutionRDS, editButton = FALSE) {
       s <- studentRDS$html
       s <- gsub("<body>",  "", s, fixed = TRUE)
@@ -133,7 +133,7 @@ studentServer <- function(pkg, autoknit, wd) {
       renderUI({
         if (input$navpage != 'overview') {
 
-          rmdPath        <- getRMDFile(input$navpage, path = wd, exists = FALSE)
+          rmdPath        <- getAssignmentRMD(input$navpage, path = wd, pkg, exists = FALSE)
           studentRDSPath <- rdsPath(input$navpage, path = studentPath(pkg))
 
           if (!file.exists(rmdPath)) {
@@ -222,13 +222,19 @@ studentServer <- function(pkg, autoknit, wd) {
     for (name in .listAssignments(pkg)) {
       # assignment pages
       output[[paste0("check-", name)]]  <- renderCheck(name)
-      
-      # submit button handler
-      observeEvent(input[[paste0("submit-", name)]], {
-        submitAssignment(name, path = wd, pkg = pkg)
-      })
     }
 
+    # submit button observers
+    sub <- lapply( .listAssignments(pkg)
+                 , function(name) {
+                   # submit button handler
+                     btnName <- paste0("submit-", name)
+                     observeEvent(force(input[[btnName]]), {
+                       submitAssignment(name, path = wd, pkg = pkg)
+                     })
+                   }
+                 )
+    
     # edit button observers    
     obs <- lapply( names(.listAssignments(pkg))
                  , function(name) {
@@ -244,15 +250,17 @@ studentServer <- function(pkg, autoknit, wd) {
                                    if (file.exists(studentRDS$sourceRMD)){ 
                                      rmd <- readLines(studentRDS$sourceRMD)
                                      taskLine <- grep(paste0("task=", i), rmd)
+                                     rstudioapi::navigateToFile( studentRDS$sourceRMD
+                                                               , line = if (length(taskLine) > 0) {
+                                                                   taskLine[1] + 1
+                                                                 } else {
+                                                                   1  
+                                                                 }
+                                                               ) 
+                                   } else {
+                                     warning("The source file for this assignment appears to have been deleted.")
                                    }
                                   
-                                   rstudioapi::navigateToFile( studentRDS$sourceRMD
-                                                             , line = if (length(taskLine) > 0) {
-                                                                taskLine[1]
-                                                               } else {
-                                                                1  
-                                                               }
-                                                             ) 
                                  }
                                })
                              }
@@ -305,14 +313,28 @@ studentServer <- function(pkg, autoknit, wd) {
                             updateTabsetPanel(session, inputId = 'navpage', selected = submitPanelId)
                           })
                           
+                          # if there's no submission for this assignment yet
                           if (is.na(submitted[[paste0(assignment, ".html")]])) {
                             return("")
                           }
-                          if (is.null(grades[[assignment]]) || (length(grades[[assignment]]) == 0) ) {
+                          
+                          # if grade entry is null or empty
+                          if ( is.null(grades[[assignment]]) || 
+                               (length(grades[[assignment]]) == 0) 
+                             ) {
                             return("Not yet graded")
                           }
-                          solutionRDS <- readRDS(rdsPath(assignment, file.path(pkg, "data") , tag = "-solutions"))
-                          if (length(grades[[assignment]]) < length(solutionRDS$html)) {
+                          
+                          # if there are fewer task grades than tasks, or the grade and submission taskHASH's don't match
+                          solutionRDS    <- readRDS(rdsPath(assignment, file.path(pkg, "data") , tag = "-solutions"))
+                          studentRDSPath <- rdsPath(assignment, path = file.path(studentPath(pkg), "submitted"))
+                          studentRDS     <- readRDS(studentRDSPath)
+                          
+                          gradeHashes <- vapply(grades[[assignment]], function(x) x$taskHASH, FUN.VALUE = "", USE.NAMES = FALSE)
+
+                          if ( length(grades[[assignment]]) < length(solutionRDS$html) ||
+                               !all(gradeHashes == studentRDS$taskHASH)
+                             ) {
                             return(
                               HTML(as.character(tags$a( id    = actionLinkId
                                                       , href  ="#"
@@ -324,6 +346,8 @@ studentServer <- function(pkg, autoknit, wd) {
                                   )
                             )
                           }
+                          
+                          # if all aren't marked as complete
                           if (!all(vapply(grades[[assignment]], function(x) x$completed, FUN.VALUE = TRUE))) {
                             HTML(as.character(tags$a( id    = actionLinkId
                                                     , href  ="#"
@@ -333,6 +357,8 @@ studentServer <- function(pkg, autoknit, wd) {
                                                     )
                                              )
                                 )
+                            
+                          # if all are
                           } else {
                             HTML(as.character(tags$a( id    = actionLinkId
                                                     , href  ="#"
@@ -347,9 +373,13 @@ studentServer <- function(pkg, autoknit, wd) {
                       , FUN.VALUE = ""
                       )
       
+      subNames    <- paste0(.listAssignments(pkg), ".html")
+      checkedVers <- as.character(reactiveValuesToList(checked)[subNames])
+      subVers     <- as.character(reactiveValuesToList(submitted)[subNames])
+      
       data.frame( Assignment            = .listAssignments(pkg)
-                , `In progress version` = substring(as.character(reactiveValuesToList(checked)), 1, 7)
-                , `Submitted version`   = substring(as.character(reactiveValuesToList(submitted)), 1, 7)
+                , `In progress version` = substring(checkedVers, 1, 7)
+                , `Submitted version`   = substring(subVers, 1, 7)
                 , Status                = status
                 , check.names           = FALSE
                 )

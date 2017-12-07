@@ -209,7 +209,7 @@ collectSubmissions <- function(pkgPath, assignments) {
                           # updated since it was last graded, include this task
                           # among the submissions
                           if (is.null(grades[[username]][[assignment]][[as.character(taskN)]]) ||
-                            grades[[username]][[assignment]][[as.character(taskN)]]$taskHASH != answerRDS$taskHASH[taskN]
+                            !identical(grades[[username]][[assignment]][[as.character(taskN)]]$taskHASH, answerRDS$taskHASH[taskN])
                           ) {
                             
                             submissions[[as.character(taskN)]][[username]] <- list( taskHTML  = answerRDS$taskHTML[[taskN]]

@@ -234,15 +234,7 @@ listSubmitted <- function(pkg, path = studentPath(pkg)) {
 listSources <- function(pkg, path) {
   vapply( splitext(.listAssignments(pkg))
         , function(name) {
-          
-            rdsFile <- rdsPath(name, path = studentPath(pkg))
-            rmdFile <- if (file.exists(rdsFile)) {
-                         data <- readRDS(rdsFile)
-                         data$sourceRMD
-                       } else { 
-                         getRMDFile(name, path, exists = FALSE)
-                       }
-
+            rmdFile <- getAssignmentRMD(name, path, pkg, exists = FALSE)
             if (!file.exists(rmdFile)) {
               as.character(NA)
             } else {

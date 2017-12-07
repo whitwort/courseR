@@ -131,6 +131,20 @@ getRMDFile <- function(name, path, onlyone = TRUE, exists = TRUE) {
   
 }
 
+getAssignmentRMD <- function(name, path, pkg, onlyone = TRUE, exists = TRUE) {
+  rdsFile <- rdsPath(name, path = studentPath(pkg))
+  rmdFile <- if (file.exists(rdsFile)) {
+    data <- readRDS(rdsFile)
+    if (file.exists(data$sourceRMD)) {
+      data$sourceRMD
+    } else {
+      getRMDFile(name, path, onlyone, exists)
+    }
+  } else { 
+    getRMDFile(name, path, onlyone, exists)
+  }
+}
+
 smartSuppress <- function(expr, warningGrep) {
   h <- function(w) {
     if (grepl(warningGrep, w)) {

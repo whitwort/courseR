@@ -40,6 +40,7 @@ build:
   #  githubOrg:   {{name}}-shiny-projects              # github organization where Shiny project repositories are hosted
   #  shinyServer: http://localhost/shiny-server:3838/  # Base URL for the Shiny server that hosts project apps
   #  publishPath: /var/shiny-server/{{name}}/          # path where students should checkout github repos to publish their Shiny apps
+  #  logPath:     /var/log/shiny-server/               # student accounts must be able to read this directory
   
   scripts:      TRUE        # should admin scripts and support files be built to scripts/; TRUE or FALSE
 

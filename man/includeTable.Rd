@@ -23,5 +23,5 @@ the HTML table tagged by htmltools so that it's rendered as HTML when
 }
 \description{
 Use this function with the YML template file created by 
-code{\link{createTable}}.
+code {\link{createTable}}.
 }

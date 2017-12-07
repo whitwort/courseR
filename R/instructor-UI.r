@@ -79,8 +79,6 @@ instructorServer <- function(pkg, initGrades, submissions) {
             grades[[student]][[assnName]][[task]]$feedback  <- submissions[[assnName]][[task]][[student]]$check
             grades[[student]][[assnName]][[task]]$grade     <- config$build$package$autograde$fail
             grades[[student]][[assnName]][[task]]$taskHASH  <- submissions[[assnName]][[task]][[student]]$taskHASH
-          } else if (submissions[[assnName]][[task]][[student]]$changed) {
-            grades[[student]][[assnName]][[task]]$feedback <- ""
           }
         }
       })
@@ -133,23 +131,34 @@ instructorServer <- function(pkg, initGrades, submissions) {
         isolate({
           subm  <- submissions[[assnName]][[task]][[student]]
           grade <- grades[[student]][[assnName]][[task]]
+
+                  # if this task hasn't been graded (either manually or by autograde)
           
-          disp  <- if (is.null(grade)) {
-                     if(!is.na(subm$check)) {
-                       list(footer = subm$check, class = "warning")
-                     } else if (subm$matches) {
-                       list(footer = "No problems; output matches answer key.", class = "info")
-                     } else {
-                       list(footer = "", class = "default")
-                     }
-                   } else {
-                     if (grade$completed) {
-                       list(footer = grade$feedback, class = "success")
-                     } else {
-                       list(footer = grade$feedback, class = "danger")
-                     }
-                   }
-  
+          disp <- if (is.null(grade) || length(grade) < 2) {
+                    list(footer = "", class = "default")
+            
+                  # if it has been graded before
+                  } else {
+                    
+                    # if this submission is the same version that was graded
+                    if (grade$taskHASH == subm$taskHASH) {
+                      
+                      # if the grade is completed show "success"
+                      if (grade$completed) {
+                        list(footer = grade$feedback, class = "success")
+                      
+                      # if the grade is not completed show "danger"  
+                      } else {
+                        list(footer = grade$feedback, class = "danger")
+                      }
+                      
+                    # if this submission is a different version than was graded
+                    } else {
+                      list(footer = "", class = "info")
+                    }
+                    
+                  }
+          
           panel( heading = fluidRow( column(6, p(student))
                                             , column(6, span(class = "pull-right", substring(subm$taskHASH, 1, 7)))
                                             )

@@ -94,10 +94,10 @@ submitAssignment <- function(name, path = getwd(), pkg) {
     stop("It doesn't look like you've ever checked your answers to this assignment.  Please do so with the `checkAssignment` function.")
   }
   
-  file <- getRMDFile(name, path)
   data <- readRDS(source)
+  file <- data$sourceRMD
   
-  if (data$sourceHASH != hash(file)) {
+  if (!file.exists(file) || data$sourceHASH != hash(file)) {
     warning("It looks like you've changed your source file for this assignment since the last time you checked it.  You are currently submitting the last CHECKED version.  You may want to run `checkAssignment` to check your current source file and then resubmit.")
   }
   
@@ -160,7 +160,7 @@ website <- function(pkg) {
 publishApp <- function(projectName, remove = TRUE, pkg) {
   config <- loadConfig(file.path(pkg, "data"))
   
-  basePath <- config$projects$publishPath
+  basePath <- config$build$projects$publishPath
   path     <- file.path(basePath, projectName)
   
   if (dir.exists(path) && remove) {
@@ -181,9 +181,26 @@ publishApp <- function(projectName, remove = TRUE, pkg) {
         )
   
   system(paste0("chmod -R g+w ", path))
+  system(paste0("chown -R :", config$`course-group`, " ", path))
   
   message("If there were no errors, your app was published to:")
   message(paste0(config$projects$shinyServer, projectName, "/"))
   
+}
+
+#' Copies any current error logs for your published shiny app into your current
+#' working directory. Note the logs are only available while your app is still
+#' running; once you close the window they will be erased.
+#' 
+#' @param projectName string with your group's project name.  This must match 
+#'   your group's repository name on GitHub.
+#' @param pkg path to course package
+#'   
+#' @export
+copyErrorLogs <- function(projectName, pkg) {
+  config <- loadConfig(file.path(pkg, "data"))
+  s <- paste0("cp ", config$build$projects$logPath, projectName, "*.log ./")
+  message("Copying logs from:", s)
+  system(s)
 }
 

@@ -87,6 +87,19 @@ website <- function() {
 #' @inheritParams courseR::publishApp
 #'   
 #' @export
-publishApp <- function(...) {
+publishApp <- function(projectName, remove = TRUE) {
   courseR::publishApp(projectName = projectName, remove = remove, pkg = system.file(package = "{{name}}"))
 }
+
+#' Copies any current error logs for your published shiny app into your current
+#' working directory. Note the logs are only available while your app is still
+#' running; once you close the window they will be erased.
+#' 
+#' @inheritParams courseR::copyErrorLogs
+#'   
+#' @export
+copyErrorLogs <- function(projectName) {
+  courseR::copyErrorLogs(projectName, pkg = system.file(package = "{{name}}"))
+}
+
+
