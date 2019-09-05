@@ -426,6 +426,12 @@ build <- function(path = getwd(), cleanBuild = FALSE, cleanPreviews = TRUE) {
              , recursive = TRUE
              )
     
+    # copy img to build/img
+    file.copy( from      = file.path(path, config$build$site$img, "")
+             , to        = buildPath
+             , recursive = TRUE
+             )
+    
     # copy rendered files to the dist path
     sitePath <- file.path(distPath, config$build$site$dist)
     if (!dir.exists(sitePath)) { dir.create(sitePath) }
