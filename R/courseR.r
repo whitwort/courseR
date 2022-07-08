@@ -43,7 +43,7 @@ init <- function( path      = getwd()
   
   if (examples) {
     newContent(file = "01-sample.Rmd", title = "Sample 1", data = "sample.txt", path = path)
-    cat("sample data", file = file.path(path, "data", "sample1.txt"))
+    cat("sample data", file = file.path(path, "sample1.txt"))
     newContent(file = "02-sample.Rmd", title = "Sample 2", path = path)
     newAssignment(file = "03-assignment.Rmd", title = "Assignment 1", path = path)
   }
