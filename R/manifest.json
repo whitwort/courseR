@@ -40,8 +40,8 @@
       "description": {
         "Package": "Rcpp",
         "Title": "Seamless R and C++ Integration",
-        "Version": "1.0.7",
-        "Date": "2021-07-06",
+        "Version": "1.0.8.3",
+        "Date": "2022-03-13",
         "Author": "Dirk Eddelbuettel, Romain Francois, JJ Allaire, Kevin Ushey, Qiang Kou,\n Nathan Russell, Inaki Ucar, Douglas Bates and John Chambers",
         "Maintainer": "Dirk Eddelbuettel <edd@debian.org>",
         "Description": "The 'Rcpp' package provides R functions as well as C++ classes which\n offer a seamless integration of R and C++. Many R data types and objects can be\n mapped back and forth to C++ equivalents which facilitates both writing of new\n code as well as easier integration of third-party libraries. Documentation\n about 'Rcpp' is provided by several vignettes included in this package, via the\n 'Rcpp Gallery' site at <https://gallery.rcpp.org>, the paper by Eddelbuettel and\n Francois (2011, <doi:10.18637/jss.v040.i08>), the book by Eddelbuettel (2013,\n <doi:10.1007/978-1-4614-6868-4>) and the paper by Eddelbuettel and Balamuta (2018,\n <doi:10.1080/00031305.2017.1375990>); see 'citation(\"Rcpp\")' for details.",
@@ -53,10 +53,10 @@
         "MailingList": "rcpp-devel@lists.r-forge.r-project.org",
         "RoxygenNote": "6.1.1",
         "NeedsCompilation": "yes",
-        "Packaged": "2021-07-06 11:37:52 UTC; edd",
+        "Packaged": "2022-03-13 17:40:34 UTC; edd",
         "Repository": "CRAN",
-        "Date/Publication": "2021-07-07 14:30:02 UTC",
-        "Built": "R 4.1.2; x86_64-pc-linux-gnu; 2021-11-11 16:05:28 UTC; unix"
+        "Date/Publication": "2022-03-17 08:30:10 UTC",
+        "Built": "R 4.1.2; x86_64-pc-linux-gnu; 2022-06-08 19:15:07 UTC; unix"
       }
     },
     "askpass": {
@@ -547,8 +547,8 @@
       "description": {
         "Package": "digest",
         "Author": "Dirk Eddelbuettel <edd@debian.org> with contributions \n by Antoine Lucas, Jarek Tuszynski, Henrik Bengtsson, Simon Urbanek,\n Mario Frasca, Bryan Lewis, Murray Stokely, Hannes Muehleisen,\n Duncan Murdoch, Jim Hester, Wush Wu, Qiang Kou, Thierry Onkelinx, \n Michel Lang, Viliam Simko, Kurt Hornik, Radford Neal, Kendon Bell,\n Matthew de Queljoe, Ion Suruceanu, Bill Denney, Dirk Schumacher,\n and Winston Chang.",
-        "Version": "0.6.28",
-        "Date": "2021-09-23",
+        "Version": "0.6.29",
+        "Date": "2021-11-30",
         "Maintainer": "Dirk Eddelbuettel <edd@debian.org>",
         "Title": "Create Compact Hash Digests of R Objects",
         "Description": "Implementation of a function 'digest()' for the creation of hash\n digests of arbitrary R objects (using the 'md5', 'sha-1', 'sha-256', 'crc32',\n 'xxhash', 'murmurhash', 'spookyhash' and 'blake3' algorithms) permitting easy\n comparison of R language objects, as well as functions such as'hmac()' to\n create hash-based message authentication code. Please note that this package\n is not meant to be deployed for cryptographic purposes for which more\n comprehensive (and widely tested) libraries such as 'OpenSSL' should be\n used.",
@@ -557,13 +557,13 @@
         "Depends": "R (>= 3.3.0)",
         "Imports": "utils",
         "License": "GPL (>= 2)",
-        "Suggests": "tinytest, knitr, rmarkdown, minidown",
-        "VignetteBuilder": "knitr",
+        "Suggests": "tinytest, simplermarkdown",
+        "VignetteBuilder": "simplermarkdown",
         "NeedsCompilation": "yes",
-        "Packaged": "2021-09-23 11:04:05 UTC; edd",
+        "Packaged": "2021-11-30 23:41:39 UTC; edd",
         "Repository": "CRAN",
-        "Date/Publication": "2021-09-23 16:50:12 UTC",
-        "Built": "R 4.1.2; x86_64-pc-linux-gnu; 2021-11-04 19:33:56 UTC; unix"
+        "Date/Publication": "2021-12-01 07:40:02 UTC",
+        "Built": "R 4.1.2; x86_64-pc-linux-gnu; 2022-06-08 19:14:22 UTC; unix"
       }
     },
     "ellipsis": {
@@ -932,7 +932,7 @@
         "Type": "Package",
         "Encoding": "UTF-8",
         "Title": "HTTP and WebSocket Server Library",
-        "Version": "1.6.3",
+        "Version": "1.6.5",
         "Authors@R": "c(\n    person(\"Joe\", \"Cheng\", role = c(\"aut\"), email = \"joe@rstudio.com\"),\n    person(\"Winston\", \"Chang\", role = c(\"aut\", \"cre\"), email = \"winston@rstudio.com\"),\n    person(family = \"RStudio, PBC\", role = \"cph\"),\n    person(\"Hector\", \"Corrada Bravo\", role = \"ctb\"),\n    person(\"Jeroen\", \"Ooms\", role = \"ctb\"),\n    person(\"Andrzej\", \"Krzemienski\", role = \"cph\", comment = \"optional.hpp\")\n    )",
         "Copyright": "RStudio, PBC; Joyent, Inc.; Nginx Inc.; Igor Sysoev; Niels\nProvos; Internet Systems Consortium, Inc.; Alexander Chemeris;\nBerkeley Software Design; Google Inc.; Sony Mobile\nCommunications AB; Alexander Peslyak; Free Software Foundation,\nInc.; X Consortium; Ben Noordhuis; StrongLoop, Inc.; Saúl\nIbarra Corretgé; Bert Belder; Fedor Indutny; libuv project;\nRefael Ackermann; Kenneth MacKay; Emergya; Diego Pettenò; xine\nproject, The Regents of the University of California, Dariusz\nDwornikowski",
         "Description": "Provides low-level socket and protocol support for handling\n    HTTP and WebSocket requests directly from within R. It is primarily\n    intended as a building block for other packages, rather than making it\n    particularly easy to create complete web applications using httpuv alone.\n    httpuv is built on top of the libuv and http-parser C libraries, both of\n    which were developed by Joyent, Inc. (See LICENSE file for libuv and\n    http-parser license information.)",
@@ -941,17 +941,17 @@
         "Imports": "Rcpp (>= 1.0.7), utils, R6, promises, later (>= 0.8.0)",
         "LinkingTo": "Rcpp, later",
         "URL": "https://github.com/rstudio/httpuv",
-        "SystemRequirements": "GNU make, C++11",
-        "RoxygenNote": "7.1.1",
+        "SystemRequirements": "GNU make, C++11, zlib",
+        "RoxygenNote": "7.1.2",
         "Suggests": "testthat, callr, curl, websocket",
         "Collate": "'RcppExports.R' 'httpuv.R' 'random_port.R' 'server.R'\n'static_paths.R' 'utils.R'",
         "NeedsCompilation": "yes",
-        "Packaged": "2021-09-09 19:51:31 UTC; winston",
+        "Packaged": "2022-01-04 21:27:22 UTC; winston",
         "Author": "Joe Cheng [aut],\n  Winston Chang [aut, cre],\n  RStudio, PBC [cph],\n  Hector Corrada Bravo [ctb],\n  Jeroen Ooms [ctb],\n  Andrzej Krzemienski [cph] (optional.hpp)",
         "Maintainer": "Winston Chang <winston@rstudio.com>",
         "Repository": "CRAN",
-        "Date/Publication": "2021-09-09 20:30:02 UTC",
-        "Built": "R 4.1.2; x86_64-pc-linux-gnu; 2021-11-11 16:10:15 UTC; unix"
+        "Date/Publication": "2022-01-05 00:40:11 UTC",
+        "Built": "R 4.1.2; x86_64-pc-linux-gnu; 2022-06-08 19:18:09 UTC; unix"
       }
     },
     "httr": {
@@ -1151,24 +1151,26 @@
         "Type": "Package",
         "Package": "magrittr",
         "Title": "A Forward-Pipe Operator for R",
-        "Version": "2.0.1",
-        "Authors@R": "\n    c(person(given = \"Stefan Milton\",\n             family = \"Bache\",\n             role = c(\"aut\", \"cph\"),\n             email = \"stefan@stefanbache.dk\",\n             comment = \"Original author and creator of magrittr\"),\n      person(given = \"Hadley\",\n             family = \"Wickham\",\n             role = \"aut\",\n             email = \"hadley@rstudio.com\"),\n      person(given = \"Lionel\",\n             family = \"Henry\",\n             role = \"cre\",\n             email = \"lionel@rstudio.com\"),\n      person(given = \"RStudio\",\n             role = c(\"cph\", \"fnd\")))",
-        "Description": "Provides a mechanism for chaining commands with a\n    new forward-pipe operator, %>%. This operator will forward a value, or\n    the result of an expression, into the next function call/expression.\n    There is flexible support for the type of right-hand side expressions.\n    For more information, see package vignette.  To quote Rene Magritte,\n    \"Ceci n'est pas un pipe.\"",
+        "Version": "2.0.3",
+        "Authors@R": "c(\n    person(\"Stefan Milton\", \"Bache\", , \"stefan@stefanbache.dk\", role = c(\"aut\", \"cph\"),\n           comment = \"Original author and creator of magrittr\"),\n    person(\"Hadley\", \"Wickham\", , \"hadley@rstudio.com\", role = \"aut\"),\n    person(\"Lionel\", \"Henry\", , \"lionel@rstudio.com\", role = \"cre\"),\n    person(\"RStudio\", role = c(\"cph\", \"fnd\"))\n  )",
+        "Description": "Provides a mechanism for chaining commands with a new\n    forward-pipe operator, %>%. This operator will forward a value, or the\n    result of an expression, into the next function call/expression.\n    There is flexible support for the type of right-hand side expressions.\n    For more information, see package vignette.  To quote Rene Magritte,\n    \"Ceci n'est pas un pipe.\"",
         "License": "MIT + file LICENSE",
         "URL": "https://magrittr.tidyverse.org,\nhttps://github.com/tidyverse/magrittr",
         "BugReports": "https://github.com/tidyverse/magrittr/issues",
+        "Depends": "R (>= 3.4.0)",
         "Suggests": "covr, knitr, rlang, rmarkdown, testthat",
         "VignetteBuilder": "knitr",
         "ByteCompile": "Yes",
+        "Config/Needs/website": "tidyverse/tidytemplate",
         "Encoding": "UTF-8",
-        "RoxygenNote": "7.1.1",
+        "RoxygenNote": "7.1.2",
         "NeedsCompilation": "yes",
-        "Packaged": "2020-11-17 12:44:34 UTC; lionel",
+        "Packaged": "2022-03-29 09:34:37 UTC; lionel",
         "Author": "Stefan Milton Bache [aut, cph] (Original author and creator of\n    magrittr),\n  Hadley Wickham [aut],\n  Lionel Henry [cre],\n  RStudio [cph, fnd]",
         "Maintainer": "Lionel Henry <lionel@rstudio.com>",
         "Repository": "CRAN",
-        "Date/Publication": "2020-11-17 16:20:06 UTC",
-        "Built": "R 4.1.2; x86_64-pc-linux-gnu; 2021-11-04 19:34:03 UTC; unix"
+        "Date/Publication": "2022-03-30 07:30:09 UTC",
+        "Built": "R 4.1.2; x86_64-pc-linux-gnu; 2022-06-08 19:14:01 UTC; unix"
       }
     },
     "markdown": {
@@ -1289,7 +1291,7 @@
         "License": "MIT + file LICENSE",
         "URL": "https://pillar.r-lib.org/, https://github.com/r-lib/pillar",
         "BugReports": "https://github.com/r-lib/pillar/issues",
-        "Imports": "cli (>= 2.3.0), crayon (>= 1.3.4), ellipsis (>= 0.3.2), fansi,\nglue, lifecycle, rlang (>= 0.3.0), utf8 (>= 1.1.0), utils,\nvctrs (>= 0.3.8)",
+        "Imports": "cli (>= 2.3.0), crayon (>= 1.3.4), ellipsis (>= 0.3.2), fansi,\nglue, lifecycle, rlang (>= 1.0.1), utf8 (>= 1.1.0), utils,\nvctrs (>= 0.3.8)",
         "Suggests": "bit64, debugme, DiagrammeR, dplyr, formattable, ggplot2,\nknitr, lubridate, nanotime, nycflights13, palmerpenguins,\nrmarkdown, scales, stringi, survival, testthat (>= 3.1.1),\ntibble, units (>= 0.7.2), vdiffr, withr",
         "VignetteBuilder": "knitr",
         "Encoding": "UTF-8",
@@ -1527,7 +1529,7 @@
         "URL": "http://purrr.tidyverse.org, https://github.com/tidyverse/purrr",
         "BugReports": "https://github.com/tidyverse/purrr/issues",
         "Depends": "R (>= 3.2)",
-        "Imports": "magrittr (>= 1.5), rlang (>= 0.3.1)",
+        "Imports": "magrittr (>= 1.5), rlang (>= 1.0.1)",
         "Suggests": "covr, crayon, dplyr (>= 0.7.8), knitr, rmarkdown, testthat,\ntibble, tidyselect",
         "VignetteBuilder": "knitr",
         "Encoding": "UTF-8",
@@ -1655,29 +1657,31 @@
       "Repository": "https://cran.rstudio.com/",
       "description": {
         "Package": "rlang",
-        "Version": "0.4.12",
+        "Version": "1.0.3",
         "Title": "Functions for Base Types and Core R and 'Tidyverse' Features",
         "Description": "A toolbox for working with base types, core R features\n  like the condition system, and core 'Tidyverse' features like tidy\n  evaluation.",
-        "Authors@R": "c(\n    person(\"Lionel\", \"Henry\", ,\"lionel@rstudio.com\", c(\"aut\", \"cre\")),\n    person(\"Hadley\", \"Wickham\", ,\"hadley@rstudio.com\", \"aut\"),\n    person(given = \"mikefc\",\n           email = \"mikefc@coolbutuseless.com\", \n           role = \"cph\", \n           comment = \"Hash implementation based on Mike's xxhashlite\"),\n    person(given = \"Yann\",\n           family = \"Collet\",\n           role = \"cph\", \n           comment = \"Author of the embedded xxHash library\"),\n    person(\"RStudio\", role = \"cph\")\n    )",
+        "Authors@R": "c(\n    person(\"Lionel\", \"Henry\", ,\"lionel@rstudio.com\", c(\"aut\", \"cre\")),\n    person(\"Hadley\", \"Wickham\", ,\"hadley@rstudio.com\", \"aut\"),\n    person(given = \"mikefc\",\n           email = \"mikefc@coolbutuseless.com\", \n           role = \"cph\", \n           comment = \"Hash implementation based on Mike's xxhashlite\"),\n    person(given = \"Yann\",\n           family = \"Collet\",\n           role = \"cph\", \n           comment = \"Author of the embedded xxHash library\"),\n    person(given = \"RStudio\", role = c(\"cph\", \"fnd\"))\n    )",
         "License": "MIT + file LICENSE",
         "ByteCompile": "true",
         "Biarch": "true",
-        "Depends": "R (>= 3.3.0)",
+        "Depends": "R (>= 3.4.0)",
         "Imports": "utils",
-        "Suggests": "cli, covr, crayon, glue, magrittr, methods, pak, pillar,\nrmarkdown, testthat (>= 3.0.0), vctrs (>= 0.2.3), withr",
+        "Suggests": "cli (>= 3.1.0), covr, crayon, fs, glue, knitr, magrittr,\nmethods, pillar, rmarkdown, stats, testthat (>= 3.0.0), tibble,\nusethis, vctrs (>= 0.2.3), withr",
         "Enhances": "winch",
+        "SystemRequirements": "C++11",
         "Encoding": "UTF-8",
-        "RoxygenNote": "7.1.1",
+        "RoxygenNote": "7.2.0.9000",
         "URL": "https://rlang.r-lib.org, https://github.com/r-lib/rlang",
         "BugReports": "https://github.com/r-lib/rlang/issues",
         "Config/testthat/edition": "3",
+        "Config/Needs/website": "dplyr, tidyverse/tidytemplate",
         "NeedsCompilation": "yes",
-        "Packaged": "2021-10-18 07:25:49 UTC; lionel",
-        "Author": "Lionel Henry [aut, cre],\n  Hadley Wickham [aut],\n  mikefc [cph] (Hash implementation based on Mike's xxhashlite),\n  Yann Collet [cph] (Author of the embedded xxHash library),\n  RStudio [cph]",
+        "Packaged": "2022-06-27 08:52:55 UTC; lionel",
+        "Author": "Lionel Henry [aut, cre],\n  Hadley Wickham [aut],\n  mikefc [cph] (Hash implementation based on Mike's xxhashlite),\n  Yann Collet [cph] (Author of the embedded xxHash library),\n  RStudio [cph, fnd]",
         "Maintainer": "Lionel Henry <lionel@rstudio.com>",
         "Repository": "CRAN",
-        "Date/Publication": "2021-10-18 23:00:02 UTC",
-        "Built": "R 4.1.2; x86_64-pc-linux-gnu; 2021-11-04 19:34:19 UTC; unix"
+        "Date/Publication": "2022-06-27 18:50:02 UTC",
+        "Built": "R 4.1.2; x86_64-pc-linux-gnu; 2022-07-08 14:14:59 UTC; unix"
       }
     },
     "rmarkdown": {
@@ -2502,7 +2506,7 @@
   },
   "files": {
     "app.r": {
-      "checksum": "9f4e96f0aeae0046d7d6f5558301930c"
+      "checksum": "8b14e274d9305ee99e350647bdf5b3c5"
     },
     "assignments.r": {
       "checksum": "b569cd2f7e15ba194819aa7e3a473b86"
