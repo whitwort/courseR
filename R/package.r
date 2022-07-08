@@ -145,7 +145,7 @@ checkAssignments <- function(path = getwd(), autoknit = TRUE, pkg) {
 #' @export
 website <- function(pkg) {
   config <- loadConfig(file.path(pkg, "data"))
-  rstudio::viewer(config$build$site$url)
+  rstudioapi::viewer(config$build$site$url)
 }
 
 #' Publish the current version of a Shiny app project hosted on the course's 
