@@ -1,0 +1,190 @@
+{
+  "version": 1,
+  "locale": "en_US",
+  "platform": "4.1.2",
+  "metadata": {
+    "appmode": "static",
+    "primary_rmd": null,
+    "primary_html": "inst/project-template/templates/init/_navbar.html",
+    "content_category": null,
+    "has_parameters": false
+  },
+  "packages": null,
+  "files": {
+    ".Rbuildignore": {
+      "checksum": "b448807b8fb2d44e049c8d54dc8b2074"
+    },
+    "DESCRIPTION": {
+      "checksum": "aa91614615be5bfbaf9569e7c1084489"
+    },
+    "inst/project-template/templates/init/_navbar.html": {
+      "checksum": "8a7ca2bf5274845fc869df7432905335"
+    },
+    "inst/project-template/templates/init/_site.yml": {
+      "checksum": "9cb5afe7631294fdd064b243296c5e71"
+    },
+    "inst/project-template/templates/init/courseR.yml": {
+      "checksum": "ca8c9386d699199cddb5e9b16f6ce94d"
+    },
+    "inst/project-template/templates/init/footer.html": {
+      "checksum": "9c5688c0f1aa2d6beae9cbd1a0877756"
+    },
+    "inst/project-template/templates/init/index.Rmd": {
+      "checksum": "3845cc1835e60ccb964a4948d4dc96f5"
+    },
+    "inst/project-template/templates/package/DESCRIPTION": {
+      "checksum": "5d617de03eaaa8b8cd5698ed478359b4"
+    },
+    "inst/project-template/templates/package/NAMESPACE": {
+      "checksum": "f4952a5a758aaeaa98846f193e878264"
+    },
+    "inst/project-template/templates/package/R/course.R": {
+      "checksum": "3af2d76563e8f05bfce691a1597a821d"
+    },
+    "inst/project-template/templates/scripts/addusers.sh": {
+      "checksum": "f5479c2f9f567fad77d383b0f385438c"
+    },
+    "inst/project-template/templates/scripts/setpasswd.sh": {
+      "checksum": "286f0a761b354fb3d787014f393cb6d3"
+    },
+    "inst/project-template/templates/scripts/user-list.txt": {
+      "checksum": "e7de2086aad73f248e8b4c7918989d7a"
+    },
+    "inst/project-template/templates/site/assignment-solution.Rmd": {
+      "checksum": "74ffb0043b04a1d93d8647bdad65fe09"
+    },
+    "inst/project-template/templates/site/assignment-tasks.Rmd": {
+      "checksum": "febdf97cf0f30f2f2d6d0f66f5d06532"
+    },
+    "inst/project-template/templates/site/assignment.Rmd": {
+      "checksum": "414b7189d236709ea26462190ec98cfe"
+    },
+    "inst/project-template/templates/site/content-page.Rmd": {
+      "checksum": "78df6c7d8701a87a3e7c1723fd7de25d"
+    },
+    "inst/project-template/templates/site/content-slides.Rmd": {
+      "checksum": "a5a429d2c0be2a4591292bb94768db18"
+    },
+    "inst/project-template/templates/site/content.Rmd": {
+      "checksum": "9acde721483752b1156970127cacd42c"
+    },
+    "inst/project-template/templates/site/includes.html": {
+      "checksum": "66332327eae3d6e83c1389e0ade873b3"
+    },
+    "inst/project-template/templates/site/partials/nav-dropdown-li.html": {
+      "checksum": "06687883b62a7690d71905a308707764"
+    },
+    "inst/project-template/templates/site/projects-page.Rmd": {
+      "checksum": "3f4244901671e8f9045ee8f28d139652"
+    },
+    "inst/project-template/templates/site/table.html": {
+      "checksum": "cb081c7a108e3643aff539f342766092"
+    },
+    "man/assignment.Rd": {
+      "checksum": "5fd32d2c17a70243e7704c58153bc32a"
+    },
+    "man/build.Rd": {
+      "checksum": "87189a25200758b47277a21980aa8cfc"
+    },
+    "man/check_cols.Rd": {
+      "checksum": "cbdb675722460a963139268e73fe9329"
+    },
+    "man/check_final.Rd": {
+      "checksum": "eb25de2f08bed44e490281ac219db450"
+    },
+    "man/check_rows.Rd": {
+      "checksum": "c27277559363704e497140d761f39387"
+    },
+    "man/checkAssignment.Rd": {
+      "checksum": "d363be8a87f02cc13ad525901bb87e15"
+    },
+    "man/checkAssignments.Rd": {
+      "checksum": "ad175e31d0de058eac73af90bd64f3df"
+    },
+    "man/clean.Rd": {
+      "checksum": "273a5a05dd7d02000743444cf5a3ac10"
+    },
+    "man/copyErrorLogs.Rd": {
+      "checksum": "4fdafacbdea38ab9d6b5b3a05281dfc0"
+    },
+    "man/createTable.Rd": {
+      "checksum": "02c266c96d4e04485676ec008bce6442"
+    },
+    "man/includeTable.Rd": {
+      "checksum": "f8df5a36390c6a824644e78f274dfe75"
+    },
+    "man/init.Rd": {
+      "checksum": "72c47922149b3be6d5c111c04721774b"
+    },
+    "man/listAssignments.Rd": {
+      "checksum": "fa90ba0ec3cecd43633c172e367ac003"
+    },
+    "man/newAssignment.Rd": {
+      "checksum": "44b967bc8947fe9a32743a81cd26e881"
+    },
+    "man/newContent.Rd": {
+      "checksum": "4f75ff1c12145b86409e28d887f7182e"
+    },
+    "man/publish.Rd": {
+      "checksum": "eefd246167eb52038ee5999842bea366"
+    },
+    "man/publishApp.Rd": {
+      "checksum": "4ba68738639d9a755029843223d2f02e"
+    },
+    "man/solution.Rd": {
+      "checksum": "9e5d6dc51073eb8f70c41475491d63ef"
+    },
+    "man/startAssignment.Rd": {
+      "checksum": "523ac42f7c15c7003f0fc0c0c660733a"
+    },
+    "man/submitAssignment.Rd": {
+      "checksum": "a4b641833a5a752255975881265f25f9"
+    },
+    "man/website.Rd": {
+      "checksum": "0608fe0f8b9a9d7f80bab8775d15b3c6"
+    },
+    "NAMESPACE": {
+      "checksum": "1bb269a7e429977865c94b742b33d23e"
+    },
+    "R/app.r": {
+      "checksum": "a25f654f349d63b1b2e5eaed7e48c166"
+    },
+    "R/assignments.r": {
+      "checksum": "b569cd2f7e15ba194819aa7e3a473b86"
+    },
+    "R/build.r": {
+      "checksum": "782854026606ee48ee554f145288d163"
+    },
+    "R/courseR.r": {
+      "checksum": "51b3844173a7520d0273f69a2ef63087"
+    },
+    "R/grading.r": {
+      "checksum": "308d235c527bd11552cf69382d154e6d"
+    },
+    "R/instructor-UI.r": {
+      "checksum": "f56ed5f0d09a37595d432599eafc7e1d"
+    },
+    "R/package.r": {
+      "checksum": "625603ea5d581c8134b8392f92ff6b06"
+    },
+    "R/student-UI.r": {
+      "checksum": "ab8815a4fb359365a0fe1ef120a74ac1"
+    },
+    "R/table.r": {
+      "checksum": "e75fefbc223ba48ac7acfe64591a6925"
+    },
+    "R/utils.r": {
+      "checksum": "43a8699cd573385076fc373e062e4f06"
+    },
+    "README.md": {
+      "checksum": "6aee3e47386485fd43cd76adce767e20"
+    },
+    "tests/testthat.R": {
+      "checksum": "9e188c943d68d297663323f2b89ab406"
+    },
+    "tests/testthat/test-end-to-end.R": {
+      "checksum": "b3b03705aa630d81a17a4da303d4d151"
+    }
+  },
+  "users": null
+}

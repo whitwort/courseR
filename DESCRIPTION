@@ -7,27 +7,27 @@ Description: This package implements my workflow for (1) creating websites for
     and (3) provides an interface for students to manage Shiny app projects on 
     github and then deploy them to a Shiny server instance.  Any of these 3 
     components can be disabled.
-Version: 0.5.0
-Date: 2017-08-10
+Version: 0.6.0
+Date: 2022-08-01
 Author: Gregg Whitworth
 Maintainer: Gregg Whitworth <whitworthg@wlu.edu>
 URL: http://github.com/whitwort/courseR
 BugReports: http://github.com/whitwort/courseR/issues
 Imports:
-  revealjs,
-  whisker,
-  yaml,
-  rmarkdown,
-  devtools, 
-  roxygen2,
-  xml2,
-  rvest,
-  httr,
-  magrittr,
-  nycflights13,
-  datasets,
-  shinythemes,
-  stringr
+    revealjs,
+    whisker,
+    yaml,
+    rmarkdown,
+    devtools,
+    roxygen2,
+    xml2,
+    rvest,
+    httr,
+    magrittr,
+    datasets,
+    shinythemes,
+    stringr,
+    pkgload
 Depends:
   shiny,
   shinydashboard
