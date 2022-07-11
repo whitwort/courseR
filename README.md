@@ -56,3 +56,4 @@ There are currently a few components, all of which are configurable from the `co
 ## License
 
 Copyright © 2013-2022 Gregg Whitworth and licensed under [GPLv3](http://www.gnu.org/licenses/gpl-3.0.html).
+
