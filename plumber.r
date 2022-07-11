@@ -14,6 +14,7 @@ getUserMetadata <- function(req) {
 #* @get /hello
 function(req, res){
   user <- getUserMetadata(req)
+  print(user)
   username <- user[["user"]]
   if (!is.null(username)) {
     return(list(message = paste0("So nice to see you, ", username, ".")))
