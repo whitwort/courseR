@@ -1304,6 +1304,38 @@
         "Built": "R 4.1.2; ; 2021-11-11 16:09:56 UTC; unix"
       }
     },
+    "plumber": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com/",
+      "description": {
+        "Encoding": "UTF-8",
+        "Package": "plumber",
+        "Type": "Package",
+        "Title": "An API Generator for R",
+        "Version": "1.1.0",
+        "Authors@R": "c(\n  person(\"Barret\", \"Schloerke\", role = c(\"cre\", \"aut\"), email = \"barret@rstudio.com\"),\n  person(\"Jeff\", \"Allen\", role = c(\"aut\", \"ccp\"), email = \"cran@trestletech.com\"),\n  person(\"Bruno\", \"Tremblay\", role = \"ctb\", email = \"cran@neoxone.com\"),\n  person(\"Frans\", \"van Dunné\", role = \"ctb\", email = \"frans@ixpantia.com\"),\n  person(\"Sebastiaan\", \"Vandewoude\", role=\"ctb\", email = \"sebastiaanvandewoude@gmail.com\"),\n  person(family = \"RStudio\", role = c(\"cph\", \"fnd\")))",
+        "License": "MIT + file LICENSE",
+        "BugReports": "https://github.com/rstudio/plumber/issues",
+        "URL": "https://www.rplumber.io, https://github.com/rstudio/plumber",
+        "Description": "Gives the ability to automatically generate and serve an HTTP API\n    from R functions using the annotations in the R documentation around your\n    functions.",
+        "Depends": "R (>= 3.0.0)",
+        "Imports": "R6 (>= 2.0.0), stringi (>= 0.3.0), jsonlite (>= 0.9.16),\nwebutils (>= 1.1), httpuv (>= 1.5.0), crayon, promises (>=\n1.1.0), sodium, swagger (>= 3.33.0), magrittr, mime, lifecycle\n(>= 0.2.0), ellipsis (>= 0.3.0), rlang",
+        "LazyData": "TRUE",
+        "ByteCompile": "TRUE",
+        "Suggests": "testthat (>= 0.11.0), rmarkdown, base64enc, htmlwidgets,\nvisNetwork, later, readr, yaml, feather, future, rstudioapi,\nspelling, mockery (>= 0.4.2)",
+        "RoxygenNote": "7.1.1",
+        "Collate": "'async.R' 'content-types.R' 'default-handlers.R' 'hookable.R'\n'shared-secret-filter.R' 'parser-cookie.R' 'parse-body.R'\n'parse-query.R' 'plumber.R' 'deprecated-R6.R' 'deprecated.R'\n'digital-ocean.R' 'find-port.R' 'globals.R' 'includes.R'\n'json.R' 'new-rstudio-project.R' 'openapi-spec.R'\n'openapi-types.R' 'options_plumber.R' 'paths.R' 'plumb-block.R'\n'plumb-globals.R' 'plumb.R' 'plumber-response.R'\n'plumber-static.R' 'plumber-step.R' 'pr.R' 'pr_set.R'\n'serializer.R' 'session-cookie.R' 'ui.R' 'utf8.R'\n'utils-pipe.R' 'utils.R' 'validate_api_spec.R' 'zzz.R'",
+        "RdMacros": "lifecycle",
+        "Language": "en-US",
+        "NeedsCompilation": "no",
+        "Packaged": "2021-03-23 19:45:36 UTC; barret",
+        "Author": "Barret Schloerke [cre, aut],\n  Jeff Allen [aut, ccp],\n  Bruno Tremblay [ctb],\n  Frans van Dunné [ctb],\n  Sebastiaan Vandewoude [ctb],\n  RStudio [cph, fnd]",
+        "Maintainer": "Barret Schloerke <barret@rstudio.com>",
+        "Repository": "CRAN",
+        "Date/Publication": "2021-03-24 05:10:02 UTC",
+        "Built": "R 4.1.2; ; 2021-12-09 18:00:28 UTC; unix"
+      }
+    },
     "praise": {
       "Source": "CRAN",
       "Repository": "https://cran.rstudio.com/",
@@ -1955,6 +1987,31 @@
         "Built": "R 4.1.2; ; 2021-11-11 16:18:03 UTC; unix"
       }
     },
+    "sodium": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com/",
+      "description": {
+        "Package": "sodium",
+        "Type": "Package",
+        "Title": "A Modern and Easy-to-Use Crypto Library",
+        "Version": "1.2.0",
+        "Author": "Jeroen Ooms",
+        "Maintainer": "Jeroen Ooms <jeroen@berkeley.edu>",
+        "Description": "Bindings to 'libsodium': a modern, easy-to-use software library for\n    encryption, decryption, signatures, password hashing and more. Sodium uses\n    curve25519, a state-of-the-art Diffie-Hellman function by Daniel Bernstein,\n    which has become very popular after it was discovered that the NSA had\n    backdoored Dual EC DRBG.",
+        "License": "MIT + file LICENSE",
+        "URL": "https://github.com/jeroen/sodium (devel)\nhttps://doc.libsodium.org/ (upstream)",
+        "BugReports": "https://github.com/jeroen/sodium/issues",
+        "SystemRequirements": "libsodium (>= 1.0.3)",
+        "VignetteBuilder": "knitr",
+        "Suggests": "knitr, rmarkdown",
+        "RoxygenNote": "7.1.1",
+        "NeedsCompilation": "yes",
+        "Packaged": "2021-10-21 14:23:28 UTC; jeroen",
+        "Repository": "CRAN",
+        "Date/Publication": "2021-10-21 15:00:02 UTC",
+        "Built": "R 4.1.2; x86_64-pc-linux-gnu; 2021-12-09 18:00:22 UTC; unix"
+      }
+    },
     "sourcetools": {
       "Source": "CRAN",
       "Repository": "https://cran.rstudio.com/",
@@ -2035,6 +2092,32 @@
         "Repository": "CRAN",
         "Date/Publication": "2019-02-10 03:40:03 UTC",
         "Built": "R 4.1.2; ; 2021-11-11 16:09:43 UTC; unix"
+      }
+    },
+    "swagger": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com/",
+      "description": {
+        "Package": "swagger",
+        "Type": "Package",
+        "Title": "Dynamically Generates Documentation from a 'Swagger' Compliant\nAPI",
+        "Version": "3.33.1",
+        "Authors@R": "c(\n    person(\"Barret\", \"Schloerke\", email = \"barret@rstudio.com\", role = c(\"cre\", \"aut\")),\n    person(\"Javier\", \"Luraschi\", email = \"javier@rstudio.com\", role = c(\"aut\")),\n    person(family = \"RStudio\", role = c(\"cph\")),\n    person(family = \"SmartBear Software\", role = c(\"aut\", \"cph\"))\n    )",
+        "Suggests": "jsonlite, plumber, testthat",
+        "Description": "A collection of 'HTML', 'JavaScript', and 'CSS' assets that\n  dynamically generate beautiful documentation from a 'Swagger' compliant API:\n  <https://swagger.io/specification/>.",
+        "License": "Apache License 2.0 | file LICENSE",
+        "Encoding": "UTF-8",
+        "LazyData": "true",
+        "URL": "https://github.com/rstudio/swagger",
+        "BugReports": "https://github.com/rstudio/swagger/issues",
+        "RoxygenNote": "7.1.1",
+        "NeedsCompilation": "no",
+        "Packaged": "2020-10-02 20:56:03 UTC; barret",
+        "Author": "Barret Schloerke [cre, aut],\n  Javier Luraschi [aut],\n  RStudio [cph],\n  SmartBear Software [aut, cph]",
+        "Maintainer": "Barret Schloerke <barret@rstudio.com>",
+        "Repository": "CRAN",
+        "Date/Publication": "2020-10-02 21:10:02 UTC",
+        "Built": "R 4.1.2; ; 2021-12-09 17:56:54 UTC; unix"
       }
     },
     "sys": {
@@ -2263,6 +2346,31 @@
         "Built": "R 4.1.2; ; 2021-11-11 16:16:44 UTC; unix"
       }
     },
+    "webutils": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com/",
+      "description": {
+        "Package": "webutils",
+        "Type": "Package",
+        "Title": "Utility Functions for Developing Web Applications",
+        "Version": "1.1",
+        "Author": "Jeroen Ooms",
+        "Maintainer": "Jeroen Ooms <jeroen@berkeley.edu>",
+        "Description": "Parses http request data in application/json, multipart/form-data, \n    or application/x-www-form-urlencoded format. Includes example of hosting\n    and parsing html form data in R using either 'httpuv' or 'Rhttpd'.",
+        "License": "MIT + file LICENSE",
+        "URL": "https://github.com/jeroen/webutils",
+        "BugReports": "https://github.com/jeroen/webutils/issues",
+        "Imports": "curl (>= 2.5), jsonlite",
+        "Suggests": "httpuv, testthat",
+        "RoxygenNote": "7.0.2",
+        "Language": "en-US",
+        "NeedsCompilation": "yes",
+        "Packaged": "2020-04-28 20:22:33 UTC; jeroen",
+        "Repository": "CRAN",
+        "Date/Publication": "2020-04-28 21:00:02 UTC",
+        "Built": "R 4.1.2; x86_64-pc-linux-gnu; 2021-12-09 17:56:48 UTC; unix"
+      }
+    },
     "whisker": {
       "Source": "CRAN",
       "Repository": "https://cran.rstudio.com/",
@@ -2477,7 +2585,7 @@
       "checksum": "b448807b8fb2d44e049c8d54dc8b2074"
     },
     "DESCRIPTION": {
-      "checksum": "aa91614615be5bfbaf9569e7c1084489"
+      "checksum": "1f57bc512fdb5295bf19f8a49f458261"
     },
     "inst/project-template/templates/init/_navbar.html": {
       "checksum": "8a7ca2bf5274845fc869df7432905335"
