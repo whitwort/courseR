@@ -3,7 +3,7 @@
   "locale": "en_US",
   "platform": "4.1.2",
   "metadata": {
-    "appmode": "shiny",
+    "appmode": "api",
     "primary_rmd": null,
     "primary_html": null,
     "content_category": null,
@@ -2478,9 +2478,6 @@
     ".Rbuildignore": {
       "checksum": "b448807b8fb2d44e049c8d54dc8b2074"
     },
-    "app.r": {
-      "checksum": "021f987937c712af296c4ed1a3fe856a"
-    },
     "DESCRIPTION": {
       "checksum": "aa91614615be5bfbaf9569e7c1084489"
     },
@@ -2613,6 +2610,9 @@
     "NAMESPACE": {
       "checksum": "1bb269a7e429977865c94b742b33d23e"
     },
+    "plumber.r": {
+      "checksum": "412e90e9de76b667e55a165751751e5f"
+    },
     "R/.gitignore": {
       "checksum": "a2d4e4ffea052bf260c4a00fd225f1d6"
     },
@@ -2621,6 +2621,9 @@
     },
     "R/build.r": {
       "checksum": "782854026606ee48ee554f145288d163"
+    },
+    "R/connect-app.r": {
+      "checksum": "cf31bbd6fb115930e6677fcd7dd0eae5"
     },
     "R/courseR.r": {
       "checksum": "40a3f8c36d3a27f81769251d13af8e8f"
@@ -2644,7 +2647,94 @@
       "checksum": "43a8699cd573385076fc373e062e4f06"
     },
     "README.md": {
-      "checksum": "6aee3e47386485fd43cd76adce767e20"
+      "checksum": "dc5e1acd59dd7842ccccb98618930a32"
+    },
+    "tests/.gitignore": {
+      "checksum": "188a0ff1e830261d0253b185a1c0f94f"
+    },
+    "tests/temp/_navbar.html": {
+      "checksum": "3b0fcf52dded46a81f3218bc97aab31b"
+    },
+    "tests/temp/_site.yml": {
+      "checksum": "e42ddb69399a560f39ae7ba094b28ccb"
+    },
+    "tests/temp/01-sample.Rmd": {
+      "checksum": "d372d1574db4f1ca371ba9265ddbb021"
+    },
+    "tests/temp/02-sample.Rmd": {
+      "checksum": "360f071b44ee92744aee677ebd26f32d"
+    },
+    "tests/temp/03-assignment.Rmd": {
+      "checksum": "137afa50825cbcfc0267eaab68f6b78b"
+    },
+    "tests/temp/courseR.yml": {
+      "checksum": "3ec6d47854464b9c63330e03d6394d16"
+    },
+    "tests/temp/footer.html": {
+      "checksum": "5ac6870398cb8208b5e484dce6720d15"
+    },
+    "tests/temp/index.Rmd": {
+      "checksum": "03b9c83b8bf2c1fb3abe0901fdfa25e4"
+    },
+    "tests/temp/package/DESCRIPTION": {
+      "checksum": "431de7bde551abeedfa6ba43055ac3f5"
+    },
+    "tests/temp/package/NAMESPACE": {
+      "checksum": "f4952a5a758aaeaa98846f193e878264"
+    },
+    "tests/temp/package/R/course.R": {
+      "checksum": "23d108b85fce4fdd77631c16ba96715a"
+    },
+    "tests/temp/sample1.txt": {
+      "checksum": "26e078b87fdaa3206ab8bf63a6096c07"
+    },
+    "tests/temp/templates/package/DESCRIPTION": {
+      "checksum": "5d617de03eaaa8b8cd5698ed478359b4"
+    },
+    "tests/temp/templates/package/NAMESPACE": {
+      "checksum": "f4952a5a758aaeaa98846f193e878264"
+    },
+    "tests/temp/templates/package/R/course.R": {
+      "checksum": "3af2d76563e8f05bfce691a1597a821d"
+    },
+    "tests/temp/templates/scripts/addusers.sh": {
+      "checksum": "f5479c2f9f567fad77d383b0f385438c"
+    },
+    "tests/temp/templates/scripts/setpasswd.sh": {
+      "checksum": "286f0a761b354fb3d787014f393cb6d3"
+    },
+    "tests/temp/templates/scripts/user-list.txt": {
+      "checksum": "e7de2086aad73f248e8b4c7918989d7a"
+    },
+    "tests/temp/templates/site/assignment-solution.Rmd": {
+      "checksum": "74ffb0043b04a1d93d8647bdad65fe09"
+    },
+    "tests/temp/templates/site/assignment-tasks.Rmd": {
+      "checksum": "febdf97cf0f30f2f2d6d0f66f5d06532"
+    },
+    "tests/temp/templates/site/assignment.Rmd": {
+      "checksum": "414b7189d236709ea26462190ec98cfe"
+    },
+    "tests/temp/templates/site/content-page.Rmd": {
+      "checksum": "78df6c7d8701a87a3e7c1723fd7de25d"
+    },
+    "tests/temp/templates/site/content-slides.Rmd": {
+      "checksum": "a5a429d2c0be2a4591292bb94768db18"
+    },
+    "tests/temp/templates/site/content.Rmd": {
+      "checksum": "9acde721483752b1156970127cacd42c"
+    },
+    "tests/temp/templates/site/includes.html": {
+      "checksum": "66332327eae3d6e83c1389e0ade873b3"
+    },
+    "tests/temp/templates/site/partials/nav-dropdown-li.html": {
+      "checksum": "06687883b62a7690d71905a308707764"
+    },
+    "tests/temp/templates/site/projects-page.Rmd": {
+      "checksum": "3f4244901671e8f9045ee8f28d139652"
+    },
+    "tests/temp/templates/site/table.html": {
+      "checksum": "cb081c7a108e3643aff539f342766092"
     },
     "tests/testthat.R": {
       "checksum": "9e188c943d68d297663323f2b89ab406"
