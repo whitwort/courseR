@@ -30,9 +30,6 @@ function(req, res) {
 }
 
 #* @get /files
-function(req, res) {
-  list( path = list.files()
-      , parent = list.files("../")
-      , grandparent = list.files("../../")
-      )
+function(path = ".") {
+  list.files(path)
 }
