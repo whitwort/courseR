@@ -14,12 +14,13 @@ getUserMetadata <- function(req) {
 #* @get /hello
 function(req, res){
   user <- getUserMetadata(req)
-  username <- user[["user"]]
-  if (!is.null(username)) {
-    list(message = paste0("So nice to see you, ", username, "."))
-  } else {
-    list(message = paste0("Howdy, stranger."))
-  }
+  user
+  # username <- user[["user"]]
+  # if (!is.null(username)) {
+  #   list(message = paste0("So nice to see you, ", username, "."))
+  # } else {
+  #   list(message = paste0("Howdy, stranger."))
+  # }
 }
    
 #* @get /static
