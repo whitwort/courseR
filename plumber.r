@@ -34,3 +34,8 @@ function(req, res) {
 function(path = ".") {
   list.files(path)
 }
+
+#* @get /env
+function(req, res) {
+  names(Sys.getenv())
+}
