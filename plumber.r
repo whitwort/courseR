@@ -14,11 +14,25 @@ getUserMetadata <- function(req) {
 #* @get /hello
 function(req, res){
   user <- getUserMetadata(req)
-  print(user)
   username <- user[["user"]]
   if (!is.null(username)) {
-    return(list(message = paste0("So nice to see you, ", username, ".")))
+    list(message = paste0("So nice to see you, ", username, "."))
   } else {
-    return(list(message = paste0("Howdy, stranger.")))
+    list(message = paste0("Howdy, stranger."))
   }
+}
+   
+#* @get /static
+#* @serializer html
+function(req, res) {
+  s <- readLines("inst/project-template/templates/site/table.html")
+  paste0(s, collapse = "\n")
+}
+
+#* @get /files
+function(req, res) {
+  list( path = list.files()
+      , parent = list.files("../")
+      , grandparent = list.files("../../")
+      )
 }
